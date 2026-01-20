@@ -1,0 +1,6 @@
+requests
+sqlalchemy
+psycopg2-binary
+pydantic
+pydantic[email]
+aws-lambda-powertools>=2.43.0

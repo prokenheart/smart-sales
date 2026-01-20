@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  smart-sales
+
+  Sample SAM Template for smart-sales
+
+Parameters:
+  DB_DRIVER:
+    Type: String
+    Description: The database driver to use (e.g., 'sqlite', 'postgresql', 'mysql', etc.)
+  DB_USER:
+    Type: String
+    Description: The database username
+  DB_PASSWORD:
+    Type: String
+    Description: The database password
+  DB_HOST:
+    Type: String
+    Description: The database host address
+  DB_PORT:
+    Type: String
+    Description: The database port number
+  DB_NAME:
+    Type: String
+    Description: The database name
+  
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 20
+
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: JSON
+Resources:
+  SmartSalesFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: app/
+      Handler: main.lambda_handler
+      Runtime: python3.12
+      Architectures:
+      - x86_64
+      Environment:
+        Variables:
+          DB_DRIVER: !Ref DB_DRIVER
+          DB_USER: !Ref DB_USER
+          DB_PASSWORD: !Ref DB_PASSWORD
+          DB_HOST: !Ref DB_HOST
+          DB_PORT: !Ref DB_PORT
+          DB_NAME: !Ref DB_NAME
+      Events:
+        Test:
+          Type: Api
+          Properties:
+            Path: /test-dynamic/{id}
+            Method: get
+        CreateCustomer:
+          Type: Api
+          Properties:
+            Path: /customers
+            Method: post
+        GetAllCustomers:
+          Type: Api
+          Properties:
+            Path: /customers
+            Method: get
+        GetCustomer:
+          Type: Api
+          Properties:
+            Path: /customers/{customer_id}
+            Method: get
+        UpdateCustomer:
+          Type: Api
+          Properties:
+            Path: /customers/{customer_id}
+            Method: put
+        DeleteCustomer:
+          Type: Api
+          Properties:
+            Path: /customers/{customer_id}
+            Method: delete
+        CreateStatus:
+          Type: Api
+          Properties:
+            Path: /statuses
+            Method: post
+        GetAllStatuss:
+          Type: Api
+          Properties:
+            Path: /statuses
+            Method: get
+        GetStatus:
+          Type: Api
+          Properties:
+            Path: /statuses/{status_id}
+            Method: get
+        UpdateStatus:
+          Type: Api
+          Properties:
+            Path: /statuses/{status_id}
+            Method: put
+        DeleteStatus:
+          Type: Api
+          Properties:
+            Path: /statuses/{status_id}
+            Method: delete
+        CreateProduct:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: post
+        GetAllProducts:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: get
+        GetProduct:
+          Type: Api
+          Properties:
+            Path: /products/{product_id}
+            Method: get
+        UpdateProduct:
+          Type: Api
+          Properties:
+            Path: /products/{product_id}
+            Method: put
+        DeleteProduct:
+          Type: Api
+          Properties:
+            Path: /products/{product_id}
+            Method: delete        
+        CreatePrice:
+          Type: Api
+          Properties:
+            Path: /prices
+            Method: post
+        GetAllPrices:
+          Type: Api
+          Properties:
+            Path: /prices
+            Method: get
+        GetPrice:
+          Type: Api
+          Properties:
+            Path: /prices/{price_id}
+            Method: get
+        UpdatePrice:
+          Type: Api
+          Properties:
+            Path: /prices/{price_id}
+            Method: put
+        DeletePrice:
+          Type: Api
+          Properties:
+            Path: /prices/{price_id}
+            Method: delete          
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  HelloWorldApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World 
+      function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/hello/"
+  HelloWorldFunction:
+    Description: Hello World Lambda Function ARN
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value: !GetAtt HelloWorldFunctionRole.Arn
