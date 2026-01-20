@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from models import Product
-from schemas.product import ProductCreate, ProductUpdate
 import uuid
 
 def create_product(
