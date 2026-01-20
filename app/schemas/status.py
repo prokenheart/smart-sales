@@ -9,6 +9,9 @@ class StatusBase(BaseModel):
 class StatusCreate(StatusBase):
     pass
 
+class StatusIdPath(BaseModel):
+    status_id: uuid.UUID
+
 class StatusResponse(StatusBase):
     status_id: uuid.UUID
     updated_at: datetime
