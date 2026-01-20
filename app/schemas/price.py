@@ -13,6 +13,9 @@ class PriceBase(BaseModel):
 class PriceCreate(PriceBase):
     pass
 
+class PriceIdPath(BaseModel):
+    price_id: uuid.UUID
+
 class PriceResponse(PriceBase):
     price_id: uuid.UUID
     updated_at: datetime

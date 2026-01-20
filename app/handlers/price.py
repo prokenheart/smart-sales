@@ -1,7 +1,17 @@
-import json
-import uuid
+from pydantic import ValidationError
+import re
+from enum import Enum
 from database import SessionLocal
-from schemas.price import PriceCreate, PriceUpdate
+from logger import logger
+from schemas.price import (
+    PriceCreate,
+    PriceIdPath,
+    PriceResponse,
+    PriceUpdate
+)
+
+from schemas.product import ProductIdPath
+
 from services.price import (
     create_price,
     get_price,
@@ -13,118 +23,206 @@ from services.price import (
 
 from core.response import success, error
 
-def create_price_handler(event):
+def create_price_handler(body: dict):
+    if body is None:
+        return error(
+            message="Request body is required",
+            status_code=400
+        )
+    try:
+        data = PriceCreate.model_validate(body)
+    except ValidationError as e:
+        return error(
+            message="Invalid request body",
+            status_code=400,
+            details=e.errors()
+        )
+        
     db = SessionLocal()
     try:
-        body = json.loads(event["body"])
-        data = PriceCreate(**body)
+        price = create_price(
+            db,
+            data.product_id,
+            data.price_amount,
+            data.price_date
+        )
 
-        price = create_price(db, data)
-        return success(price, price_code=201)
-
+        response = PriceResponse.model_validate(price)
+        return success(
+            data=response,
+            status_code=201
+        )
+    
     except Exception as e:
-        return error(500, "Internal server error")
+        return error(
+            message="Internal server error",
+            status_code=500,
+            details=str(e)
+        )
 
     finally:
         db.close()
 
-def get_price_handler(event):
+def get_price_handler(price_id: str):
+    try:
+        price_id = PriceIdPath.model_validate({"price_id": price_id}).price_id
+    except ValidationError:
+            return error(
+                message="Invalid price_id",
+                status_code=400
+            )
+    
     db = SessionLocal()
     try:
-        price_id = uuid.UUID(event["pathParameters"]["price_id"])
         price = get_price(db, price_id)
-
         if not price:
-            return error(404, "Price not found")
+            return error(
+                message="Price not found",
+                status_code=404
+            )
+        
+        response = PriceResponse.model_validate(price)
 
-        return success(price)
-
-    except ValueError:
-        return error(400, "Invalid price ID format")
+        return success(response)
 
     except Exception as e:
-        return error(500, "Internal server error")
+        return error(
+            message="Internal server error",
+            status_code=500,
+            details=str(e)
+        )
 
     finally:
         db.close()
 
-def get_price_by_product_handler(event):
-    db = SessionLocal()
-    try:
-        product_id = uuid.UUID(event["pathParameters"]["product_id"])
-        prices = get_prices_by_product(db, product_id)
-
-        return success(prices)
-
-    except ValueError:
-        return error(400, "Invalid product ID format")
-
-    except Exception as e:
-        return error(500, "Internal server error")
-
-    finally:
-        db.close()
-
-def get_all_prices_handler(event):
+def get_all_prices_handler():
     db = SessionLocal()
     try:
         prices = get_all_prices(db)
-        return success(prices)
+        return success([
+            PriceResponse.model_validate(price) for price in prices
+        ])
 
     except Exception as e:
-        return error(500, "Internal server error")
+        return error(
+            message="Internal server error",
+            status_code=500,
+            details=str(e)
+        )
 
     finally:
         db.close()
 
-
-def update_price_handler(event):
+def get_prices_by_product_handler(product_id: str):
+    try:
+        product_id = ProductIdPath.model_validate({"product_id": product_id}).product_id
+    except ValidationError as e:
+        return error(
+            message="Invalid product_id",
+            status_code=400,
+            details=e.errors()
+        )
+        
     db = SessionLocal()
     try:
-        price_id = uuid.UUID(event["pathParameters"]["price_id"])
-        body = json.loads(event["body"])
-        data = PriceUpdate(**body)
+        prices = get_prices_by_product(db, product_id)
+        return success([
+            PriceResponse.model_validate(price) for price in prices
+        ])
+    
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=500,
+            details=str(e)
+        )
 
-        price = update_price(db, price_id, data)
+    finally:
+        db.close()
+
+def update_price_handler(price_id: str, body: dict):
+    if body is None:
+        return error(
+            message="Request body is required",
+            status_code=400
+        )
+    try:
+        price_id = PriceIdPath.model_validate({"price_id": price_id}).price_id
+    except ValidationError as e:
+        return error(
+            message="Invalid price_id",
+            status_code=400,
+            details=e.errors()
+        )
+    
+    try:
+        data = PriceUpdate.model_validate(body)
+    except ValidationError as e:
+        return error(
+            message="Invalid request body",
+            status_code=400,
+            details=e.errors()
+        )
+    
+    db = SessionLocal()
+    try:
+        price = update_price(
+            db,
+            price_id,
+            data.product_id,
+            data.price_amount,
+            data.price_date
+        )
 
         if not price:
-            return error(404, "Price not found")
-
-        return success(price)
-
-    except ValueError:
-        return error(400, "Invalid price ID format")
+            return error(
+                message="Price not found",
+                status_code=404
+            )
+        
+        response = PriceResponse.model_validate(price)
+        return success(response)
 
     except Exception as e:
-        return error(500, "Internal server error")
+        return error(
+            message="Internal server error",
+            status_code=500,
+            details=str(e)
+        )
 
     finally:
         db.close()
 
-def delete_price_handler(event):
+def delete_price_handler(price_id: str):
+    try:
+        price_id = PriceIdPath.model_validate({"price_id": price_id}).price_id
+    except ValidationError as e:
+        return error(
+            message="Invalid price_id",
+            status_code=400,
+            details=e.errors()
+        )
+    
     db = SessionLocal()
     try:
-        price_id = uuid.UUID(event["pathParameters"]["price_id"])
         deleted_id = delete_price(db, price_id)
 
         if not deleted_id:
-            return error(404, "Price not found")
+            return error(
+                message="Price not found",
+                status_code=404
+            )
 
-        return success({"deleted_price_id": str(deleted_id)})
-
-    except ValueError:
-        return error(400, "Invalid price ID format")
+        return success(
+            data={"price_id": str(deleted_id)}
+        )
 
     except Exception as e:
-        return error(500, "Internal server error")
+        return error(
+            message="Internal server error",
+            status_code=500,
+            details=str(e)
+        )
 
     finally:
         db.close()
-
-def get_prices_collection_handler(event):
-    query = event.get("queryStringParameters") or {}
-
-    if "product_id" in query:
-        return get_price_by_product_handler(event)
-    
-    return get_all_prices_handler(event)

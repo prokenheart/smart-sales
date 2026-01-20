@@ -52,11 +52,6 @@ Resources:
           DB_PORT: !Ref DB_PORT
           DB_NAME: !Ref DB_NAME
       Events:
-        Test:
-          Type: Api
-          Properties:
-            Path: /test-dynamic/{id}
-            Method: get
         CreateCustomer:
           Type: Api
           Properties:

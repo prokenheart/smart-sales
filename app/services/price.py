@@ -1,15 +1,19 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from models import Price
-from schemas.price import PriceCreate, PriceUpdate
 import uuid
 
 
-def create_price(db: Session, data: PriceCreate) -> Price:
+def create_price(
+        db: Session,
+        product_id: str,
+        price_amount: str,
+        price_date: str
+    ) -> Price:
     price = Price(
-        product_id=data.product_id,
-        price_amount=data.price_amount,
-        price_date=data.price_date
+        product_id=product_id,
+        price_amount=price_amount,
+        price_date=price_date
     )
     db.add(price)
     db.commit()
@@ -28,17 +32,23 @@ def get_all_prices(db: Session) -> list[Price]:
     stmt = select(Price)
     return db.execute(stmt).scalars().all()
 
-def update_price(db: Session, price_id: uuid.UUID, data: PriceUpdate) -> Price | None:
+def update_price(
+        db: Session,
+        price_id: uuid.UUID,
+        product_id: str,
+        price_amount: str,
+        price_date: str
+    ) -> Price | None:
     price = get_price(db, price_id)
     if not price:
         return None
 
-    if data.product_id:
-        price.product_id = data.product_id
-    if data.price_amount:
-        price.price_amount = data.price_amount
-    if data.price_date:
-        price.price_date = data.price_date
+    if product_id:
+        price.product_id = product_id
+    if price_amount:
+        price.price_amount = price_amount
+    if price_date:
+        price.price_date = price_date
 
     db.add(price)
     db.commit()
