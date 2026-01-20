@@ -1,6 +1,4 @@
 from pydantic import ValidationError
-import re
-from enum import Enum
 from database import SessionLocal
 from logger import logger
 from schemas.price import (
