@@ -180,16 +180,17 @@ create table item (
     order_id UUID NOT NULL REFERENCES orders(order_id),
     product_id UUID NOT NULL REFERENCES product(product_id),
     item_quantity int NOT NULL,
-    item_price decimal(10, 2) NOT NULL DEFAULT 0,
+    item_price decimal(10, 2) NOT NULL,
     PRIMARY KEY (order_id, product_id),
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO item (order_id, product_id, item_quantity)
+INSERT INTO item (order_id, product_id, item_quantity, item_price)
 SELECT
     o.order_id,
     p.product_id,
-    FLOOR(random() * 5 + 1)::int
+    FLOOR(random() * 5 + 1)::int,
+    0
 FROM orders o
 CROSS JOIN LATERAL (
     SELECT product_id
