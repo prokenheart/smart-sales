@@ -18,10 +18,10 @@ app.include_router(status_router)
 
 @logger.inject_lambda_context
 def lambda_handler(event, context):
-    logger.info("DEBUG_EVENT_PATH", extra={
-        "path": event.get("path"),
-        "rawPath": event.get("rawPath"),
-        "resource": event.get("resource"),
-        "requestContext": event.get("requestContext"),
-    })
+    # logger.info("DEBUG_EVENT_PATH", extra={
+    #     "path": event.get("path"),
+    #     "rawPath": event.get("rawPath"),
+    #     "resource": event.get("resource"),
+    #     "requestContext": event.get("requestContext"),
+    # })
     return app.resolve(event, context)

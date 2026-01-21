@@ -244,6 +244,5 @@ $RECYCLE.BIN/
 .aws-sam/
 tests/
 events/
-SmartSalesPlus.sql
 
 # End of https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode

@@ -1,3 +1,12 @@
+drop trigger if exists trg_customer_updated_at on customer;
+drop trigger if exists trg_product_updated_at on product;
+drop trigger if exists trg_price_updated_at on price;
+drop trigger if exists trg_staff_updated_at on staff;
+drop trigger if exists trg_users_updated_at on users;
+drop trigger if exists trg_status_updated_at on status;
+drop trigger if exists trg_orders_updated_at on orders;
+drop trigger if exists trg_item_updated_at on item;
+
 drop table if exists item;
 drop table if exists orders;
 drop table if exists status;
@@ -57,6 +66,38 @@ create table price (
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO price (
+    product_id,
+    price_amount,
+    price_date
+)
+SELECT
+    p.product_id,
+
+    (
+        FLOOR(
+            CASE
+                WHEN p.product_name ILIKE '%Laptop%'     THEN 800 + RANDOM() * 400
+                WHEN p.product_name ILIKE '%Smartphone%' THEN 500 + RANDOM() * 300
+                WHEN p.product_name ILIKE '%Tablet%'     THEN 300 + RANDOM() * 200
+                WHEN p.product_name ILIKE '%Camera%'     THEN 400 + RANDOM() * 300
+                WHEN p.product_name ILIKE '%Monitor%'    THEN 250 + RANDOM() * 200
+                WHEN p.product_name ILIKE '%Printer%'    THEN 150 + RANDOM() * 150
+                WHEN p.product_name ILIKE '%Smartwatch%' THEN 200 + RANDOM() * 150
+                WHEN p.product_name ILIKE '%Headphones%' THEN 100 + RANDOM() * 100
+                WHEN p.product_name ILIKE '%Keyboard%'   THEN 50  + RANDOM() * 50
+                WHEN p.product_name ILIKE '%Mouse%'      THEN 30  + RANDOM() * 40
+                ELSE 100 + RANDOM() * 100
+            END
+        / 100) * 100
+    ) + 99.99 AS price_amount,
+
+    -- Ngày cách đây ít nhất 6 tháng
+    CURRENT_DATE - (180 + FLOOR(RANDOM() * 30))::int AS price_date
+
+FROM product p;
+
+
 create table users (
     user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_name varchar(50) NOT NULL,
@@ -86,30 +127,99 @@ create table status (
 insert into status (status_name) VALUES
 ('Pending'),
 ('Processing'),
+('Paid'),
 ('Shipped'),
 ('Delivered'),
 ('Cancelled');
 
 create table orders (
-    orders_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES customer(customer_id),
-    users_id UUID NOT NULL REFERENCES users(users_id),
-    orders_date date NOT NULL,
-    orders_total decimal(10, 2) NOT NULL DEFAULT 0,
+    user_id UUID NOT NULL REFERENCES users(user_id),
+    order_total decimal(10, 2) NOT NULL DEFAULT 0,
     status_id UUID NOT NULL REFERENCES status(status_id),
+    order_date timestamp DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO orders (
+    customer_id,
+    user_id,
+    order_date,
+    status_id
+)
+SELECT
+    c.customer_id,
+    u.user_id,
+    CURRENT_DATE - (FLOOR(RANDOM() * 30))::int + (RANDOM() * INTERVAL '1 day'),
+    s.status_id
+FROM generate_series(1, 3) gs
+CROSS JOIN (
+    SELECT customer_id
+    FROM customer
+    ORDER BY RANDOM()
+    LIMIT 2
+) c
+CROSS JOIN (
+    SELECT user_id
+    FROM users
+    ORDER BY RANDOM()
+    LIMIT 1
+) u
+CROSS JOIN (
+    SELECT status_id
+    FROM status
+    ORDER BY RANDOM()
+    LIMIT 3
+) s;
+
 create table item (
-    orders_id UUID NOT NULL REFERENCES orders(orders_id),
+    order_id UUID NOT NULL REFERENCES orders(order_id),
     product_id UUID NOT NULL REFERENCES product(product_id),
     item_quantity int NOT NULL,
     item_price decimal(10, 2) NOT NULL DEFAULT 0,
-    PRIMARY KEY (orders_id, product_id),
+    PRIMARY KEY (order_id, product_id),
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO item (order_id, product_id, item_quantity)
+SELECT
+    o.order_id,
+    p.product_id,
+    FLOOR(random() * 5 + 1)::int
+FROM orders o
+CROSS JOIN LATERAL (
+    SELECT product_id
+    FROM product
+    ORDER BY random()
+    LIMIT (1 + floor(random() * 5)::int)   -- 1 đến 5
+) p;
 
+UPDATE item
+SET item_price = p.price_amount
+FROM item i
+JOIN orders o ON o.order_id = i.order_id
+JOIN LATERAL (
+    SELECT pr.price_amount
+    FROM price pr
+    WHERE pr.product_id = i.product_id
+    	AND pr.price_date <= o.order_date::date
+    ORDER BY pr.price_date DESC
+    LIMIT 1
+) p ON TRUE
+WHERE item.order_id = i.order_id
+  	AND item.product_id = i.product_id;
+
+UPDATE orders o
+SET order_total = t.total
+FROM (
+    SELECT
+        order_id,
+        SUM(item_quantity * item_price) AS total
+    FROM item
+    GROUP BY order_id
+) t
+WHERE o.order_id = t.order_id;
 
 
 create or replace function set_updated_at()
@@ -132,11 +242,6 @@ execute function set_updated_at();
 
 create trigger trg_price_updated_at
 before update on price
-for each row
-execute function set_updated_at();
-
-create trigger trg_staff_updated_at
-before update on staff
 for each row
 execute function set_updated_at();
 
