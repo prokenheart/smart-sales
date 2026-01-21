@@ -16,7 +16,8 @@ from services.price import (
     get_prices_by_product,
     get_all_prices,
     update_price,
-    delete_price
+    delete_price,
+    NotFoundError
 )
 
 from core.response import success, error
@@ -49,6 +50,12 @@ def create_price_handler(body: dict):
         return success(
             data=response,
             status_code=201
+        )
+    
+    except NotFoundError as e:
+        return error(
+            message=str(e),
+            status_code=404
         )
     
     except Exception as e:
@@ -128,6 +135,12 @@ def get_prices_by_product_handler(product_id: str):
             PriceResponse.model_validate(price) for price in prices
         ])
     
+    except NotFoundError as e:
+        return error(
+            message=str(e),
+            status_code=404
+        )
+    
     except Exception as e:
         return error(
             message="Internal server error",
@@ -180,6 +193,12 @@ def update_price_handler(price_id: str, body: dict):
         
         response = PriceResponse.model_validate(price)
         return success(response)
+    
+    except NotFoundError as e:
+        return error(
+            message=str(e),
+            status_code=404
+        )
 
     except Exception as e:
         return error(
