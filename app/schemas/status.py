@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 import uuid
 from datetime import datetime
-from typing import Optional
 
 class StatusBase(BaseModel):
     status_name: str
+    status_code: str
 
 class StatusCreate(StatusBase):
     pass
@@ -21,3 +21,4 @@ class StatusResponse(StatusBase):
 
 class StatusUpdate(BaseModel):
     status_name: str | None = None
+    status_code: str | None = None

@@ -37,7 +37,8 @@ def create_status_handler(body: dict):
     try:
         status = create_status(
             db,
-            data.status_name
+            data.status_name,
+            data.status_code
         )
         response = StatusResponse.model_validate(status)
         return success(
@@ -135,7 +136,8 @@ def update_status_handler(status_id: str, body: dict):
         status = update_status(
             db,
             status_id,
-            data.status_name
+            data.status_name,
+            data.status_code
         )
 
         if not status:

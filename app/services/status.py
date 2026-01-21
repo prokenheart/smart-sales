@@ -6,10 +6,12 @@ import uuid
 
 def create_status(
         db: Session,
-        status_name: str
+        status_name: str,
+        status_code: str
     ) -> Status:
     status = Status(
         status_name=status_name,
+        status_code=status_code
     )
     db.add(status)
     db.commit()
@@ -27,7 +29,8 @@ def get_all_statuses(db: Session) -> list[Status]:
 def update_status(
         db: Session,
         status_id: uuid.UUID,
-        status_name: str
+        status_name: str | None = None,
+        status_code: str | None = None
     ) -> Status | None:
     status = get_status(db, status_id)
     if not status:
@@ -35,6 +38,9 @@ def update_status(
 
     if status_name:
         status.status_name = status_name
+
+    if status_code:
+        status.status_code = status_code
 
     db.add(status)
     db.commit()
