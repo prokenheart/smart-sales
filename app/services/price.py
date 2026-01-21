@@ -42,9 +42,9 @@ def get_all_prices(db: Session) -> list[Price]:
 def update_price(
         db: Session,
         price_id: uuid.UUID,
-        product_id: uuid.UUID,
-        price_amount: Decimal,
-        price_date: date
+        product_id: uuid.UUID | None = None,
+        price_amount: Decimal | None = None,
+        price_date: date | None = None
     ) -> Price | None:
     price = get_price(db, price_id)
     if not price:

@@ -46,9 +46,9 @@ def get_all_customers(db: Session) -> list[Customer]:
 def update_customer(
         db: Session,
         customer_id: uuid.UUID,
-        customer_name: str,
-        customer_email: str,
-        customer_phone: str
+        customer_name: str | None = None,
+        customer_email: str | None = None,
+        customer_phone: str | None = None
     ) -> Customer | None:
     customer = get_customer(db, customer_id)
     if not customer:

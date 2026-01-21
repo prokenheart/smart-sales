@@ -78,9 +78,9 @@ def get_all_users(db: Session) -> list[User]:
 def update_user_info(
         db: Session,
         user_id: uuid.UUID,
-        user_name: str,
-        user_email: str,
-        user_phone: str
+        user_name: str | None = None,
+        user_email: str | None = None,
+        user_phone: str | None = None
     ) -> User | None:
     user = get_user(db, user_id)
     if not user:

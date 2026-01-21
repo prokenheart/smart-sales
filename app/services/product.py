@@ -31,9 +31,9 @@ def get_all_products(db: Session) -> list[Product]:
 def update_product(
         db: Session,
         product_id: uuid.UUID,
-        product_name: str,
-        product_description: str,
-        product_quantity: int
+        product_name: str | None = None,
+        product_description: str | None = None,
+        product_quantity: int | None = None
     ) -> Product | None:
     product = get_product(db, product_id)
     if not product:
