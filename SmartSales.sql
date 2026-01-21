@@ -116,6 +116,10 @@ insert into users (user_name, user_email, user_phone, user_account, user_passwor
 ('Emma Harris', 'emma.harris@company.com', '+12025550107', 'emma.harris', 'hashed_password_7'),
 ('Daniel Martinez', 'daniel.martinez@company.com', '+12025550108', 'daniel.martinez', 'hashed_password_8');
 
+UPDATE users
+SET user_password = crypt(user_password, gen_salt('bf'));
+
+
 create table status (
     status_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     status_name varchar(50) NOT NULL,
