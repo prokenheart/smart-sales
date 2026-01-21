@@ -151,7 +151,37 @@ Resources:
           Type: Api
           Properties:
             Path: /prices/{price_id}
-            Method: delete          
+            Method: delete
+        CreateUser:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+        GetAllUsers:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: get
+        GetUser:
+          Type: Api
+          Properties:
+            Path: /users/{user_id}
+            Method: get
+        UpdateUser:
+          Type: Api
+          Properties:
+            Path: /users/{user_id}
+            Method: patch
+        ChangeUserPassword:
+          Type: Api
+          Properties:
+            Path: /users/{user_id}/password
+            Method: patch
+        DeleteUser:
+          Type: Api
+          Properties:
+            Path: /users/{user_id}
+            Method: delete      
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
