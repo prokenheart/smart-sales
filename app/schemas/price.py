@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 import uuid
 from datetime import datetime
-from typing import Optional
 import decimal
 from datetime import date
 
@@ -24,6 +23,6 @@ class PriceResponse(PriceBase):
         from_attributes = True
 
 class PriceUpdate(BaseModel):
-    product_id: Optional[uuid.UUID] = None
-    price_amount: Optional[decimal.Decimal] = None
-    price_date: Optional[date] = None
+    product_id: uuid.UUID | None = None
+    price_amount: decimal.Decimal | None = None
+    price_date: date | None = None

@@ -20,4 +20,4 @@ class StatusResponse(StatusBase):
         from_attributes = True
 
 class StatusUpdate(BaseModel):
-    status_name: Optional[str] = None
+    status_name: str | None = None

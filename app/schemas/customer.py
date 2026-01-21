@@ -1,7 +1,6 @@
 from pydantic import BaseModel, EmailStr
 import uuid
 from datetime import datetime
-from typing import Optional
 
 class CustomerBase(BaseModel):
     customer_name: str
@@ -25,6 +24,6 @@ class CustomerResponse(CustomerBase):
         from_attributes = True
 
 class CustomerUpdate(BaseModel):
-    customer_name: Optional[str] = None
-    customer_email: Optional[EmailStr] = None
-    customer_phone: Optional[str] = None
+    customer_name: str | None = None
+    customer_email: EmailStr | None = None
+    customer_phone: str | None = None
