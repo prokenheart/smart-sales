@@ -123,16 +123,17 @@ SET user_password = crypt(user_password, gen_salt('bf'));
 create table status (
     status_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     status_name varchar(50) NOT NULL,
+    status_code varchar(20) UNIQUE NOT NULL,          
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
-insert into status (status_name) VALUES
-('Pending'),
-('Processing'),
-('Paid'),
-('Shipped'),
-('Delivered'),
-('Cancelled');
+insert into status (status_name, status_code) VALUES
+('Pending', 'PENDING'),
+('Processing', 'PROCESSING'),
+('Paid', 'PAID'),
+('Shipped', 'SHIPPED'),
+('Delivered', 'DELIVERED'),
+('Cancelled', 'CANCELLED');
 
 create table orders (
     order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
