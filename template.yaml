@@ -6,22 +6,22 @@ Description: >
   Sample SAM Template for smart-sales
 
 Parameters:
-  DB_DRIVER:
+  DBDriver:
     Type: String
     Description: The database driver to use (e.g., 'sqlite', 'postgresql', 'mysql', etc.)
-  DB_USER:
+  DBUser:
     Type: String
     Description: The database username
-  DB_PASSWORD:
+  DBPassword:
     Type: String
     Description: The database password
-  DB_HOST:
+  DBHost:
     Type: String
     Description: The database host address
-  DB_PORT:
+  DBPort:
     Type: String
     Description: The database port number
-  DB_NAME:
+  DBName:
     Type: String
     Description: The database name
   
@@ -45,30 +45,20 @@ Resources:
       - x86_64
       Environment:
         Variables:
-          DB_DRIVER: !Ref DB_DRIVER
-          DB_USER: !Ref DB_USER
-          DB_PASSWORD: !Ref DB_PASSWORD
-          DB_HOST: !Ref DB_HOST
-          DB_PORT: !Ref DB_PORT
-          DB_NAME: !Ref DB_NAME
+          DB_DRIVER: !Ref DBDriver
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_HOST: !Ref DBHost
+          DB_PORT: !Ref DBPort
+          DB_NAME: !Ref DBName
       Events:
         Api:
           Type: Api
           Properties:
             Path: /{proxy+}
             Method: ANY
-
+            
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World 
-      function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/hello/"
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
