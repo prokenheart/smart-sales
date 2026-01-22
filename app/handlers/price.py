@@ -184,12 +184,6 @@ def update_price_handler(price_id: str, body: dict):
             data.price_amount,
             data.price_date
         )
-
-        if not price:
-            return error(
-                message="Price not found",
-                status_code=404
-            )
         
         response = PriceResponse.model_validate(price)
         return success(response)

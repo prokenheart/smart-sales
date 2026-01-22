@@ -14,9 +14,10 @@ def create_price(
         price_amount: Decimal,
         price_date: date
     ) -> Price:
-    product = get_product(db, product_id)
+    if not product_exists(db, product_id):
+        raise NotFoundError("Product with given ID does not exist.")
     price = Price(
-        product=product,
+        product_id=product_id,
         price_amount=price_amount,
         price_date=price_date
     )
@@ -28,6 +29,10 @@ def create_price(
 def get_price(db: Session, price_id: uuid.UUID) -> Price | None:
     stmt = select(Price).where(Price.price_id == price_id)
     return db.execute(stmt).scalar_one_or_none()
+
+def price_exists(db: Session, price_id: uuid.UUID) -> bool:
+    stmt = select(exists().where(Price.price_id == price_id))
+    return db.execute(stmt).scalar_one()
 
 def get_prices_by_product(db: Session, product_id: uuid.UUID) -> list[Price]:
     if not product_exists(db, product_id):
@@ -45,20 +50,20 @@ def update_price(
         product_id: uuid.UUID | None = None,
         price_amount: Decimal | None = None,
         price_date: date | None = None
-    ) -> Price | None:
+    ) -> Price:
     price = get_price(db, price_id)
     if not price:
-        return None
+        raise NotFoundError("Price with given ID does not exist.")
 
-    if product_id:
-        product = get_product(db, product_id)
-        price.product = product
-    if price_amount:
+    if product_id is not None:
+        if not product_exists(db, product_id):
+            raise NotFoundError("Product with given ID does not exist.")            
+        price.product_id = product_id
+    if price_amount is not None:
         price.price_amount = price_amount
-    if price_date:
+    if price_date is not None:
         price.price_date = price_date
 
-    db.add(price)
     db.commit()
     db.refresh(price)
     return price
@@ -72,12 +77,6 @@ def delete_price(db: Session, price_id: uuid.UUID) -> uuid.UUID | bool:
     db.commit()
     return price_id
 
-def get_product(db: Session, product_id: uuid.UUID) -> Product:
-    product = db.get(Product, product_id)
-    if not product:
-        raise NotFoundError("Product with given ID does not exist.")
-    return product
-
 def product_exists(db: Session, product_id: uuid.UUID) -> bool:
     stmt = select(exists().where(Product.product_id == product_id))
-    return db.execute(stmt).scalar()
+    return db.execute(stmt).scalar_one()
