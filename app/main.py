@@ -7,6 +7,7 @@ from routes.price import router as price_router
 from routes.status import router as status_router
 from routes.user import router as user_router
 from routes.order import router as order_router
+from routes.item import router as item_router
 
 app = APIGatewayRestResolver(
     debug=True
@@ -19,6 +20,7 @@ app.include_router(price_router)
 app.include_router(status_router)
 app.include_router(user_router)
 app.include_router(order_router)
+app.include_router(item_router)
 
 @logger.inject_lambda_context
 def lambda_handler(event, context):
