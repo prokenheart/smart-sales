@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import uuid
 from datetime import datetime
-import decimal
+from decimal import Decimal
 from datetime import date
 
 class PriceBase(BaseModel):
     product_id: uuid.UUID
-    price_amount: decimal.Decimal
+    price_amount: Decimal = Field(gt=0)
     price_date: date
 
 class PriceCreate(PriceBase):
@@ -24,5 +24,5 @@ class PriceResponse(PriceBase):
 
 class PriceUpdate(BaseModel):
     product_id: uuid.UUID | None = None
-    price_amount: decimal.Decimal | None = None
+    price_amount: Decimal | None = Field(default=None, gt=0)
     price_date: date | None = None

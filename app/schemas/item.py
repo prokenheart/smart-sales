@@ -1,17 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import uuid
 from datetime import datetime
-import decimal
+from decimal import Decimal
 
 class ItemBase(BaseModel):
     product_id: uuid.UUID
-    item_quantity: int
+    item_quantity: int = Field(gt=0)
 
 class ItemList(BaseModel):
     list_item: list[ItemBase]
 
 class ItemResponse(ItemBase):
-    item_price: decimal.Decimal
+    item_price: Decimal
     order_id: uuid.UUID
     updated_at: datetime
 

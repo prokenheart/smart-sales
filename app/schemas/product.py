@@ -1,11 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import uuid
 from datetime import datetime
 
 class ProductBase(BaseModel):
     product_name: str
     product_description: str | None = None
-    product_quantity: int
+    product_quantity: int = Field(gt=0)
 
 class ProductCreate(ProductBase):
     pass
@@ -23,4 +23,4 @@ class ProductResponse(ProductBase):
 class ProductUpdate(BaseModel):
     product_name: str | None = None
     product_description: str | None = None
-    product_quantity: int | None = None
+    product_quantity: int | None = Field(default=None, gt=0)

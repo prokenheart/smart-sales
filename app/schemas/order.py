@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import uuid
 from datetime import datetime
 from decimal import Decimal
@@ -15,7 +15,7 @@ class OrderIdPath(BaseModel):
 
 class OrderResponse(OrderBase):
     order_id: uuid.UUID
-    order_total: Decimal
+    order_total: Decimal = Field(gt=0)
     status_id: uuid.UUID
     order_date: datetime
     updated_at: datetime
