@@ -6,6 +6,9 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
+class WrongStatus(Exception):
+    pass
+
 class Order(Base):
     __tablename__ = "orders"
 
@@ -20,3 +23,9 @@ class Order(Base):
     customer = relationship("Customer")
     user = relationship("User")
     status = relationship("Status")
+
+    def ensure_items_can_be_modified(self):
+        if self.status.status_code != "PENDING":
+            raise WrongStatus(
+                f"Cannot modify items when order status is {self.status.status_code}"
+            )
