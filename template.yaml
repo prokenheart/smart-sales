@@ -26,17 +26,22 @@ Parameters:
     Description: The database name
   
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 20
-
-    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
       LogFormat: JSON
 Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,PUT,PATCH,DELETE'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
   SmartSalesFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function 
     Properties:
       CodeUri: app/
       Handler: main.lambda_handler
@@ -52,12 +57,217 @@ Resources:
           DB_PORT: !Ref DBPort
           DB_NAME: !Ref DBName
       Events:
-        Api:
+        CreateCustomer:
           Type: Api
           Properties:
-            Path: /{proxy+}
-            Method: ANY
-            
+            RestApiId: !Ref MyApi
+            Path: /customers
+            Method: POST
+        GetCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /customers/{customer_id}
+            Method: GET
+        GetAllCustomers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /customers
+            Method: GET     
+        UpdateCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /customers/{customer_id}
+            Method: PUT
+        DeleteCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /customers/{customer_id}
+            Method: DELETE
+        CreateProduct:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /products
+            Method: POST
+        GetProduct:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /products/{product_id}
+            Method: GET
+        GetAllProducts:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /products
+            Method: GET     
+        UpdateProduct:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /products/{product_id}
+            Method: PUT
+        DeleteProduct:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /products/{product_id}
+            Method: DELETE
+        CreatePrice:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /prices
+            Method: POST
+        GetPrice:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /prices/{price_id}
+            Method: GET
+        GetAllPrices:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /prices
+            Method: GET     
+        UpdatePrice:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /prices/{price_id}
+            Method: PUT
+        DeletePrice:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /prices/{price_id}
+            Method: DELETE
+        CreateStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /statuses
+            Method: POST
+        GetStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /statuses/{status_id}
+            Method: GET
+        GetAllStatuses:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /statuses
+            Method: GET     
+        UpdateStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /statuses/{status_id}
+            Method: PUT
+        DeleteStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /statuses/{status_id}
+            Method: DELETE
+        CreateUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: POST
+        GetUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users/{user_id}
+            Method: GET
+        GetAllUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: GET     
+        UpdateUserInfo:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users/{user_id}
+            Method: PATCH
+        UpdateUserPassword:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users/{user_id}/password
+            Method: PATCH
+        DeleteUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users/{user_id}
+            Method: DELETE
+        CreateOrder:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders
+            Method: POST
+        GetOrder:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}
+            Method: GET
+        GetAllOrders:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders
+            Method: GET     
+        UpdateOrderStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}
+            Method: PATCH
+        DeleteOrder:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}
+            Method: DELETE
+        GetItem:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}/items/{product_id}
+            Method: GET
+        GetAllItems:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /items
+            Method: GET
+        GetItemsByOrder:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}/items
+            Method: GET
+        UpdateItems:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}/items
+            Method: PUT
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
