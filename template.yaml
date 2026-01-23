@@ -31,11 +31,14 @@ Globals:
     Timeout: 20
     LoggingConfig:
       LogFormat: JSON
+  Api:
+    Auth:
+      DefaultAuthorizer: NONE
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: prod
+      StageName: Prod
       Cors:
         AllowMethods: "'GET,POST,PUT,PATCH,DELETE'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
@@ -271,4 +274,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
