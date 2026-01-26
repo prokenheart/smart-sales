@@ -17,9 +17,9 @@ def test_customer_create_valid():
 def test_customer_create_invalid_email():
     with pytest.raises(ValidationError) as exc_info:
         CustomerCreate(
-            customer_name="Bob Johnson",
+            customer_name="Alice Peterson",
             customer_email="invalid-email",
-            customer_phone="+12025550108"
+            customer_phone="+12025550107"
         )
     error = exc_info.value.errors()[0]
 
@@ -29,13 +29,13 @@ def test_customer_create_invalid_email():
 # Hợp lệ theo regex (không + nhưng bắt đầu [1-9], đủ dài)
 def test_customer_create_valid_phone_no_plus():
     customer = CustomerCreate(
-        customer_name="Charlie Davis",
-        customer_email="charlie.davis@example.com",
-        customer_phone="12025550109"  
+        customer_name="Alice Peterson",
+        customer_email="alice.peterson@gmail.com",
+        customer_phone="12025550107"  
     )
-    assert customer.customer_name == "Charlie Davis"
-    assert customer.customer_email == "charlie.davis@example.com"
-    assert customer.customer_phone == "12025550109"
+    assert customer.customer_name == "Alice Peterson"
+    assert customer.customer_email == "alice.peterson@gmail.com"
+    assert customer.customer_phone == "12025550107"
 
 # Số điện thoại
 @pytest.mark.parametrize(
@@ -50,8 +50,8 @@ def test_customer_create_valid_phone_no_plus():
 def test_customer_create_invalid_phone(invalid_phone):
     with pytest.raises(ValidationError) as exc_info:
         CustomerCreate(
-            customer_name="Dana Evans",
-            customer_email="dana.evans@example.com",
+            customer_name="Alice Peterson",
+            customer_email="alice.peterson@gmail.com",
             customer_phone=invalid_phone
         )
     error = exc_info.value.errors()[0]
@@ -63,8 +63,8 @@ def test_customer_create_invalid_phone(invalid_phone):
 def test_customer_create_missing_name():
     with pytest.raises(ValidationError) as exc_info:
         CustomerCreate(
-            customer_email="missing.name@example.com",
-            customer_phone="+12025550110"
+            customer_email="alice.peterson@gmail.com",
+            customer_phone="+12025550107"
         )
     error = exc_info.value.errors()[0]
 
@@ -75,8 +75,8 @@ def test_customer_create_missing_name():
 def test_customer_create_missing_email():
     with pytest.raises(ValidationError) as exc_info:
         CustomerCreate(
-            customer_name="Missing Email",
-            customer_phone="+12025550111"
+            customer_name="Alice Peterson",
+            customer_phone="+12025550107"
         )
     error = exc_info.value.errors()[0]
 
@@ -87,8 +87,8 @@ def test_customer_create_missing_email():
 def test_customer_create_missing_phone():
     with pytest.raises(ValidationError) as exc_info:
         CustomerCreate(
-            customer_name="Missing Phone",
-            customer_email="missing.phone@example.com"
+            customer_name="Alice Peterson",
+            customer_email="alice.peterson@gmail.com"
         )
     error = exc_info.value.errors()[0]
 
@@ -99,12 +99,12 @@ def test_customer_create_missing_phone():
 # Truyền thiếu thông tin nhưng vẫn hợp lệ do optional
 def test_customer_update_valid_partial():
     update = CustomerUpdate(
-        customer_name="Updated Name",
-        customer_phone="+12025550112"
+        customer_name="Alice Peterson",
+        customer_phone="+12025550107"
     )
-    assert update.customer_name == "Updated Name"
+    assert update.customer_name == "Alice Peterson"
     assert update.customer_email is None
-    assert update.customer_phone == "+12025550112"
+    assert update.customer_phone == "+12025550107"
 
 # Email không hợp lệ (thiếu dấu @)
 def test_customer_update_invalid_email():
@@ -117,11 +117,20 @@ def test_customer_update_invalid_email():
     assert error["loc"] == ("customer_email",)
     assert "email" in error["msg"].lower()
 
-# Số điện thoại bắt đầu bằng 0
-def test_customer_update_invalid_phone():
+# Số điện thoại
+@pytest.mark.parametrize(
+    "invalid_phone",
+    [
+        "+123456",              # Quá ngắn
+        "+1234567890123456",    # Quá dài
+        "+0123456789",          # Bắt đầu bằng 0
+        "+12345abcde"           # Chứa chữ cái
+    ]
+)
+def test_customer_update_invalid_phone(invalid_phone):
     with pytest.raises(ValidationError) as exc_info:
         CustomerUpdate(
-            customer_phone="+0123456789"
+            customer_phone=invalid_phone
         )
     error = exc_info.value.errors()[0]
 
