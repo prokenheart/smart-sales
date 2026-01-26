@@ -21,7 +21,10 @@ def test_customer_create_invalid_email():
             customer_email="invalid-email",
             customer_phone="+12025550108"
         )
-    assert "value is not a valid email address" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_email",)
+    assert "email" in error["msg"].lower()
 
 # Hợp lệ theo regex (không + nhưng bắt đầu [1-9], đủ dài)
 def test_customer_create_valid_phone_no_plus():
@@ -30,7 +33,6 @@ def test_customer_create_valid_phone_no_plus():
         customer_email="charlie.davis@example.com",
         customer_phone="12025550109"  
     )
-    
     assert customer.customer_name == "Charlie Davis"
     assert customer.customer_email == "charlie.davis@example.com"
     assert customer.customer_phone == "12025550109"
@@ -43,7 +45,10 @@ def test_customer_create_invalid_phone_too_short():
             customer_email="dana.evans@example.com",
             customer_phone="+123456"
         )
-    assert "Invalid phone number" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_phone",)
+    assert "phone" in error["msg"].lower()
 
 # Số điện thoại quá dài
 def test_customer_create_invalid_phone_too_long():
@@ -53,7 +58,10 @@ def test_customer_create_invalid_phone_too_long():
             customer_email="evan.foster@example.com",
             customer_phone="+1234567890123456"  # 16 chữ số sau +, tổng >15
         )
-    assert "Invalid phone number" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_phone",)
+    assert "phone" in error["msg"].lower()
 
 # Số điện thoại bắt đầu bằng 0
 def test_customer_create_invalid_phone_starts_with_zero():
@@ -63,7 +71,10 @@ def test_customer_create_invalid_phone_starts_with_zero():
             customer_email="fiona.green@example.com",
             customer_phone="+0123456789"  # Bắt đầu bằng 0 sau +
         )
-    assert "Invalid phone number" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_phone",)
+    assert "phone" in error["msg"].lower()
 
 # Số điện thoại có chữ cái
 def test_customer_create_invalid_phone_non_digits():
@@ -73,7 +84,10 @@ def test_customer_create_invalid_phone_non_digits():
             customer_email="george.harris@example.com",
             customer_phone="+12345abcde"  # Chứa chữ cái
         )
-    assert "Invalid phone number" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_phone",)
+    assert "phone" in error["msg"].lower()
 
 # Thiếu customer_name
 def test_customer_create_missing_name():
@@ -82,7 +96,10 @@ def test_customer_create_missing_name():
             customer_email="missing.name@example.com",
             customer_phone="+12025550110"
         )
-    assert "Field required" in str(exc_info.value) or "customer_name" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_name",)
+    assert error["type"] == "missing"
 
 # Thiếu customer_email
 def test_customer_create_missing_email():
@@ -91,7 +108,10 @@ def test_customer_create_missing_email():
             customer_name="Missing Email",
             customer_phone="+12025550111"
         )
-    assert "Field required" in str(exc_info.value) or "customer_email" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_email",)
+    assert error["type"] == "missing"
 
 # Thiếu customer_phone
 def test_customer_create_missing_phone():
@@ -100,10 +120,13 @@ def test_customer_create_missing_phone():
             customer_name="Missing Phone",
             customer_email="missing.phone@example.com"
         )
-    assert "Field required" in str(exc_info.value) or "customer_phone" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_phone",)
+    assert error["type"] == "missing"
 
 
-# Truyền thiếu thông tin nhưng vẫn hợp lệ
+# Truyền thiếu thông tin nhưng vẫn hợp lệ do optional
 def test_customer_update_valid_partial():
     update = CustomerUpdate(
         customer_name="Updated Name",
@@ -119,7 +142,10 @@ def test_customer_update_invalid_email():
         CustomerUpdate(
             customer_email="invalid-email"
         )
-    assert "value is not a valid email address" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_email",)
+    assert "email" in error["msg"].lower()
 
 # Số điện thoại bắt đầu bằng 0
 def test_customer_update_invalid_phone():
@@ -127,7 +153,10 @@ def test_customer_update_invalid_phone():
         CustomerUpdate(
             customer_phone="+0123456789"
         )
-    assert "Invalid phone number" in str(exc_info.value)
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_phone",)
+    assert "phone" in error["msg"].lower()
 
 # Pass do optional
 def test_customer_update_none_phone():
