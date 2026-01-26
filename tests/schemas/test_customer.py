@@ -3,7 +3,7 @@ from app.schemas.customer import CustomerCreate, CustomerUpdate
 from pydantic import ValidationError
 
 # Truyền đầy đủ thông tin
-def test_customer_schema_valid():
+def test_customer_create_valid():
     customer = CustomerCreate(
         customer_name="Alice Peterson",
         customer_email="alice.peterson@gmail.com",
