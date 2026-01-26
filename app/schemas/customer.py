@@ -1,11 +1,19 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 import uuid
 from datetime import datetime
+import re
 
 class CustomerBase(BaseModel):
     customer_name: str
     customer_email: EmailStr
     customer_phone: str
+
+    @field_validator("customer_phone")
+    @classmethod
+    def validate_phone(cls, v):
+        if not re.fullmatch(r'^\+?[1-9]\d{7,14}$', v):
+            raise ValueError("Invalid phone number")
+        return v
 
 class CustomerCreate(CustomerBase):
     pass
@@ -27,3 +35,13 @@ class CustomerUpdate(BaseModel):
     customer_name: str | None = None
     customer_email: EmailStr | None = None
     customer_phone: str | None = None
+
+    @field_validator("customer_phone")
+    @classmethod
+    def validate_phone(cls, v):
+        if v is None:
+            return v
+
+        if not re.fullmatch(r'^\+?[1-9]\d{7,14}$', v):
+            raise ValueError("Invalid phone number")
+        return v

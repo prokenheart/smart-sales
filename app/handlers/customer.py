@@ -30,7 +30,7 @@ class SearchType(str, Enum):
     NAME = "name"
     PHONE = "phone"
 
-PHONE_REGEX = re.compile(r"^\+?\d{8,15}$")
+PHONE_REGEX = re.compile(r"^\+?[1-9]\d{7,14}$")
 UPPERCASE_REGEX = re.compile(r"[A-Z]")
 
 def create_customer_handler(body: dict):
@@ -42,10 +42,15 @@ def create_customer_handler(body: dict):
     try:
         data = CustomerCreate.model_validate(body)
     except ValidationError as e:
+        safe_errors = []
+        for err in e.errors():
+            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
+            safe_errors.append(safe_err)
+        
         return error(
             message="Invalid request body",
             status_code=400,
-            details=e.errors()
+            details=safe_errors
         )
         
     db = SessionLocal()
@@ -74,7 +79,7 @@ def create_customer_handler(body: dict):
             status_code=500,
             details=str(e)
         )
-
+    
     finally:
         db.close()
 
@@ -163,8 +168,6 @@ def get_customer_by_email_handler(customer_email: str):
     finally:
         db.close()
 
-
-
 def update_customer_handler(customer_id: str, body: dict):
     if body is None:
         return error(
@@ -183,10 +186,15 @@ def update_customer_handler(customer_id: str, body: dict):
     try:
         data = CustomerUpdate.model_validate(body)
     except ValidationError as e:
+        safe_errors = []
+        for err in e.errors():
+            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
+            safe_errors.append(safe_err)
+        
         return error(
             message="Invalid request body",
             status_code=400,
-            details=e.errors()
+            details=safe_errors
         )
     
     db = SessionLocal()
