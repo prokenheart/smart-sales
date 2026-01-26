@@ -35,7 +35,7 @@ def test_customer_create_valid_phone_no_plus():
     )
     assert customer.customer_name == "Alice Peterson"
     assert customer.customer_email == "alice.peterson@gmail.com"
-    assert customer.customer_phone == "12025550107"
+    assert customer.customer_phone == "+12025550107"
 
 # Số điện thoại
 @pytest.mark.parametrize(
