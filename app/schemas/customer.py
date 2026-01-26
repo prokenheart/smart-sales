@@ -28,7 +28,7 @@ class CustomerResponse(CustomerBase):
     customer_id: uuid.UUID
     updated_at: datetime
 
-model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 class CustomerUpdate(BaseModel):
     customer_name: str | None = None
