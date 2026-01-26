@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 import uuid
 from datetime import datetime
 
@@ -16,8 +16,7 @@ class StatusResponse(StatusBase):
     status_id: uuid.UUID
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class StatusUpdate(BaseModel):
     status_name: str | None = None
