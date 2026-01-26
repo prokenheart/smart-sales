@@ -37,52 +37,22 @@ def test_customer_create_valid_phone_no_plus():
     assert customer.customer_email == "charlie.davis@example.com"
     assert customer.customer_phone == "12025550109"
 
-# Số điện thoại quá ngắn
-def test_customer_create_invalid_phone_too_short():
+# Số điện thoại
+@pytest.mark.parametrize(
+    "invalid_phone",
+    [
+        "+123456",              # Quá ngắn
+        "+1234567890123456",    # Quá dài
+        "+0123456789",          # Bắt đầu bằng 0
+        "+12345abcde"           # Chứa chữ cái
+    ]
+)
+def test_customer_create_invalid_phone(invalid_phone):
     with pytest.raises(ValidationError) as exc_info:
         CustomerCreate(
             customer_name="Dana Evans",
             customer_email="dana.evans@example.com",
-            customer_phone="+123456"
-        )
-    error = exc_info.value.errors()[0]
-
-    assert error["loc"] == ("customer_phone",)
-    assert "phone" in error["msg"].lower()
-
-# Số điện thoại quá dài
-def test_customer_create_invalid_phone_too_long():
-    with pytest.raises(ValidationError) as exc_info:
-        CustomerCreate(
-            customer_name="Evan Foster",
-            customer_email="evan.foster@example.com",
-            customer_phone="+1234567890123456"  # 16 chữ số sau +, tổng >15
-        )
-    error = exc_info.value.errors()[0]
-
-    assert error["loc"] == ("customer_phone",)
-    assert "phone" in error["msg"].lower()
-
-# Số điện thoại bắt đầu bằng 0
-def test_customer_create_invalid_phone_starts_with_zero():
-    with pytest.raises(ValidationError) as exc_info:
-        CustomerCreate(
-            customer_name="Fiona Green",
-            customer_email="fiona.green@example.com",
-            customer_phone="+0123456789"  # Bắt đầu bằng 0 sau +
-        )
-    error = exc_info.value.errors()[0]
-
-    assert error["loc"] == ("customer_phone",)
-    assert "phone" in error["msg"].lower()
-
-# Số điện thoại có chữ cái
-def test_customer_create_invalid_phone_non_digits():
-    with pytest.raises(ValidationError) as exc_info:
-        CustomerCreate(
-            customer_name="George Harris",
-            customer_email="george.harris@example.com",
-            customer_phone="+12345abcde"  # Chứa chữ cái
+            customer_phone=invalid_phone
         )
     error = exc_info.value.errors()[0]
 
