@@ -49,10 +49,15 @@ def create_user_handler(body: dict):
     try:
         data = UserCreate.model_validate(body)
     except ValidationError as e:
+        safe_errors = []
+        for err in e.errors():
+            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
+            safe_errors.append(safe_err)
+        
         return error(
             message="Invalid request body",
             status_code=400,
-            details=e.errors()
+            details=safe_errors
         )
         
     db = SessionLocal()
@@ -213,7 +218,7 @@ def update_user_info_handler(user_id: str, body: dict):
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
     except ValidationError as e:
         return error(
-            message="Invalid user_id",
+            message="Invalid request body",
             status_code=400,
             details=e.errors()
         )
@@ -221,10 +226,15 @@ def update_user_info_handler(user_id: str, body: dict):
     try:
         data = UserUpdateInfo.model_validate(body)
     except ValidationError as e:
+        safe_errors = []
+        for err in e.errors():
+            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
+            safe_errors.append(safe_err)
+        
         return error(
             message="Invalid request body",
             status_code=400,
-            details=e.errors()
+            details=safe_errors
         )
     
     db = SessionLocal()
@@ -272,7 +282,7 @@ def update_user_password_handler(user_id: str, body: dict):
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
     except ValidationError as e:
         return error(
-            message="Invalid user_id",
+            message="Invalid request body",
             status_code=400,
             details=e.errors()
         )
