@@ -40,7 +40,7 @@ class CustomerUpdate(BaseModel):
 
     @field_validator("customer_phone")
     @classmethod
-    def validate_and_normalize_phone(cls, v):
+    def validate_and_normalize_phone(cls, v: str) -> str:
         if v is None:
             return v
         

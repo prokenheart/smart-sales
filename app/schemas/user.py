@@ -12,8 +12,11 @@ class UserBase(BaseModel):
 
     @field_validator("user_phone")
     @classmethod
-    def validate_phone(cls, v):
-        if not re.fullmatch(r'^\+?[1-9]\d{7,14}$', v):
+    def validate_and_normalize_phone(cls, v: str) -> str:
+        if not v.startswith("+"):
+            v = f"+{v}"
+
+        if not re.fullmatch(r'^\+[1-9]\d{7,14}$', v):
             raise ValueError("Invalid phone number")
         return v
 
@@ -43,11 +46,14 @@ class UserUpdateInfo(BaseModel):
 
     @field_validator("user_phone")
     @classmethod
-    def validate_phone(cls, v):
+    def validate_and_normalize_phone(cls, v: str) -> str:
         if v is None:
             return v
+        
+        if not v.startswith("+"):
+            v = f"+{v}"
 
-        if not re.fullmatch(r'^\+?[1-9]\d{7,14}$', v):
+        if not re.fullmatch(r'^\+[1-9]\d{7,14}$', v):
             raise ValueError("Invalid phone number")
         return v
 
