@@ -5,7 +5,7 @@ from datetime import datetime
 class ProductBase(BaseModel):
     product_name: str
     product_description: str | None = None
-    product_quantity: int = Field(gt=0)
+    product_quantity: int = Field(ge=0)
 
 class ProductCreate(ProductBase):
     pass
@@ -22,4 +22,4 @@ class ProductResponse(ProductBase):
 class ProductUpdate(BaseModel):
     product_name: str | None = None
     product_description: str | None = None
-    product_quantity: int | None = Field(default=None, gt=0)
+    product_quantity: int | None = Field(default=None, ge=0)
