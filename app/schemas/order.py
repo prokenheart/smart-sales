@@ -15,7 +15,7 @@ class OrderIdPath(BaseModel):
 
 class OrderResponse(OrderBase):
     order_id: uuid.UUID
-    order_total: Decimal = Field(gt=0)
+    order_total: Decimal
     status_id: uuid.UUID
     order_date: datetime
     updated_at: datetime
