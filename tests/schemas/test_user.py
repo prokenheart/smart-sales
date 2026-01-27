@@ -1,6 +1,7 @@
 import pytest
-from app.schemas.user import UserCreate, UserUpdateInfo
+from app.schemas.user import UserCreate, UserUpdateInfo, UserIdPath
 from pydantic import ValidationError
+import uuid
 
 # Truyền đầy đủ thông tin
 def test_user_create_valid():
@@ -210,3 +211,32 @@ def test_user_update_info_all_none():
     assert update.user_name is None
     assert update.user_email is None
     assert update.user_phone is None
+
+# Test kiểu dữ liệu id
+def test_user_id_path_valid():
+    user_id = uuid.uuid4()
+    user = UserIdPath(
+        user_id=user_id
+    )
+    assert user.user_id == user_id
+    assert isinstance(user.user_id, uuid.UUID)
+
+@pytest.mark.parametrize(
+    "user_id",
+    [
+        "",
+        "abc123",
+        "12345678-1234-1234-1234",
+        "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz",
+        str(uuid.uuid4())[:-1] + "@",
+    ]
+)
+def test_user_id_path_invalid(user_id):
+    with pytest.raises(ValidationError) as exc_info:
+        UserIdPath(
+            user_id=user_id
+        )
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("user_id",)
+    assert "input should be a valid uuid" in error["msg"].lower()

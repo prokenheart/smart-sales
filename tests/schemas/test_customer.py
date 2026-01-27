@@ -1,6 +1,7 @@
 import pytest
-from app.schemas.customer import CustomerCreate, CustomerUpdate
+from app.schemas.customer import CustomerCreate, CustomerUpdate, CustomerIdPath
 from pydantic import ValidationError
+import uuid
 
 # Truyền đầy đủ thông tin
 def test_customer_create_valid():
@@ -149,3 +150,33 @@ def test_customer_update_all_none():
     assert update.customer_name is None
     assert update.customer_email is None
     assert update.customer_phone is None
+
+# Test kiểu dữ liệu id
+def test_customer_id_path_valid():
+    customer_id = uuid.uuid4()
+    customer = CustomerIdPath(
+        customer_id=customer_id
+    )
+    assert customer.customer_id == customer_id
+    assert isinstance(customer.customer_id, uuid.UUID)
+
+@pytest.mark.parametrize(
+    "customer_id",
+    [
+        "",
+        "abc123",
+        "12345678-1234-1234-1234",
+        "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz",
+        str(uuid.uuid4())[:-1] + "@",
+    ]
+)
+def test_customer_id_path_invalid(customer_id):
+    with pytest.raises(ValidationError) as exc_info:
+        CustomerIdPath(
+            customer_id=customer_id
+        )
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("customer_id",)
+    assert "input should be a valid uuid" in error["msg"].lower()
+    
