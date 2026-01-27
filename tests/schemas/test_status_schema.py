@@ -1,5 +1,5 @@
 import pytest
-from app.schemas.status import StatusBase, StatusIdPath
+from app.schemas.status import StatusBase, StatusIdPath, StatusCode
 from pydantic import ValidationError
 import uuid
 
@@ -63,6 +63,31 @@ def test_status_base_missing_status_code():
 
     assert error["loc"] == ("status_code",)
     assert error["type"] == "missing"
+
+# Test kiểu dữ liệu status_code
+def test_status_code_valid():
+    status = StatusCode(
+        status_code="PAID"
+    )
+    assert status.status_code == "PAID"
+
+@pytest.mark.parametrize(
+    "status_code",
+    [
+        "",
+        "paid2",
+        "paid@"
+    ]
+)
+def test_status_code_invalid(status_code):
+    with pytest.raises(ValidationError) as exc_info:
+        StatusCode(
+            status_code=status_code
+        )
+    error = exc_info.value.errors()[0]
+
+    assert error["loc"] == ("status_code",)
+    assert "only uppercase letters" in error["msg"].lower()
 
 # Test kiểu dữ liệu id
 def test_status_id_path_valid():

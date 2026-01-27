@@ -118,6 +118,12 @@ def test_customer_update_invalid_email():
     assert error["loc"] == ("customer_email",)
     assert "email" in error["msg"].lower()
 
+def test_customer_update_valid_phone_no_plus():
+    update = CustomerUpdate(
+        customer_phone="12025550107"  
+    )
+    assert update.customer_phone == "+12025550107"
+
 # Số điện thoại
 @pytest.mark.parametrize(
     "invalid_phone",
