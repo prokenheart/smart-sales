@@ -43,10 +43,9 @@ def get_orders_by_customer(db: Session, customer_id: uuid.UUID) -> list[Order]:
     stmt = select(Order).where(Order.customer_id == customer_id)
     return db.execute(stmt).scalars().all()
 
-def get_orders_by_status(db: Session, status_id: uuid.UUID) -> list[Order]:
-    if not status_exists(db, status_id):
-        raise NotFoundError("Status with given ID does not exist.")
-    stmt = select(Order).where(Order.status_id == status_id)
+def get_orders_by_status(db: Session, status_code: str) -> list[Order]:
+    status = get_status_by_code(db, status_code)
+    stmt = select(Order).where(Order.status_id == status.status_id)
     return db.execute(stmt).scalars().all()
 
 def get_all_orders(db: Session) -> list[Order]:
@@ -97,6 +96,13 @@ def get_status(db: Session, status_id: uuid.UUID) -> Status:
         raise NotFoundError("Status with given ID does not exist.")
     return status
 
+def get_status_by_code(db: Session, status_code: str) -> Status:
+    stmt = select(Status).where(Status.status_code == status_code)
+    status = db.execute(stmt).scalar_one_or_none()
+    if not status:
+        raise NotFoundError("Status with given code does not exist.")
+    return status
+
 def get_default_status(db: Session) -> Status:
     stmt = select(Status).where(Status.status_code == 'PENDING')
     status = db.execute(stmt).scalar_one_or_none()
@@ -112,8 +118,8 @@ def customer_exists(db: Session, customer_id: uuid.UUID) -> bool:
     stmt = select(exists().where(Customer.customer_id == customer_id))
     return db.execute(stmt).scalar()
 
-def status_exists(db: Session, status_id: uuid.UUID) -> bool:
-    stmt = select(exists().where(Status.status_id == status_id))
+def status_exists(db: Session, status_code: str) -> bool:
+    stmt = select(exists().where(Status.status_code == status_code))
     return db.execute(stmt).scalar()
 
 def get_orders_by_date(db: Session, order_date: date) -> list[Order]:

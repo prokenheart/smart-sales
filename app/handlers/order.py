@@ -10,6 +10,7 @@ from schemas.order import (
 )
 
 from schemas.user import UserIdPath
+from schemas.status import StatusCode
 
 from services.order import (
     create_order,
@@ -187,19 +188,24 @@ def get_orders_by_customer_handler(customer_id: str):
     finally:
         db.close()
 
-def get_orders_by_status_handler(status_id: str):
+def get_orders_by_status_handler(status_code: str):
     try:
-        status_id = OrderIdPath.model_validate({"order_id": status_id}).order_id
+        status_code = StatusCode.model_validate({"status_code": status_code}).status_code
     except ValidationError as e:
+        safe_errors = []
+        for err in e.errors():
+            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
+            safe_errors.append(safe_err)
+        
         return error(
-            message="Invalid status_id",
+            message="Invalid status code",
             status_code=400,
-            details=e.errors()
+            details=safe_errors
         )
         
     db = SessionLocal()
     try:
-        orders = get_orders_by_status(db, status_id)
+        orders = get_orders_by_status(db, status_code)
         return success([
             OrderResponse.model_validate(order) for order in orders
         ])

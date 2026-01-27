@@ -32,8 +32,8 @@ def get_all_orders():
     if "customer_id" in params:
         return get_orders_by_customer_handler(params["customer_id"])
     
-    if "status_id" in params:
-        return get_orders_by_status_handler(params["status_id"])
+    if "status_code" in params:
+        return get_orders_by_status_handler(params["status_code"])
     
     if "order_date" in params:
         return get_orders_by_date_handler(params["order_date"])
