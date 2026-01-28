@@ -1,9 +1,8 @@
 from pydantic import ValidationError
 import re
 from enum import Enum
-from database import SessionLocal
-from logger import logger
-from schemas.customer import (
+from app.database import SessionLocal
+from app.schemas.customer import (
     CustomerCreate,
     CustomerIdPath,
     CustomerEmailQuery,
@@ -11,7 +10,7 @@ from schemas.customer import (
     CustomerUpdate
 )
 
-from services.customer import (
+from app.services.customer import (
     create_customer,
     get_customer,
     get_all_customers,
@@ -24,7 +23,7 @@ from services.customer import (
     DuplicateEmailError
 )
 
-from core.response import success, error
+from app.core.response import success, error
 class SearchType(str, Enum):
     EMAIL = "email"
     NAME = "name"

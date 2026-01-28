@@ -1,6 +1,5 @@
 from aws_lambda_powertools.event_handler.router import Router
-from logger import logger
-from handlers.status import (
+from app.handlers.status import (
     get_status_handler,
     get_status_by_code_handler,
     get_all_statuses_handler

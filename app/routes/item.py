@@ -1,6 +1,5 @@
 from aws_lambda_powertools.event_handler.router import Router
-from logger import logger
-from handlers.item import (
+from app.handlers.item import (
     get_item_handler,
     get_all_items_handler,
     get_items_by_order_handler,

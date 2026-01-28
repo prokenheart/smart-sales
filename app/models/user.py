@@ -1,7 +1,7 @@
 from sqlalchemy import String, TIMESTAMP, text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
-from models import Base
+from app.models import Base
 import uuid
 from datetime import datetime
 

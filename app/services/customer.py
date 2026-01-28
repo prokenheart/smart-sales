@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
-from models import Customer
+from app.models import Customer
 import uuid
 
 class DuplicateEmailError(Exception):

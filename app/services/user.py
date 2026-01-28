@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
-from models import User
+from app.models import User
 import uuid
 from passlib.context import CryptContext
 

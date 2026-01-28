@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from models import Status
+from app.models import Status
 import uuid
 
 def get_status(db: Session, status_id: uuid.UUID) -> Status | None:

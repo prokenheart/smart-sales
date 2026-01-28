@@ -1,19 +1,18 @@
 from pydantic import ValidationError
-from database import SessionLocal
-from logger import logger
-from schemas.status import (
+from app.database import SessionLocal
+from app.schemas.status import (
     StatusIdPath,
     StatusCode,
     StatusResponse
 )
 
-from services.status import (
+from app.services.status import (
     get_status,
     get_status_by_code,
     get_all_statuses,
 )
 
-from core.response import success, error
+from app.core.response import success, error
 
 def get_status_handler(status_id: str):
     try:

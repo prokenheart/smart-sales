@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select, exists
-from models import Price, Product
+from app.models import Price, Product
 import uuid
 from datetime import date
 from decimal import Decimal

@@ -1,6 +1,5 @@
 from aws_lambda_powertools.event_handler.router import Router
-from logger import logger
-from handlers.price import (
+from app.handlers.price import (
     create_price_handler,
     get_price_handler,
     get_all_prices_handler,

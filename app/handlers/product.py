@@ -1,14 +1,13 @@
 from pydantic import ValidationError
-from database import SessionLocal
-from logger import logger
-from schemas.product import (
+from app.database import SessionLocal
+from app.schemas.product import (
     ProductCreate,
     ProductResponse,
     ProductUpdate,
     ProductIdPath
 )
 
-from services.product import (
+from app.services.product import (
     create_product,
     get_product,
     get_all_products,
@@ -17,7 +16,7 @@ from services.product import (
     search_products_by_name
 )
 
-from core.response import success, error
+from app.core.response import success, error
 
 
 def create_product_handler(body: dict):

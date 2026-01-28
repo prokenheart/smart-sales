@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select, exists
-from models import Item, Product, Order, Price
-from schemas.item import ItemBase
+from app.models import Item, Product, Order, Price
+from app.schemas.item import ItemBase
 import uuid
 from datetime import date
 from decimal import Decimal

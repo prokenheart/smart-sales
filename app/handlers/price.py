@@ -1,16 +1,15 @@
 from pydantic import ValidationError
-from database import SessionLocal
-from logger import logger
-from schemas.price import (
+from app.database import SessionLocal
+from app.schemas.price import (
     PriceCreate,
     PriceIdPath,
     PriceResponse,
     PriceUpdate
 )
 
-from schemas.product import ProductIdPath
+from app.schemas.product import ProductIdPath
 
-from services.price import (
+from app.services.price import (
     create_price,
     get_price,
     get_prices_by_product,
@@ -20,7 +19,7 @@ from services.price import (
     NotFoundError
 )
 
-from core.response import success, error
+from app.core.response import success, error
 
 def create_price_handler(body: dict):
     if body is None:

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from models import Product
+from app.models import Product
 import uuid
 
 def create_product(

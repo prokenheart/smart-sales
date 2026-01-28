@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select, exists
-from models import Order, User, Customer, Status
+from app.models import Order, User, Customer, Status
 import uuid
 from datetime import date, datetime, timedelta
 
