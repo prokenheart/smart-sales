@@ -118,10 +118,6 @@ def customer_exists(db: Session, customer_id: uuid.UUID) -> bool:
     stmt = select(exists().where(Customer.customer_id == customer_id))
     return db.execute(stmt).scalar()
 
-def status_exists(db: Session, status_code: str) -> bool:
-    stmt = select(exists().where(Status.status_code == status_code))
-    return db.execute(stmt).scalar()
-
 def get_orders_by_date(db: Session, order_date: date) -> list[Order]:
     start = datetime.combine(order_date, datetime.min.time())
     end = start + timedelta(days=1)
