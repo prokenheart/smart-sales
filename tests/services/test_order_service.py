@@ -4,8 +4,7 @@ import pytest
 import uuid
 from app.services.order import NotFoundError
 from unittest.mock import patch
-from datetime import date, datetime
-from sqlalchemy import select
+from datetime import date
 
 @pytest.fixture
 def existing_customer():
