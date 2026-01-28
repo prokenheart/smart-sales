@@ -18,9 +18,9 @@ def create_order(
     status = get_default_status(db)
 
     order = Order(
-        customer=customer,
-        user=user,
-        status=status,
+        customer_id=customer.customer_id,
+        user_id=user.user_id,
+        status_id=status.status_id
     )
     db.add(order)
     db.commit()
@@ -62,7 +62,7 @@ def update_order_status(
         return None
     
     status = get_status(db, status_id)
-    order.status = status
+    order.status_id = status.status_id
 
     db.add(order)
     db.commit()
