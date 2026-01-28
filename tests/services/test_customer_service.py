@@ -2,7 +2,7 @@
 from app.services import customer as service
 from app.models import Customer
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import uuid
 from app.services.customer import DuplicateEmailError
 from sqlalchemy.exc import IntegrityError
