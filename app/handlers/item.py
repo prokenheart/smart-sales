@@ -1,5 +1,5 @@
 from pydantic import ValidationError
-from app.core.database import get_db
+from app.database import get_db
 from app.schemas.item import (
     ItemResponse,
     ItemList
