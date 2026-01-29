@@ -1,11 +1,3 @@
-drop trigger if exists trg_customer_updated_at on customer;
-drop trigger if exists trg_product_updated_at on product;
-drop trigger if exists trg_price_updated_at on price;
-drop trigger if exists trg_users_updated_at on users;
-drop trigger if exists trg_status_updated_at on status;
-drop trigger if exists trg_orders_updated_at on orders;
-drop trigger if exists trg_item_updated_at on item;
-
 drop table if exists item;
 drop table if exists orders;
 drop table if exists status;
