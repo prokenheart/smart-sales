@@ -1,5 +1,5 @@
 from pydantic import ValidationError
-from app.database import SessionLocal
+from app.database import get_db
 from app.schemas.price import (
     PriceCreate,
     PriceIdPath,
@@ -35,21 +35,21 @@ def create_price_handler(body: dict):
             status_code=400,
             details=e.errors()
         )
-        
-    db = SessionLocal()
-    try:
-        price = create_price(
-            db,
-            data.product_id,
-            data.price_amount,
-            data.price_date
-        )
 
-        response = PriceResponse.model_validate(price)
-        return success(
-            data=response,
-            status_code=201
-        )
+    try:
+        with get_db() as db:
+            price = create_price(
+                db,
+                data.product_id,
+                data.price_amount,
+                data.price_date
+            )
+
+            response = PriceResponse.model_validate(price)
+            return success(
+                data=response,
+                status_code=201
+            )
     
     except NotFoundError as e:
         return error(
@@ -63,9 +63,6 @@ def create_price_handler(body: dict):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_price_handler(price_id: str):
     try:
@@ -76,18 +73,18 @@ def get_price_handler(price_id: str):
                 status_code=400
             )
     
-    db = SessionLocal()
     try:
-        price = get_price(db, price_id)
-        if not price:
-            return error(
-                message="Price not found",
-                status_code=404
-            )
-        
-        response = PriceResponse.model_validate(price)
+        with get_db() as db:
+            price = get_price(db, price_id)
+            if not price:
+                return error(
+                    message="Price not found",
+                    status_code=404
+                )
+            
+            response = PriceResponse.model_validate(price)
 
-        return success(response)
+            return success(response)
 
     except Exception as e:
         return error(
@@ -95,17 +92,14 @@ def get_price_handler(price_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_all_prices_handler():
-    db = SessionLocal()
     try:
-        prices = get_all_prices(db)
-        return success([
-            PriceResponse.model_validate(price) for price in prices
-        ])
+        with get_db() as db:
+            prices = get_all_prices(db)
+            return success([
+                PriceResponse.model_validate(price) for price in prices
+            ])
 
     except Exception as e:
         return error(
@@ -113,9 +107,6 @@ def get_all_prices_handler():
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_prices_by_product_handler(product_id: str):
     try:
@@ -126,13 +117,13 @@ def get_prices_by_product_handler(product_id: str):
             status_code=400,
             details=e.errors()
         )
-        
-    db = SessionLocal()
+    
     try:
-        prices = get_prices_by_product(db, product_id)
-        return success([
-            PriceResponse.model_validate(price) for price in prices
-        ])
+        with get_db() as db:
+            prices = get_prices_by_product(db, product_id)
+            return success([
+                PriceResponse.model_validate(price) for price in prices
+            ])
     
     except NotFoundError as e:
         return error(
@@ -146,9 +137,6 @@ def get_prices_by_product_handler(product_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def update_price_handler(price_id: str, body: dict):
     if body is None:
@@ -174,18 +162,18 @@ def update_price_handler(price_id: str, body: dict):
             details=e.errors()
         )
     
-    db = SessionLocal()
     try:
-        price = update_price(
-            db,
-            price_id,
-            data.product_id,
-            data.price_amount,
-            data.price_date
-        )
-        
-        response = PriceResponse.model_validate(price)
-        return success(response)
+        with get_db() as db:
+            price = update_price(
+                db,
+                price_id,
+                data.product_id,
+                data.price_amount,
+                data.price_date
+            )
+            
+            response = PriceResponse.model_validate(price)
+            return success(response)
     
     except NotFoundError as e:
         return error(
@@ -200,9 +188,6 @@ def update_price_handler(price_id: str, body: dict):
             details=str(e)
         )
 
-    finally:
-        db.close()
-
 def delete_price_handler(price_id: str):
     try:
         price_id = PriceIdPath.model_validate({"price_id": price_id}).price_id
@@ -213,19 +198,19 @@ def delete_price_handler(price_id: str):
             details=e.errors()
         )
     
-    db = SessionLocal()
     try:
-        deleted_id = delete_price(db, price_id)
+        with get_db() as db:
+            deleted_id = delete_price(db, price_id)
 
-        if not deleted_id:
-            return error(
-                message="Price not found",
-                status_code=404
+            if not deleted_id:
+                return error(
+                    message="Price not found",
+                    status_code=404
+                )
+
+            return success(
+                data={"price_id": str(deleted_id)}
             )
-
-        return success(
-            data={"price_id": str(deleted_id)}
-        )
 
     except Exception as e:
         return error(
@@ -233,6 +218,3 @@ def delete_price_handler(price_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()

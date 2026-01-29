@@ -1,6 +1,7 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
 
 DB_DRIVER = os.getenv("DB_DRIVER")
 DB_USER = os.getenv("DB_USER")
@@ -36,3 +37,8 @@ engine = create_engine(
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+@contextmanager
+def get_db():
+    with SessionLocal() as db:
+        yield db

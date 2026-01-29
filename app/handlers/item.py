@@ -1,5 +1,5 @@
 from pydantic import ValidationError
-from app.database import SessionLocal
+from app.database import get_db
 from app.schemas.item import (
     ItemResponse,
     ItemList
@@ -32,19 +32,18 @@ def get_item_handler(order_id: str, product_id: str):
                 details=e.errors
             )
     
-    
-    db = SessionLocal()
     try:
-        item = get_item(db, order_id, product_id)
-        if not item:
-            return error(
-                message="Item not found",
-                status_code=404
-            )
-        
-        response = ItemResponse.model_validate(item)
+        with get_db() as db:
+            item = get_item(db, order_id, product_id)
+            if not item:
+                return error(
+                    message="Item not found",
+                    status_code=404
+                )
+            
+            response = ItemResponse.model_validate(item)
 
-        return success(response)
+            return success(response)
 
     except Exception as e:
         return error(
@@ -52,17 +51,14 @@ def get_item_handler(order_id: str, product_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_all_items_handler():
-    db = SessionLocal()
     try:
-        items = get_all_items(db)
-        return success([
-            ItemResponse.model_validate(item) for item in items
-        ])
+        with get_db() as db:
+            items = get_all_items(db)
+            return success([
+                ItemResponse.model_validate(item) for item in items
+            ])
 
     except Exception as e:
         return error(
@@ -70,9 +66,6 @@ def get_all_items_handler():
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_items_by_order_handler(order_id: str):
     try:
@@ -84,12 +77,12 @@ def get_items_by_order_handler(order_id: str):
             details=e.errors()
         )
         
-    db = SessionLocal()
     try:
-        items = get_items_by_order(db, order_id)
-        return success([
-            ItemResponse.model_validate(item) for item in items
-        ])
+        with get_db() as db:
+            items = get_items_by_order(db, order_id)
+            return success([
+                ItemResponse.model_validate(item) for item in items
+            ])
     
     except NotFoundError as e:
         return error(
@@ -103,9 +96,6 @@ def get_items_by_order_handler(order_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def update_item_handler(order_id: str, body: dict):
     if body is None:
@@ -130,19 +120,19 @@ def update_item_handler(order_id: str, body: dict):
             status_code=400,
             details=e.errors()
         )
-    
-    db = SessionLocal()
+
     try:
-        items = update_list_of_item(
-            db,
-            order_id,
-            data.list_item
-        )
-        
-        return success([
-            ItemResponse.model_validate(item)
-            for item in items
-        ])
+        with get_db() as db:
+            items = update_list_of_item(
+                db,
+                order_id,
+                data.list_item
+            )
+            
+            return success([
+                ItemResponse.model_validate(item)
+                for item in items
+            ])
     
     except NotFoundError as e:
         return error(
@@ -174,6 +164,3 @@ def update_item_handler(order_id: str, body: dict):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()

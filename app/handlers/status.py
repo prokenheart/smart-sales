@@ -1,5 +1,5 @@
 from pydantic import ValidationError
-from app.database import SessionLocal
+from app.database import get_db
 from app.schemas.status import (
     StatusIdPath,
     StatusCode,
@@ -24,19 +24,19 @@ def get_status_handler(status_id: str):
                 details=e.errors()
             )
     
-    db = SessionLocal()
     try:
-        status = get_status(db, status_id)
+        with get_db() as db:
+            status = get_status(db, status_id)
 
-        if not status:
-            return error(
-                message="Status not found",
-                status_code=404
-            )
-        
-        response = StatusResponse.model_validate(status)
+            if not status:
+                return error(
+                    message="Status not found",
+                    status_code=404
+                )
+            
+            response = StatusResponse.model_validate(status)
 
-        return success(response)
+            return success(response)
 
     except Exception as e:
         return error(
@@ -44,9 +44,6 @@ def get_status_handler(status_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_status_by_code_handler(status_code: str):
     try:
@@ -62,20 +59,20 @@ def get_status_by_code_handler(status_code: str):
             status_code=400,
             details=safe_errors
         )
-        
-    db = SessionLocal()
-    try:
-        status = get_status_by_code(db, status_code)
-        
-        if not status:
-            return error(
-                message="Status not found",
-                status_code=404
-            )
-        
-        response = StatusResponse.model_validate(status)
 
-        return success(response)
+    try:
+        with get_db() as db:
+            status = get_status_by_code(db, status_code)
+            
+            if not status:
+                return error(
+                    message="Status not found",
+                    status_code=404
+                )
+            
+            response = StatusResponse.model_validate(status)
+
+            return success(response)
 
     except Exception as e:
         return error(
@@ -83,17 +80,14 @@ def get_status_by_code_handler(status_code: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_all_statuses_handler():
-    db = SessionLocal()
     try:
-        statuses = get_all_statuses(db)
-        return success([
-            StatusResponse.model_validate(status) for status in statuses
-        ])
+        with get_db() as db:
+            statuses = get_all_statuses(db)
+            return success([
+                StatusResponse.model_validate(status) for status in statuses
+            ])
 
     except Exception as e:
         return error(
@@ -101,6 +95,3 @@ def get_all_statuses_handler():
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()

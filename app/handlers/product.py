@@ -1,5 +1,5 @@
 from pydantic import ValidationError
-from app.database import SessionLocal
+from app.database import get_db
 from app.schemas.product import (
     ProductCreate,
     ProductResponse,
@@ -34,19 +34,19 @@ def create_product_handler(body: dict):
             details=e.errors()
         )
         
-    db = SessionLocal()
     try:
-        product = create_product(
-            db,
-            data.product_name,
-            data.product_description,
-            data.product_quantity
-        )
-        response = ProductResponse.model_validate(product)
-        return success(
-            data=response,
-            status_code=201
-        )
+        with get_db() as db:
+            product = create_product(
+                db,
+                data.product_name,
+                data.product_description,
+                data.product_quantity
+            )
+            response = ProductResponse.model_validate(product)
+            return success(
+                data=response,
+                status_code=201
+            )
 
     except Exception as e:
         return error(
@@ -54,9 +54,6 @@ def create_product_handler(body: dict):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_product_handler(product_id: str):
     try:
@@ -67,19 +64,19 @@ def get_product_handler(product_id: str):
                 status_code=400
             )
     
-    db = SessionLocal()
     try:
-        product = get_product(db, product_id)
+        with get_db() as db:
+            product = get_product(db, product_id)
 
-        if not product:
-            return error(
-                message="Product not found",
-                status_code=404
-            )
-        
-        response = ProductResponse.model_validate(product)
+            if not product:
+                return error(
+                    message="Product not found",
+                    status_code=404
+                )
+            
+            response = ProductResponse.model_validate(product)
 
-        return success(response)
+            return success(response)
 
     except Exception as e:
         return error(
@@ -87,17 +84,14 @@ def get_product_handler(product_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_all_products_handler():
-    db = SessionLocal()
     try:
-        products = get_all_products(db)
-        return success([
-            ProductResponse.model_validate(product) for product in products
-        ])
+        with get_db() as db:
+            products = get_all_products(db)
+            return success([
+                ProductResponse.model_validate(product) for product in products
+            ])
 
     except Exception as e:
         return error(
@@ -105,9 +99,6 @@ def get_all_products_handler():
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def update_product_handler(product_id: str, body: dict):
     if body is None:
@@ -132,25 +123,25 @@ def update_product_handler(product_id: str, body: dict):
             status_code=400,
             details=e.errors()
         )
-    
-    db = SessionLocal()
-    try:
-        product = update_product(
-            db,
-            product_id,
-            data.product_name,
-            data.product_description,
-            data.product_quantity
-        )
 
-        if not product:
-            return error(
-                message="Product not found",
-                status_code=404
+    try:
+        with get_db() as db:
+            product = update_product(
+                db,
+                product_id,
+                data.product_name,
+                data.product_description,
+                data.product_quantity
             )
-        
-        response = ProductResponse.model_validate(product)
-        return success(response)
+
+            if not product:
+                return error(
+                    message="Product not found",
+                    status_code=404
+                )
+            
+            response = ProductResponse.model_validate(product)
+            return success(response)
 
     except Exception as e:
         return error(
@@ -158,9 +149,6 @@ def update_product_handler(product_id: str, body: dict):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def delete_product_handler(product_id: str):
     try:
@@ -172,19 +160,19 @@ def delete_product_handler(product_id: str):
             details=e.errors()
         )
     
-    db = SessionLocal()
     try:
-        deleted_id = delete_product(db, product_id)
+        with get_db() as db:
+            deleted_id = delete_product(db, product_id)
 
-        if not deleted_id:
-            return error(
-                message="Product not found",
-                status_code=404
+            if not deleted_id:
+                return error(
+                    message="Product not found",
+                    status_code=404
+                )
+
+            return success(
+                data={"product_id": str(deleted_id)}
             )
-
-        return success(
-            data={"product_id": str(deleted_id)}
-        )
 
     except Exception as e:
         return error(
@@ -192,9 +180,6 @@ def delete_product_handler(product_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def search_products_handler(query: str):
     if not query or not query.strip():
@@ -202,13 +187,14 @@ def search_products_handler(query: str):
             message="Query parameter is required and cannot be empty",
             status_code=400
         )
-    db = SessionLocal()
-    try:        
-        products = search_products_by_name(db, query)
 
-        return success([
-            ProductResponse.model_validate(product) for product in products
-        ])
+    try:   
+        with get_db() as db:
+            products = search_products_by_name(db, query)
+
+            return success([
+                ProductResponse.model_validate(product) for product in products
+            ])
 
     except Exception as e:
         return error(
@@ -216,6 +202,3 @@ def search_products_handler(query: str):
             status_code=500,
             details=str(e)
         )
-    
-    finally:
-        db.close()

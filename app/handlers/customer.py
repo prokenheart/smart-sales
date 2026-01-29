@@ -1,7 +1,7 @@
 from pydantic import ValidationError
 import re
 from enum import Enum
-from app.database import SessionLocal
+from app.database import get_db
 from app.schemas.customer import (
     CustomerCreate,
     CustomerIdPath,
@@ -51,20 +51,20 @@ def create_customer_handler(body: dict):
             status_code=400,
             details=safe_errors
         )
-        
-    db = SessionLocal()
+    
     try:
-        customer = create_customer(
-            db,
-            data.customer_name,
-            data.customer_email,
-            data.customer_phone
-        )
-        response = CustomerResponse.model_validate(customer)
-        return success(
-            data=response,
-            status_code=201
-        )
+        with get_db() as db:
+            customer = create_customer(
+                db,
+                data.customer_name,
+                data.customer_email,
+                data.customer_phone
+            )
+            response = CustomerResponse.model_validate(customer)
+            return success(
+                data=response,
+                status_code=201
+            )
 
     except DuplicateEmailError as e:
         return error(
@@ -78,9 +78,6 @@ def create_customer_handler(body: dict):
             status_code=500,
             details=str(e)
         )
-    
-    finally:
-        db.close()
 
 def get_customer_handler(customer_id: str):
     try:
@@ -90,20 +87,20 @@ def get_customer_handler(customer_id: str):
                 message="Invalid customer_id",
                 status_code=400
             )
-    
-    db = SessionLocal()
+
     try:
-        customer = get_customer(db, customer_id)
+        with get_db() as db:
+            customer = get_customer(db, customer_id)
 
-        if not customer:
-            return error(
-                message="Customer not found",
-                status_code=404
-            )
-        
-        response = CustomerResponse.model_validate(customer)
+            if not customer:
+                return error(
+                    message="Customer not found",
+                    status_code=404
+                )
+            
+            response = CustomerResponse.model_validate(customer)
 
-        return success(response)
+            return success(response)
 
     except Exception as e:
         return error(
@@ -111,17 +108,14 @@ def get_customer_handler(customer_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_all_customers_handler():
-    db = SessionLocal()
     try:
-        customers = get_all_customers(db)
-        return success([
-            CustomerResponse.model_validate(customer) for customer in customers
-        ])
+        with get_db() as db:
+            customers = get_all_customers(db)
+            return success([
+                CustomerResponse.model_validate(customer) for customer in customers
+            ])
 
     except Exception as e:
         return error(
@@ -129,9 +123,6 @@ def get_all_customers_handler():
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_customer_by_email_handler(customer_email: str):
     try:
@@ -142,19 +133,19 @@ def get_customer_by_email_handler(customer_email: str):
             status_code=400,
             details=e.errors()
         )
-        
-    db = SessionLocal()
+    
     try:
-        customer = get_customer_by_email(db, customer_email)
+        with get_db() as db:
+            customer = get_customer_by_email(db, customer_email)
 
-        if not customer:
-            return error(
-                message="Customer not found",
-                status_code=404
-            )
+            if not customer:
+                return error(
+                    message="Customer not found",
+                    status_code=404
+                )
 
-        response = CustomerResponse.model_validate(customer)
-        return success(response)
+            response = CustomerResponse.model_validate(customer)
+            return success(response)
     
 
     except Exception as e:
@@ -163,9 +154,6 @@ def get_customer_by_email_handler(customer_email: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def update_customer_handler(customer_id: str, body: dict):
     if body is None:
@@ -196,24 +184,24 @@ def update_customer_handler(customer_id: str, body: dict):
             details=safe_errors
         )
     
-    db = SessionLocal()
     try:
-        customer = update_customer(
-            db,
-            customer_id,
-            data.customer_name,
-            data.customer_email,
-            data.customer_phone
-        )
-
-        if not customer:
-            return error(
-                message="Customer not found",
-                status_code=404
+        with get_db() as db:
+            customer = update_customer(
+                db,
+                customer_id,
+                data.customer_name,
+                data.customer_email,
+                data.customer_phone
             )
-        
-        response = CustomerResponse.model_validate(customer)
-        return success(response)
+
+            if not customer:
+                return error(
+                    message="Customer not found",
+                    status_code=404
+                )
+            
+            response = CustomerResponse.model_validate(customer)
+            return success(response)
 
     except DuplicateEmailError as e:
         return error(
@@ -228,9 +216,6 @@ def update_customer_handler(customer_id: str, body: dict):
             details=str(e)
         )
 
-    finally:
-        db.close()
-
 def delete_customer_handler(customer_id: str):
     try:
         customer_id = CustomerIdPath.model_validate({"customer_id": customer_id}).customer_id
@@ -241,19 +226,19 @@ def delete_customer_handler(customer_id: str):
             details=e.errors()
         )
     
-    db = SessionLocal()
     try:
-        deleted_id = delete_customer(db, customer_id)
+        with get_db() as db:
+            deleted_id = delete_customer(db, customer_id)
 
-        if not deleted_id:
-            return error(
-                message="Customer not found",
-                status_code=404
+            if not deleted_id:
+                return error(
+                    message="Customer not found",
+                    status_code=404
+                )
+
+            return success(
+                data={"customer_id": str(deleted_id)}
             )
-
-        return success(
-            data={"customer_id": str(deleted_id)}
-        )
 
     except Exception as e:
         return error(
@@ -261,9 +246,6 @@ def delete_customer_handler(customer_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def search_customers_handler(query: str):
     if not query or not query.strip():
@@ -271,21 +253,22 @@ def search_customers_handler(query: str):
             message="Query parameter is required and cannot be empty",
             status_code=400
         )
-    db = SessionLocal()
-    try:        
-        keyword = query.strip()
-        search_type = detect_search_type(keyword)
 
-        if search_type == SearchType.EMAIL:
-            customers = search_customers_by_email(db, keyword)
-        elif search_type == SearchType.PHONE:
-            customers = search_customers_by_phone(db, keyword)
-        else:
-            customers = search_customers_by_name(db, keyword)
+    try:       
+        with get_db() as db: 
+            keyword = query.strip()
+            search_type = detect_search_type(keyword)
 
-        return success([
-            CustomerResponse.model_validate(customer) for customer in customers
-        ])
+            if search_type == SearchType.EMAIL:
+                customers = search_customers_by_email(db, keyword)
+            elif search_type == SearchType.PHONE:
+                customers = search_customers_by_phone(db, keyword)
+            else:
+                customers = search_customers_by_name(db, keyword)
+
+            return success([
+                CustomerResponse.model_validate(customer) for customer in customers
+            ])
 
     except Exception as e:
         return error(
@@ -293,10 +276,6 @@ def search_customers_handler(query: str):
             status_code=500,
             details=str(e)
         )
-    
-    finally:
-        db.close()
-
 
 def detect_search_type(keyword: str) -> str:
     keyword = keyword.strip()

@@ -1,7 +1,7 @@
 from pydantic import ValidationError
 import re
 from enum import Enum
-from app.database import SessionLocal
+from app.database import get_db
 from app.schemas.user import (
     UserCreate,
     UserIdPath,
@@ -59,21 +59,21 @@ def create_user_handler(body: dict):
             details=safe_errors
         )
         
-    db = SessionLocal()
     try:
-        user = create_user(
-            db,
-            data.user_name,
-            data.user_email,
-            data.user_phone,
-            data.user_account,
-            data.user_password
-        )
-        response = UserResponse.model_validate(user)
-        return success(
-            data=response,
-            status_code=201
-        )
+        with get_db() as db:
+            user = create_user(
+                db,
+                data.user_name,
+                data.user_email,
+                data.user_phone,
+                data.user_account,
+                data.user_password
+            )
+            response = UserResponse.model_validate(user)
+            return success(
+                data=response,
+                status_code=201
+            )
     
     except DuplicateAccountError as e:
         return error(
@@ -94,9 +94,6 @@ def create_user_handler(body: dict):
             details=str(e)
         )
 
-    finally:
-        db.close()
-
 def get_user_handler(user_id: str):
     try:
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
@@ -106,19 +103,19 @@ def get_user_handler(user_id: str):
                 status_code=400
             )
     
-    db = SessionLocal()
     try:
-        user = get_user(db, user_id)
+        with get_db() as db:
+            user = get_user(db, user_id)
 
-        if not user:
-            return error(
-                message="User not found",
-                status_code=404
-            )
-        
-        response = UserResponse.model_validate(user)
+            if not user:
+                return error(
+                    message="User not found",
+                    status_code=404
+                )
+            
+            response = UserResponse.model_validate(user)
 
-        return success(response)
+            return success(response)
 
     except Exception as e:
         return error(
@@ -126,17 +123,14 @@ def get_user_handler(user_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
-
+    
 def get_all_users_handler():
-    db = SessionLocal()
     try:
-        users = get_all_users(db)
-        return success([
-            UserResponse.model_validate(user) for user in users
-        ])
+        with get_db() as db:
+            users = get_all_users(db)
+            return success([
+                UserResponse.model_validate(user) for user in users
+            ])
 
     except Exception as e:
         return error(
@@ -144,24 +138,20 @@ def get_all_users_handler():
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_user_by_account_handler(user_account: str):
-    db = SessionLocal()
     try:
-        user = get_user_by_account(db, user_account)
+        with get_db() as db:
+            user = get_user_by_account(db, user_account)
 
-        if not user:
-            return error(
-                message="User not found",
-                status_code=404
-            )
+            if not user:
+                return error(
+                    message="User not found",
+                    status_code=404
+                )
 
-        response = UserResponse.model_validate(user)
-        return success(response)
-    
+            response = UserResponse.model_validate(user)
+            return success(response)
 
     except Exception as e:
         return error(
@@ -169,9 +159,6 @@ def get_user_by_account_handler(user_account: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def get_user_by_email_handler(user_email: str):
     try:
@@ -182,30 +169,26 @@ def get_user_by_email_handler(user_email: str):
             status_code=400,
             details=e.errors()
         )
-        
-    db = SessionLocal()
+
     try:
-        user = get_user_by_email(db, user_email)
+        with get_db() as db:
+            user = get_user_by_email(db, user_email)
 
-        if not user:
-            return error(
-                message="User not found",
-                status_code=404
-            )
+            if not user:
+                return error(
+                    message="User not found",
+                    status_code=404
+                )
 
-        response = UserResponse.model_validate(user)
-        return success(response)
+            response = UserResponse.model_validate(user)
+            return success(response)
     
-
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def update_user_info_handler(user_id: str, body: dict):
     if body is None:
@@ -236,24 +219,24 @@ def update_user_info_handler(user_id: str, body: dict):
             details=safe_errors
         )
     
-    db = SessionLocal()
     try:
-        user = update_user_info(
-            db,
-            user_id,
-            data.user_name,
-            data.user_email,
-            data.user_phone
-        )
-
-        if not user:
-            return error(
-                message="User not found",
-                status_code=404
+        with get_db() as db:
+            user = update_user_info(
+                db,
+                user_id,
+                data.user_name,
+                data.user_email,
+                data.user_phone
             )
-        
-        response = UserResponse.model_validate(user)
-        return success(response)
+
+            if not user:
+                return error(
+                    message="User not found",
+                    status_code=404
+                )
+            
+            response = UserResponse.model_validate(user)
+            return success(response)
 
     except DuplicateEmailError as e:
         return error(
@@ -267,9 +250,6 @@ def update_user_info_handler(user_id: str, body: dict):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def update_user_password_handler(user_id: str, body: dict):
     if body is None:
@@ -295,34 +275,34 @@ def update_user_password_handler(user_id: str, body: dict):
             details=e.errors()
         )
     
-    db = SessionLocal()
     try:
-        user = get_user(db, user_id)
-        if not user:
-            return error(
-                message="User not found",
-                status_code=404
+        with get_db() as db:
+            user = get_user(db, user_id)
+            if not user:
+                return error(
+                    message="User not found",
+                    status_code=404
+                )
+
+            if not verify_password(data.old_password, user.user_password):
+                return error(
+                    message="Old password is incorrect",
+                    status_code=400
+                )
+
+            if verify_password(data.new_password, user.user_password):
+                return error(
+                    message="New password must be different from old password",
+                    status_code=400
+                )
+
+            update_user_password(
+                db,
+                user_id,
+                data.new_password
             )
 
-        if not verify_password(data.old_password, user.user_password):
-            return error(
-                message="Old password is incorrect",
-                status_code=400
-            )
-
-        if verify_password(data.new_password, user.user_password):
-            return error(
-                message="New password must be different from old password",
-                status_code=400
-            )
-
-        update_user_password(
-            db,
-            user_id,
-            data.new_password
-        )
-
-        return success(status_code=204)
+            return success(status_code=204)
 
     except Exception as e:
         return error(
@@ -330,10 +310,6 @@ def update_user_password_handler(user_id: str, body: dict):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
-
 
 def delete_user_handler(user_id: str):
     try:
@@ -345,19 +321,19 @@ def delete_user_handler(user_id: str):
             details=e.errors()
         )
     
-    db = SessionLocal()
     try:
-        deleted_id = delete_user(db, user_id)
+        with get_db() as db:
+            deleted_id = delete_user(db, user_id)
 
-        if not deleted_id:
-            return error(
-                message="User not found",
-                status_code=404
-            )
+            if not deleted_id:
+                return error(
+                    message="User not found",
+                    status_code=404
+                )
 
-        return success(
-            data={"user_id": str(deleted_id)}
-        )
+            return success(
+                data={"user_id": str(deleted_id)}
+            )   
 
     except Exception as e:
         return error(
@@ -365,9 +341,6 @@ def delete_user_handler(user_id: str):
             status_code=500,
             details=str(e)
         )
-
-    finally:
-        db.close()
 
 def search_users_handler(query: str):
     if not query or not query.strip():
@@ -375,23 +348,24 @@ def search_users_handler(query: str):
             message="Query parameter is required and cannot be empty",
             status_code=400
         )
-    db = SessionLocal()
-    try:        
-        keyword = query.strip()
-        search_type = detect_search_type(keyword)
 
-        if search_type == SearchType.EMAIL:
-            users = search_users_by_email(db, keyword)
-        elif search_type == SearchType.PHONE:
-            users = search_users_by_phone(db, keyword)
-        elif search_type == SearchType.NAME:
-            users = search_users_by_name(db, keyword)
-        else:
-            users = search_users_by_account(db, keyword)
+    try:
+        with get_db() as db:
+            keyword = query.strip()
+            search_type = detect_search_type(keyword)
 
-        return success([
-            UserResponse.model_validate(user) for user in users
-        ])
+            if search_type == SearchType.EMAIL:
+                users = search_users_by_email(db, keyword)
+            elif search_type == SearchType.PHONE:
+                users = search_users_by_phone(db, keyword)
+            elif search_type == SearchType.NAME:
+                users = search_users_by_name(db, keyword)
+            else:
+                users = search_users_by_account(db, keyword)
+
+            return success([
+                UserResponse.model_validate(user) for user in users
+            ])
 
     except Exception as e:
         return error(
@@ -399,9 +373,6 @@ def search_users_handler(query: str):
             status_code=500,
             details=str(e)
         )
-    
-    finally:
-        db.close()
 
 def detect_search_type(keyword: str) -> str:
     keyword = keyword.strip()
