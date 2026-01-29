@@ -1,4 +1,4 @@
-from app.logger import logger
+from app.core.logger import logger
 from aws_lambda_powertools.event_handler import APIGatewayRestResolver
 
 from app.routes.customer import router as customer_router

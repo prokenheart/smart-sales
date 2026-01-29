@@ -1,7 +1,7 @@
 from pydantic import ValidationError
 import re
 from enum import Enum
-from app.database import get_db
+from app.core.database import get_db
 from app.schemas.customer import (
     CustomerCreate,
     CustomerIdPath,
