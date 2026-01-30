@@ -1,11 +1,14 @@
 from pydantic import ValidationError
+import json
 from app.database import get_db
 from app.schemas.order import (
     OrderCreate,
     OrderIdPath,
     OrderResponse,
     OrderUpdateStatus,
-    OrderDateQuery
+    OrderDateQuery,
+    OrderAttachmentResponse,
+    OrderAttachmentUploadURLRequest
 )
 
 from app.schemas.user import UserIdPath
@@ -21,8 +24,11 @@ from app.services.order import (
     get_all_orders,
     update_order_status,
     delete_order,
+    update_order_attachment_url,
     NotFoundError
 )
+
+from app.services.s3_client import generate_presigned_upload_url
 
 from app.core.response import success, error
 
@@ -314,3 +320,78 @@ def delete_order_handler(order_id: str):
             status_code=500,
             details=str(e)
         )
+    
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+def create_order_attachment_upload_url_handler(order_id: str, body):
+    if body is None:
+        return error(
+            message="Request body is required",
+            status_code=400
+        )
+
+    try:
+        data = OrderAttachmentUploadURLRequest.model_validate(body)
+        content_type = data.content_type
+    except ValidationError as e:
+        safe_errors = []
+        for err in e.errors():
+            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
+            safe_errors.append(safe_err)
+        
+        return error(
+            message="Invalid content type",
+            status_code=400,
+            details=safe_errors
+        )
+
+    try:
+        order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
+    except ValidationError as e:
+        return error("Invalid order_id", 400, e.errors())
+
+    try:
+        upload_url, s3_key = generate_presigned_upload_url(
+            content_type=content_type,
+            expires_in=300
+        )
+    except ValueError as e:
+        return error(str(e), 400)
+    
+    response = {
+        "upload_url": upload_url,
+        "s3_key": s3_key,
+        "max_file_size": MAX_FILE_SIZE
+    }
+
+    return success(response)
+
+def confirm_order_attachment_handler(order_id: str, body: dict):
+    if body is None:
+        return error(
+            message="Request body is required",
+            status_code=400
+        )
+
+    s3_key = body.get("s3_key")
+    if not s3_key:
+        return error("s3_key is required", 400)
+
+    try:
+        order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
+    except ValidationError as e:
+        return error("Invalid order_id", 400, e.errors())
+
+    try:
+        with get_db() as db:
+            order = update_order_attachment_url(
+                db=db,
+                order_id=order_id,
+                attachment_url=s3_key
+            )
+
+        response = OrderAttachmentResponse.model_validate(order)
+        return success(response)
+
+    except NotFoundError as e:
+        return error(str(e), 404)

@@ -129,3 +129,19 @@ def get_orders_by_date(db: Session, order_date: date) -> list[Order]:
     )
 
     return db.execute(stmt).scalars().all()
+
+def update_order_attachment_url(
+        db: Session,
+        order_id: uuid.UUID,
+        attachment_url: str
+    ) -> Order | None:
+    order = get_order(db, order_id)
+    if not order:
+        return None
+
+    order.order_attachment = attachment_url
+
+    db.add(order)
+    db.commit()
+    db.refresh(order)
+    return order

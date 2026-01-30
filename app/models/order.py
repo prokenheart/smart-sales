@@ -1,4 +1,4 @@
-from sqlalchemy import DECIMAL, TIMESTAMP, text, ForeignKey
+from sqlalchemy import DECIMAL, TIMESTAMP, text, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from app.models import Base
@@ -17,6 +17,7 @@ class Order(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False)
     order_total: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False, default=0.00)
     status_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("status.status_id"), nullable=False)
+    order_attachment: Mapped[str | None] = mapped_column(String(255), nullable=True)
     order_date: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
 

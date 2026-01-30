@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 import uuid
 from datetime import datetime
 from decimal import Decimal
@@ -27,3 +27,26 @@ class OrderUpdateStatus(BaseModel):
 
 class OrderDateQuery(BaseModel):
     order_date: datetime
+
+class OrderAttachmentResponse(BaseModel):
+    order_id: uuid.UUID
+    order_attachment: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+class OrderAttachmentUploadURLRequest(BaseModel):
+    content_type: str = Field(..., alias="contentType")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    @field_validator("content_type")
+    @classmethod
+    def validate_content_type(cls, v: str) -> str:
+        allowed = {
+            "image/png",
+            "image/jpeg",
+            "application/pdf"
+        }
+        if v not in allowed:
+            raise ValueError("Unsupported content type")
+        return v

@@ -133,6 +133,7 @@ create table orders (
     user_id UUID NOT NULL REFERENCES users(user_id),
     order_total decimal(10, 2) NOT NULL DEFAULT 0,
     status_id UUID NOT NULL REFERENCES status(status_id),
+    order_attachment varchar(255) DEFAULT NULL,
     order_date timestamp DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );

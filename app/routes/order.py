@@ -8,7 +8,9 @@ from app.handlers.order import (
     get_orders_by_status_handler,
     get_orders_by_date_handler,
     update_order_status_handler,
-    delete_order_handler
+    delete_order_handler,
+    create_order_attachment_upload_url_handler,
+    confirm_order_attachment_handler
 )
 router = Router()
 
@@ -47,3 +49,13 @@ def update_order(order_id: str):
 @router.delete("/orders/<order_id>")
 def delete_order(order_id: str):
     return delete_order_handler(order_id)
+
+@router.post("/orders/<order_id>/attachment/upload-url")
+def upload_file(order_id: str):
+    body = router.current_event.json_body
+    return create_order_attachment_upload_url_handler(order_id, body)
+
+@router.post("/orders/<order_id>/attachment/confirm")
+def confirm_attachment(order_id: str):
+    body = router.current_event.json_body
+    return confirm_order_attachment_handler(order_id, body)

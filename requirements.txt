@@ -7,3 +7,5 @@ aws-lambda-powertools>=2.43.0
 passlib==1.7.4
 bcrypt==4.0.1
 pytest
+boto3
+requests_toolbelt
