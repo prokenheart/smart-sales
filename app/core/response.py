@@ -1,6 +1,7 @@
 from aws_lambda_powertools.event_handler import Response
 from typing import Any
 from enum import Enum
+from pydantic import ValidationError
 
 def success(data: Any = None, status_code: int = 200):
     return Response(
@@ -31,3 +32,15 @@ class StatusCode (int, Enum):
     CONFLICT = 409
     UNPROCESSABLE_ENTITY = 422
     INTERNAL_SERVER_ERROR = 500
+
+def errors_from_validation_error(e: ValidationError) -> list[dict[str, Any]]:
+    errors = []
+    for err in e.errors():
+        error = {
+            "type": err.get("type", ""),
+            "loc": err.get("loc", []),
+            "msg": err.get("msg", ""),
+            "input": err.get("input", "")
+        }
+        errors.append(error)
+    return errors

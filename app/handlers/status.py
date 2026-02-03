@@ -12,7 +12,7 @@ from app.services.status import (
     get_all_statuses,
 )
 
-from app.core.response import success, error, StatusCode
+from app.core.response import success, error, StatusCode, errors_from_validation_error
 
 def get_status_handler(status_id: str):
     try:
@@ -21,7 +21,7 @@ def get_status_handler(status_id: str):
             return error(
                 message="Invalid status_id",
                 status_code=StatusCode.BAD_REQUEST,
-                details=e.errors()
+                details=errors_from_validation_error(e)
             )
     
     try:
@@ -49,15 +49,10 @@ def get_status_by_code_handler(status_code: str):
     try:
         status_code = StatusCode.model_validate({"status_code": status_code}).status_code
     except ValidationError as e:
-        safe_errors = []
-        for err in e.errors():
-            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
-            safe_errors.append(safe_err)
-        
         return error(
             message="Invalid status code",
             status_code=StatusCode.BAD_REQUEST,
-            details=safe_errors
+            details=errors_from_validation_error(e)
         )
 
     try:

@@ -1,5 +1,4 @@
 from pydantic import ValidationError
-import json
 from app.database import get_db
 from app.schemas.order import (
     OrderCreate,
@@ -28,9 +27,9 @@ from app.services.order import (
     NotFoundError
 )
 
-from app.services.s3_client import generate_presigned_upload_url
+from app.s3_client import generate_presigned_upload_url
 
-from app.core.response import success, error, StatusCode
+from app.core.response import success, error, StatusCode, errors_from_validation_error
 
 def create_order_handler(body: dict):
     if body is None:
@@ -44,7 +43,7 @@ def create_order_handler(body: dict):
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
         
     try:
@@ -80,7 +79,8 @@ def get_order_handler(order_id: str):
     except ValidationError:
             return error(
                 message="Invalid order_id",
-                status_code=StatusCode.BAD_REQUEST
+                status_code=StatusCode.BAD_REQUEST,
+                details=errors_from_validation_error(e)
             )
     
     try:
@@ -125,7 +125,7 @@ def get_orders_by_user_handler(user_id: str):
         return error(
             message="Invalid user_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
         
     try:
@@ -155,7 +155,7 @@ def get_orders_by_customer_handler(customer_id: str):
         return error(
             message="Invalid customer_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
         
     try:
@@ -182,15 +182,10 @@ def get_orders_by_status_handler(status_code: str):
     try:
         status_code = StatusCode.model_validate({"status_code": status_code}).status_code
     except ValidationError as e:
-        safe_errors = []
-        for err in e.errors():
-            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
-            safe_errors.append(safe_err)
-        
         return error(
             message="Invalid status code",
             status_code=StatusCode.BAD_REQUEST,
-            details=safe_errors
+            details=errors_from_validation_error(e)
         )
         
     try:
@@ -226,7 +221,7 @@ def get_orders_by_date_handler(date_str: str):
         return error(
             message="Invalid date format",
             status_code=StatusCode.BAD_REQUEST,
-            details=str(e)
+            details=errors_from_validation_error(e)
         )
     
     except Exception as e:
@@ -248,7 +243,7 @@ def update_order_status_handler(order_id: str, body: dict):
         return error(
             message="Invalid order_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -257,7 +252,7 @@ def update_order_status_handler(order_id: str, body: dict):
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
 
     try:
@@ -297,7 +292,7 @@ def delete_order_handler(order_id: str):
         return error(
             message="Invalid order_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -334,21 +329,20 @@ def create_order_attachment_upload_url_handler(order_id: str, body):
         data = OrderAttachmentUploadURLRequest.model_validate(body)
         content_type = data.content_type
     except ValidationError as e:
-        safe_errors = []
-        for err in e.errors():
-            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
-            safe_errors.append(safe_err)
-        
         return error(
             message="Invalid content type",
             status_code=StatusCode.BAD_REQUEST,
-            details=safe_errors
+            details=errors_from_validation_error(e)
         )
 
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
-        return error("Invalid order_id", 400, e.errors())
+        return error(
+            message="Invalid order_id",
+            status_code=StatusCode.BAD_REQUEST,
+            details=errors_from_validation_error(e)
+        )
 
     try:
         upload_url, s3_key = generate_presigned_upload_url(
@@ -380,7 +374,11 @@ def confirm_order_attachment_handler(order_id: str, body: dict):
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
-        return error("Invalid order_id", 400, e.errors())
+        return error(
+            message="Invalid order_id", 
+            status_code=StatusCode.BAD_REQUEST,
+            details=errors_from_validation_error(e)
+        )
 
     try:
         with get_db() as db:

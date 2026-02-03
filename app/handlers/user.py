@@ -29,7 +29,7 @@ from app.services.user import (
     DuplicateEmailError
 )
 
-from app.core.response import success, error, StatusCode
+from app.core.response import success, error, StatusCode, errors_from_validation_error
 class SearchType(str, Enum):
     EMAIL = "email"
     NAME = "name"
@@ -48,15 +48,10 @@ def create_user_handler(body: dict):
     try:
         data = UserCreate.model_validate(body)
     except ValidationError as e:
-        safe_errors = []
-        for err in e.errors():
-            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
-            safe_errors.append(safe_err)
-        
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=safe_errors
+            details=errors_from_validation_error(e)
         )
         
     try:
@@ -100,7 +95,8 @@ def get_user_handler(user_id: str):
     except ValidationError:
             return error(
                 message="Invalid user_id",
-                status_code=StatusCode.BAD_REQUEST
+                status_code=StatusCode.BAD_REQUEST,
+                details=errors_from_validation_error(e)
             )
     
     try:
@@ -167,7 +163,7 @@ def get_user_by_email_handler(user_email: str):
         return error(
             message="Invalid email parameter",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
 
     try:
@@ -200,23 +196,18 @@ def update_user_info_handler(user_id: str, body: dict):
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
     except ValidationError as e:
         return error(
-            message="Invalid request body",
+            message="Invalid user_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
         data = UserUpdateInfo.model_validate(body)
-    except ValidationError as e:
-        safe_errors = []
-        for err in e.errors():
-            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
-            safe_errors.append(safe_err)
-        
+    except ValidationError as e: 
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=safe_errors
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -261,9 +252,9 @@ def update_user_password_handler(user_id: str, body: dict):
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
     except ValidationError as e:
         return error(
-            message="Invalid request body",
+            message="Invalid user_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -272,7 +263,7 @@ def update_user_password_handler(user_id: str, body: dict):
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -318,7 +309,7 @@ def delete_user_handler(user_id: str):
         return error(
             message="Invalid user_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:

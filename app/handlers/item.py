@@ -19,7 +19,7 @@ from app.services.item import (
     NotEnoughError
 )
 
-from app.core.response import success, error, StatusCode
+from app.core.response import success, error, StatusCode, errors_from_validation_error
 
 def get_item_handler(order_id: str, product_id: str):
     try:
@@ -29,7 +29,7 @@ def get_item_handler(order_id: str, product_id: str):
             return error(
                 message="Invalid id",
                 status_code=StatusCode.BAD_REQUEST,
-                details=e.errors
+                details=errors_from_validation_error(e)
             )
     
     try:
@@ -74,7 +74,7 @@ def get_items_by_order_handler(order_id: str):
         return error(
             message="Invalid order_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
         
     try:
@@ -109,7 +109,7 @@ def update_item_handler(order_id: str, body: dict):
         return error(
             message="Invalid order_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -118,7 +118,7 @@ def update_item_handler(order_id: str, body: dict):
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
 
     try:

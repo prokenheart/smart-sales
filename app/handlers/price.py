@@ -19,7 +19,7 @@ from app.services.price import (
     NotFoundError
 )
 
-from app.core.response import success, error, StatusCode
+from app.core.response import success, error, StatusCode, errors_from_validation_error
 
 def create_price_handler(body: dict):
     if body is None:
@@ -33,7 +33,7 @@ def create_price_handler(body: dict):
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
 
     try:
@@ -70,7 +70,8 @@ def get_price_handler(price_id: str):
     except ValidationError:
             return error(
                 message="Invalid price_id",
-                status_code=StatusCode.BAD_REQUEST
+                status_code=StatusCode.BAD_REQUEST,
+                details=errors_from_validation_error(e)
             )
     
     try:
@@ -115,7 +116,7 @@ def get_prices_by_product_handler(product_id: str):
         return error(
             message="Invalid product_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -150,7 +151,7 @@ def update_price_handler(price_id: str, body: dict):
         return error(
             message="Invalid price_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -159,7 +160,7 @@ def update_price_handler(price_id: str, body: dict):
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -195,7 +196,7 @@ def delete_price_handler(price_id: str):
         return error(
             message="Invalid price_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:

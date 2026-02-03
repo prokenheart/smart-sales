@@ -23,7 +23,7 @@ from app.services.customer import (
     DuplicateEmailError
 )
 
-from app.core.response import success, error, StatusCode
+from app.core.response import success, error, StatusCode, errors_from_validation_error
 class SearchType(str, Enum):
     EMAIL = "email"
     NAME = "name"
@@ -41,15 +41,10 @@ def create_customer_handler(body: dict):
     try:
         data = CustomerCreate.model_validate(body)
     except ValidationError as e:
-        safe_errors = []
-        for err in e.errors():
-            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
-            safe_errors.append(safe_err)
-        
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=safe_errors
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -86,6 +81,7 @@ def get_customer_handler(customer_id: str):
             return error(
                 message="Invalid customer_id",
                 status_code=StatusCode.BAD_REQUEST,
+                details=errors_from_validation_error(e)
             )
 
     try:
@@ -131,7 +127,7 @@ def get_customer_by_email_handler(customer_email: str):
         return error(
             message="Invalid email parameter",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -167,21 +163,16 @@ def update_customer_handler(customer_id: str, body: dict):
         return error(
             message="Invalid customer_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
         data = CustomerUpdate.model_validate(body)
     except ValidationError as e:
-        safe_errors = []
-        for err in e.errors():
-            safe_err = {k: v for k, v in err.items() if k != 'ctx'}  # loại bỏ 'ctx' chứa ValueError
-            safe_errors.append(safe_err)
-        
         return error(
             message="Invalid request body",
             status_code=StatusCode.BAD_REQUEST,
-            details=safe_errors
+            details=errors_from_validation_error(e)
         )
     
     try:
@@ -223,7 +214,7 @@ def delete_customer_handler(customer_id: str):
         return error(
             message="Invalid customer_id",
             status_code=StatusCode.BAD_REQUEST,
-            details=e.errors()
+            details=errors_from_validation_error(e)
         )
     
     try:
