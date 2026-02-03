@@ -257,6 +257,18 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /orders/{order_id}/attachment/upload_url
             Method: POST
+        CreateGetURL:
+          Type: Api
+          Properties: 
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}/attachment/get_url
+            Method: POST
+        DeleteAttachment:
+          Type: Api
+          Properties: 
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}/attachment
+            Method: DELETE
         ConfirmUpload:
           Type: Api
           Properties:

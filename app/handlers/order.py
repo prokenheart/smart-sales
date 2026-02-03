@@ -27,7 +27,7 @@ from app.services.order import (
     NotFoundError
 )
 
-from app.s3_client import generate_presigned_upload_url
+from app.s3_client import generate_presigned_upload_url, generate_presigned_get_url, delete_file_from_s3
 
 from app.core.response import success, error, StatusCode, errors_from_validation_error
 
@@ -397,6 +397,97 @@ def confirm_order_attachment_handler(order_id: str, body: dict):
 
     except NotFoundError as e:
         return error(str(e), 404)
+
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            details=str(e)
+        )
+    
+def create_order_attachment_get_url_handler(order_id: str):
+    try:
+        order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
+    except ValidationError as e:
+        return error(
+            message="Invalid order_id",
+            status_code=StatusCode.BAD_REQUEST,
+            details=errors_from_validation_error(e)
+        )
+    
+    with get_db() as db:
+        order = get_order(db, order_id)
+        if not order:
+            return error(
+                message="Order not found",
+                status_code=StatusCode.NOT_FOUND
+            )
+        
+        if order.order_attachment is None:
+            return error(
+                message="No attachment found for this order",
+                status_code=StatusCode.NOT_FOUND
+            )
+        s3_key = order.order_attachment
+
+
+    try:
+        get_url = generate_presigned_get_url(
+            key=s3_key,
+            expires_in=300
+        )
+
+        response = {
+            "get_url": get_url
+        }
+        return success(response)
+    
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            details=str(e)
+        )
+    
+def delete_order_attachment_handler(order_id: str):
+    try:
+        order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
+    except ValidationError as e:
+        return error(
+            message="Invalid order_id",
+            status_code=StatusCode.BAD_REQUEST,
+            details=errors_from_validation_error(e)
+        )
+    
+    try:
+        with get_db() as db:
+            order = get_order(db, order_id)
+            if not order:
+                return error(
+                    message="Order not found",
+                    status_code=StatusCode.NOT_FOUND
+                )
+            
+            if order.order_attachment is None:
+                return error(
+                    message="No attachment found for this order",
+                    status_code=StatusCode.NOT_FOUND
+                )
+            s3_key = order.order_attachment
+
+            delete_file_from_s3(s3_key)
+
+            update_order_attachment_url(
+                db=db,
+                order_id=order_id,
+                attachment_url=None
+            )
+
+            response = {
+                "message": "Attachment deleted successfully"
+            }
+
+            return success(response)
 
     except Exception as e:
         return error(

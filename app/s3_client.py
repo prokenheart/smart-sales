@@ -50,3 +50,25 @@ def generate_presigned_upload_url(
     )
 
     return upload_url, key
+
+def generate_presigned_get_url(
+    key: str,
+    expires_in: int = 300,
+) -> str:
+    s3 = get_s3_client()
+    get_url = s3.generate_presigned_url(
+        ClientMethod="get_object",
+        Params={
+            "Bucket": BUCKET_NAME,
+            "Key": key,
+        },
+        ExpiresIn=expires_in,
+    )
+    return get_url
+
+def delete_file_from_s3(key: str):
+    s3 = get_s3_client()
+    s3.delete_object(
+        Bucket=BUCKET_NAME,
+        Key=key,
+    )
