@@ -3,6 +3,7 @@ from sqlalchemy import select, exists
 from app.models import Order, User, Customer, Status
 import uuid
 from datetime import date, datetime, timedelta
+from app.core.logger import logger
 
 class NotFoundError(Exception):
     pass
@@ -61,12 +62,25 @@ def update_order_status(
     if not order:
         return None
     
+    old_status = get_status(db, order.status_id)
+    
     status = get_status(db, status_id)
     order.status_id = status.status_id
 
     db.add(order)
     db.commit()
     db.refresh(order)
+
+    logger.info(
+        "order_status_changed",
+        extra={
+            "order_id": str(order.order_id),
+            "user_id": str(order.user_id),
+            "old_status": str(old_status.status_code),
+            "new_status": str(status.status_code)
+        }
+    )
+
     return order
 
 def delete_order(db: Session, order_id: uuid.UUID) -> uuid.UUID | None:
