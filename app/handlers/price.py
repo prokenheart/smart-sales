@@ -67,7 +67,7 @@ def create_price_handler(body: dict):
 def get_price_handler(price_id: str):
     try:
         price_id = PriceIdPath.model_validate({"price_id": price_id}).price_id
-    except ValidationError:
+    except ValidationError as e:
             return error(
                 message="Invalid price_id",
                 status_code=StatusCode.BAD_REQUEST,

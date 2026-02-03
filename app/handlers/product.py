@@ -58,7 +58,7 @@ def create_product_handler(body: dict):
 def get_product_handler(product_id: str):
     try:
         product_id = ProductIdPath.model_validate({"product_id": product_id}).product_id
-    except ValidationError:
+    except ValidationError as e:
             return error(
                 message="Invalid product_id",
                 status_code=StatusCode.BAD_REQUEST,

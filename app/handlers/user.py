@@ -92,7 +92,7 @@ def create_user_handler(body: dict):
 def get_user_handler(user_id: str):
     try:
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
-    except ValidationError:
+    except ValidationError as e:
             return error(
                 message="Invalid user_id",
                 status_code=StatusCode.BAD_REQUEST,

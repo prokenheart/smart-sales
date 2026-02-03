@@ -76,7 +76,7 @@ def create_order_handler(body: dict):
 def get_order_handler(order_id: str):
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
-    except ValidationError:
+    except ValidationError as e:
             return error(
                 message="Invalid order_id",
                 status_code=StatusCode.BAD_REQUEST,

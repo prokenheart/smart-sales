@@ -77,7 +77,7 @@ def create_customer_handler(body: dict):
 def get_customer_handler(customer_id: str):
     try:
         customer_id = CustomerIdPath.model_validate({"customer_id": customer_id}).customer_id
-    except ValidationError:
+    except ValidationError as e:
             return error(
                 message="Invalid customer_id",
                 status_code=StatusCode.BAD_REQUEST,
