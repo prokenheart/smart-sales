@@ -349,16 +349,20 @@ def create_order_attachment_upload_url_handler(order_id: str, body):
             content_type=content_type,
             expires_in=300
         )
-    except ValueError as e:
-        return error(str(e), 400)
-    
-    response = {
-        "upload_url": upload_url,
-        "s3_key": s3_key,
-        "max_file_size": MAX_FILE_SIZE
-    }
 
-    return success(response)
+        response = {
+            "upload_url": upload_url,
+            "s3_key": s3_key,
+            "max_file_size": MAX_FILE_SIZE
+        }
+        return success(response)
+    
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            details=str(e)
+        )
 
 def confirm_order_attachment_handler(order_id: str, body: dict):
     if body is None:
@@ -393,3 +397,10 @@ def confirm_order_attachment_handler(order_id: str, body: dict):
 
     except NotFoundError as e:
         return error(str(e), 404)
+
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            details=str(e)
+        )
