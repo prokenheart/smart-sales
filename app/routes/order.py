@@ -50,7 +50,7 @@ def update_order(order_id: str):
 def delete_order(order_id: str):
     return delete_order_handler(order_id)
 
-@router.post("/orders/<order_id>/attachment/upload-url")
+@router.post("/orders/<order_id>/attachment/upload_url")
 def upload_file(order_id: str):
     body = router.current_event.json_body
     return create_order_attachment_upload_url_handler(order_id, body)

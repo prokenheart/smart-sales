@@ -62,7 +62,7 @@ Resources:
           DB_HOST: !Ref DBHost
           DB_PORT: !Ref DBPort
           DB_NAME: !Ref DBName
-          AWS_REGION: ap-southeast-2
+          # AWS_REGION: ap-southeast-2
           AWS_BUCKET_NAME: smart-sales-images
       Events:
         CreateCustomer:
@@ -255,12 +255,13 @@ Resources:
           Type: Api
           Properties: 
             RestApiId: !Ref MyApi
-            Path: /orders/{orderId}/attachment/upload-url
+            Path: /orders/{order_id}/attachment/upload_url
             Method: POST
         ConfirmUpload:
           Type: Api
           Properties:
-            Path: /orders/{orderId}/attachment/confirm
+            RestApiId: !Ref MyApi
+            Path: /orders/{order_id}/attachment/confirm
             Method: POST
         GetItem:
           Type: Api
