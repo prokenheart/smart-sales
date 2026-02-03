@@ -29,7 +29,7 @@ def test_item_creat_invalid_product_id():
 
 # Số lượng nhỏ hơn hoặc bằng 0
 @pytest.mark.parametrize("quantity", [0, -1, -10])
-def test_item_create_invalid_quantity(quantity):
+def test_item_create_invalid_quantity(quantity: int):
     with pytest.raises(ValidationError) as exc_info:
         ItemCreate(
             product_id=uuid.uuid4(),

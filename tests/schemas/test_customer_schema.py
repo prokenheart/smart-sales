@@ -48,7 +48,7 @@ def test_customer_create_valid_phone_no_plus():
         "+12345abcde"           # Chứa chữ cái
     ]
 )
-def test_customer_create_invalid_phone(invalid_phone):
+def test_customer_create_invalid_phone(invalid_phone: str):
     with pytest.raises(ValidationError) as exc_info:
         CustomerCreate(
             customer_name="Alice Peterson",
@@ -134,7 +134,7 @@ def test_customer_update_valid_phone_no_plus():
         "+12345abcde"           # Chứa chữ cái
     ]
 )
-def test_customer_update_invalid_phone(invalid_phone):
+def test_customer_update_invalid_phone(invalid_phone: str):
     with pytest.raises(ValidationError) as exc_info:
         CustomerUpdate(
             customer_phone=invalid_phone
@@ -176,7 +176,7 @@ def test_customer_id_path_valid():
         str(uuid.uuid4())[:-1] + "@",
     ]
 )
-def test_customer_id_path_invalid(customer_id):
+def test_customer_id_path_invalid(customer_id: str):
     with pytest.raises(ValidationError) as exc_info:
         CustomerIdPath(
             customer_id=customer_id

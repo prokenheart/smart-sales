@@ -30,7 +30,7 @@ def test_status_base_upper():
     ]
 )
 # Sai kiểu status_code
-def test_status_base_invalid_code(status_code):
+def test_status_base_invalid_code(status_code: str):
     with pytest.raises(ValidationError) as exc_info:
         StatusBase(
             status_name="Unpaid",
@@ -79,7 +79,7 @@ def test_status_code_valid():
         "paid@"
     ]
 )
-def test_status_code_invalid(status_code):
+def test_status_code_invalid(status_code: str):
     with pytest.raises(ValidationError) as exc_info:
         StatusCode(
             status_code=status_code
@@ -108,7 +108,7 @@ def test_status_id_path_valid():
         str(uuid.uuid4())[:-1] + "@",
     ]
 )
-def test_status_id_path_invalid(status_id):
+def test_status_id_path_invalid(status_id: str):
     with pytest.raises(ValidationError) as exc_info:
         StatusIdPath(
             status_id=status_id

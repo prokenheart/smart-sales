@@ -34,7 +34,7 @@ def test_product_create_valid_description():
         -100
     ]
 )
-def test_product_create_invalid_quantity(product_quantity):
+def test_product_create_invalid_quantity(product_quantity: int):
     with pytest.raises(ValidationError) as exc_info:
         ProductCreate(
             product_name="Acer Swift 3 Laptop",
@@ -54,7 +54,7 @@ def test_product_create_invalid_quantity(product_quantity):
         9.1
     ]
 )
-def test_product_create_invalid_quantity_not_int(product_quantity):
+def test_product_create_invalid_quantity_not_int(product_quantity: float):
     with pytest.raises(ValidationError) as exc_info:
         ProductCreate(
             product_name="Acer Swift 3 Laptop",
@@ -109,7 +109,7 @@ def test_product_update_valid_partial():
         -100
     ]
 )
-def test_product_update_invalid_quantity(product_quantity):
+def test_product_update_invalid_quantity(product_quantity: int):
     with pytest.raises(ValidationError) as exc_info:
         ProductUpdate(
             product_quantity=product_quantity
@@ -127,7 +127,7 @@ def test_product_update_invalid_quantity(product_quantity):
         9.1
     ]
 )
-def test_product_update_invalid_quantity_not_int(product_quantity):
+def test_product_update_invalid_quantity_not_int(product_quantity: float):
     with pytest.raises(ValidationError) as exc_info:
         ProductUpdate(
             product_quantity=product_quantity
@@ -169,7 +169,7 @@ def test_product_id_path_valid():
         str(uuid.uuid4())[:-1] + "@",
     ]
 )
-def test_product_id_path_invalid(product_id):
+def test_product_id_path_invalid(product_id: str):
     with pytest.raises(ValidationError) as exc_info:
         ProductIdPath(
             product_id=product_id

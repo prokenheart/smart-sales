@@ -12,6 +12,7 @@ from app.schemas.order import (
 
 from app.schemas.user import UserIdPath
 from app.schemas.status import StatusCode
+from app.schemas.customer import CustomerIdPath
 
 from app.services.order import (
     create_order,
@@ -29,20 +30,20 @@ from app.services.order import (
 
 from app.s3_client import generate_presigned_upload_url, generate_presigned_get_url, delete_file_from_s3
 
-from app.core.response import success, error, StatusCode, errors_from_validation_error
+from app.core.response import success, error, ResponseStatusCode, errors_from_validation_error, Response
 
-def create_order_handler(body: dict):
+def create_order_handler(body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=StatusCode.BAD_REQUEST
+            status_code=ResponseStatusCode.BAD_REQUEST
         )
     try:
         data = OrderCreate.model_validate(body)
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
         
@@ -63,23 +64,23 @@ def create_order_handler(body: dict):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.NOT_FOUND
+            status_code=ResponseStatusCode.NOT_FOUND
         )
     
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_order_handler(order_id: str):
+def get_order_handler(order_id: str) -> Response:
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
             return error(
                 message="Invalid order_id",
-                status_code=StatusCode.BAD_REQUEST,
+                status_code=ResponseStatusCode.BAD_REQUEST,
                 details=errors_from_validation_error(e)
             )
     
@@ -89,7 +90,7 @@ def get_order_handler(order_id: str):
             if not order:
                 return error(
                     message="Order not found",
-                    status_code=StatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND
                 )
             
             response = OrderResponse.model_validate(order)
@@ -99,11 +100,11 @@ def get_order_handler(order_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
     
-def get_all_orders_handler():
+def get_all_orders_handler() -> Response:
     try:
         with get_db() as db:
             orders = get_all_orders(db)
@@ -114,17 +115,17 @@ def get_all_orders_handler():
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_orders_by_user_handler(user_id: str):
+def get_orders_by_user_handler(user_id: str) -> Response:
     try:
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
     except ValidationError as e:
         return error(
             message="Invalid user_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
         
@@ -138,23 +139,23 @@ def get_orders_by_user_handler(user_id: str):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.NOT_FOUND
+            status_code=ResponseStatusCode.NOT_FOUND
         )
     
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_orders_by_customer_handler(customer_id: str):
+def get_orders_by_customer_handler(customer_id: str) -> Response:
     try:
-        customer_id = UserIdPath.model_validate({"user_id": customer_id}).user_id
+        customer_id = CustomerIdPath.model_validate({"customer_id": customer_id}).customer_id
     except ValidationError as e:
         return error(
             message="Invalid customer_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
         
@@ -168,23 +169,23 @@ def get_orders_by_customer_handler(customer_id: str):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.NOT_FOUND
+            status_code=ResponseStatusCode.NOT_FOUND
         )
     
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_orders_by_status_handler(status_code: str):
+def get_orders_by_status_handler(status_code: str) -> Response:
     try:
         status_code = StatusCode.model_validate({"status_code": status_code}).status_code
     except ValidationError as e:
         return error(
             message="Invalid status code",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
         
@@ -198,17 +199,17 @@ def get_orders_by_status_handler(status_code: str):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.NOT_FOUND
+            status_code=ResponseStatusCode.NOT_FOUND
         )
     
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_orders_by_date_handler(date_str: str):
+def get_orders_by_date_handler(date_str: str) -> Response:
     try:
         with get_db() as db:
             date_query = OrderDateQuery.model_validate({"order_date": date_str}).order_date
@@ -220,29 +221,29 @@ def get_orders_by_date_handler(date_str: str):
     except ValidationError as e:
         return error(
             message="Invalid date format",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
     
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def update_order_status_handler(order_id: str, body: dict):
+def update_order_status_handler(order_id: str, body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=StatusCode.BAD_REQUEST
+            status_code=ResponseStatusCode.BAD_REQUEST
         )
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
     
@@ -251,7 +252,7 @@ def update_order_status_handler(order_id: str, body: dict):
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
 
@@ -266,7 +267,7 @@ def update_order_status_handler(order_id: str, body: dict):
             if not order:
                 return error(
                     message="Order not found",
-                    status_code=StatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND
                 )
             
             response = OrderResponse.model_validate(order)
@@ -275,23 +276,23 @@ def update_order_status_handler(order_id: str, body: dict):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.NOT_FOUND
+            status_code=ResponseStatusCode.NOT_FOUND
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def delete_order_handler(order_id: str):
+def delete_order_handler(order_id: str) -> Response:
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
     
@@ -302,7 +303,7 @@ def delete_order_handler(order_id: str):
             if not deleted_id:
                 return error(
                     message="Order not found",
-                    status_code=StatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND
                 )
 
             return success(
@@ -312,17 +313,17 @@ def delete_order_handler(order_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
     
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
-def create_order_attachment_upload_url_handler(order_id: str, body):
+def create_order_attachment_upload_url_handler(order_id: str, body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=StatusCode.BAD_REQUEST
+            status_code=ResponseStatusCode.BAD_REQUEST
         )
 
     try:
@@ -331,7 +332,7 @@ def create_order_attachment_upload_url_handler(order_id: str, body):
     except ValidationError as e:
         return error(
             message="Invalid content type",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
 
@@ -340,7 +341,7 @@ def create_order_attachment_upload_url_handler(order_id: str, body):
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
 
@@ -360,15 +361,15 @@ def create_order_attachment_upload_url_handler(order_id: str, body):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def confirm_order_attachment_handler(order_id: str, body: dict):
+def confirm_order_attachment_handler(order_id: str, body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=StatusCode.BAD_REQUEST
+            status_code=ResponseStatusCode.BAD_REQUEST
         )
 
     s3_key = body.get("s3_key")
@@ -380,7 +381,7 @@ def confirm_order_attachment_handler(order_id: str, body: dict):
     except ValidationError as e:
         return error(
             message="Invalid order_id", 
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
 
@@ -401,17 +402,17 @@ def confirm_order_attachment_handler(order_id: str, body: dict):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
     
-def create_order_attachment_get_url_handler(order_id: str):
+def create_order_attachment_get_url_handler(order_id: str) -> Response:
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
     
@@ -420,13 +421,13 @@ def create_order_attachment_get_url_handler(order_id: str):
         if not order:
             return error(
                 message="Order not found",
-                status_code=StatusCode.NOT_FOUND
+                status_code=ResponseStatusCode.NOT_FOUND
             )
         
         if order.order_attachment is None:
             return error(
                 message="No attachment found for this order",
-                status_code=StatusCode.NOT_FOUND
+                status_code=ResponseStatusCode.NOT_FOUND
             )
         s3_key = order.order_attachment
 
@@ -445,17 +446,17 @@ def create_order_attachment_get_url_handler(order_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
     
-def delete_order_attachment_handler(order_id: str):
+def delete_order_attachment_handler(order_id: str) -> Response:
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
     
@@ -465,13 +466,13 @@ def delete_order_attachment_handler(order_id: str):
             if not order:
                 return error(
                     message="Order not found",
-                    status_code=StatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND
                 )
             
             if order.order_attachment is None:
                 return error(
                     message="No attachment found for this order",
-                    status_code=StatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND
                 )
             s3_key = order.order_attachment
 
@@ -492,6 +493,6 @@ def delete_order_attachment_handler(order_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )

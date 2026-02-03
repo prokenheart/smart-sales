@@ -6,6 +6,7 @@ from unittest.mock import patch
 import uuid
 from app.services.customer import DuplicateEmailError
 from sqlalchemy.exc import IntegrityError
+from tests.conftest import MagicMock
 
 @pytest.fixture
 def new_customer():
@@ -34,7 +35,7 @@ def existing_customer_2():
     )
 
 
-def test_create_customer(mock_session, new_customer):
+def test_create_customer(mock_session: MagicMock, new_customer: Customer):
     with patch(
         "app.services.customer.get_customer_by_email",
         return_value=None
@@ -53,7 +54,7 @@ def test_create_customer(mock_session, new_customer):
     assert created_customer.customer_email == new_customer.customer_email
     assert created_customer.customer_phone == new_customer.customer_phone
 
-def test_create_customer_integrity_error(mock_session, new_customer):
+def test_create_customer_integrity_error(mock_session: MagicMock, new_customer: Customer):
     with patch(
         "app.services.customer.get_customer_by_email",
         return_value=None
@@ -74,7 +75,7 @@ def test_create_customer_integrity_error(mock_session, new_customer):
 
     mock_session.rollback.assert_called_once()
 
-def test_create_customer_email_exists(mock_session, new_customer, existing_customer):
+def test_create_customer_email_exists(mock_session: MagicMock, new_customer: Customer, existing_customer: Customer):
     with patch(
         "app.services.customer.get_customer_by_email",
         return_value=existing_customer
@@ -87,7 +88,7 @@ def test_create_customer_email_exists(mock_session, new_customer, existing_custo
                 customer_phone=new_customer.customer_phone
             )
 
-def test_get_customer(mock_session, existing_customer):
+def test_get_customer(mock_session: MagicMock, existing_customer: Customer):
     mock_session.execute.return_value.scalar_one_or_none.return_value = existing_customer
 
     customer = service.get_customer(
@@ -109,7 +110,7 @@ def test_get_customer_not_found(mock_session):
     mock_session.execute.assert_called_once()
     assert customer is None
 
-def test_get_customer_by_email(mock_session, existing_customer):
+def test_get_customer_by_email(mock_session: MagicMock, existing_customer: Customer):
     mock_session.execute.return_value.scalar_one_or_none.return_value = existing_customer
 
     customer = service.get_customer_by_email(
@@ -130,7 +131,7 @@ def test_get_customer_by_email_not_found(mock_session):
     mock_session.execute.assert_called_once()
     assert customer is None
 
-def test_get_all_customers(mock_session, existing_customer):
+def test_get_all_customers(mock_session: MagicMock, existing_customer: Customer):
     mock_session.execute.return_value.scalars.return_value.all.return_value = [existing_customer]
 
     customers = service.get_all_customers(mock_session)
@@ -138,7 +139,7 @@ def test_get_all_customers(mock_session, existing_customer):
     mock_session.execute.assert_called_once()
     assert customers == [existing_customer]
 
-def test_get_all_customers_empty(mock_session):
+def test_get_all_customers_empty(mock_session: MagicMock):
     mock_session.execute.return_value.scalars.return_value.all.return_value = []
 
     customers = service.get_all_customers(mock_session)
@@ -146,7 +147,7 @@ def test_get_all_customers_empty(mock_session):
     mock_session.execute.assert_called_once()
     assert customers == []
 
-def test_update_customer(mock_session, existing_customer, new_customer):
+def test_update_customer(mock_session: MagicMock, existing_customer, new_customer: Customer):
     with(
         patch(
             "app.services.customer.get_customer",
@@ -169,7 +170,7 @@ def test_update_customer(mock_session, existing_customer, new_customer):
     mock_session.refresh.assert_called_once()
     assert updated_customer is existing_customer
 
-def test_update_customer_not_found(mock_session, new_customer):
+def test_update_customer_not_found(mock_session: MagicMock, new_customer: Customer):
     with patch(
         "app.services.customer.get_customer",
         return_value=None
@@ -184,7 +185,7 @@ def test_update_customer_not_found(mock_session, new_customer):
 
     assert updated_customer is None
 
-def test_update_customer_email_exists(mock_session, existing_customer, existing_customer_2):
+def test_update_customer_email_exists(mock_session: MagicMock, existing_customer: Customer, existing_customer_2: Customer):
     with (
         patch(
             "app.services.customer.get_customer",
@@ -202,7 +203,7 @@ def test_update_customer_email_exists(mock_session, existing_customer, existing_
                 customer_email=existing_customer_2.customer_email
             )
 
-def test_update_customer_integrity_error(mock_session, existing_customer, new_customer):
+def test_update_customer_integrity_error(mock_session: MagicMock, existing_customer: Customer, new_customer: Customer):
     with (
         patch(
             "app.services.customer.get_customer",
@@ -230,7 +231,7 @@ def test_update_customer_integrity_error(mock_session, existing_customer, new_cu
 
     mock_session.rollback.assert_called_once()
 
-def test_delete_customer(mock_session, existing_customer):
+def test_delete_customer(mock_session: MagicMock, existing_customer: Customer):
     with patch(
         "app.services.customer.get_customer",
         return_value=existing_customer
@@ -244,7 +245,7 @@ def test_delete_customer(mock_session, existing_customer):
     mock_session.commit.assert_called_once()
     assert deleted_id == existing_customer.customer_id
 
-def test_delete_customer_not_found(mock_session):
+def test_delete_customer_not_found(mock_session: MagicMock):
     with patch(
         "app.services.customer.get_customer",
         return_value=None
@@ -256,7 +257,7 @@ def test_delete_customer_not_found(mock_session):
 
     assert deleted_id is None
 
-def search_customers_by_name(mock_session, existing_customer, existing_customer_2):
+def search_customers_by_name(mock_session: MagicMock, existing_customer: Customer, existing_customer_2: Customer):
     mock_session.execute.return_value.scalars.return_value.all.return_value = [
         existing_customer,
         existing_customer_2
@@ -270,7 +271,7 @@ def search_customers_by_name(mock_session, existing_customer, existing_customer_
     mock_session.execute.assert_called_once()
     assert customers == [existing_customer, existing_customer_2]
 
-def test_search_customers_by_name_no_results(mock_session):
+def test_search_customers_by_name_no_results(mock_session: MagicMock):
     mock_session.execute.return_value.scalars.return_value.all.return_value = []
 
     customers = service.search_customers_by_name(
@@ -281,7 +282,7 @@ def test_search_customers_by_name_no_results(mock_session):
     mock_session.execute.assert_called_once()
     assert customers == []
 
-def test_search_customers_by_email(mock_session, existing_customer):
+def test_search_customers_by_email(mock_session: MagicMock, existing_customer: Customer):
     mock_session.execute.return_value.scalars.return_value.all.return_value = [
         existing_customer
     ]
@@ -294,7 +295,7 @@ def test_search_customers_by_email(mock_session, existing_customer):
     mock_session.execute.assert_called_once()
     assert customers == [existing_customer]
 
-def test_search_customers_by_email_no_results(mock_session):
+def test_search_customers_by_email_no_results(mock_session: MagicMock):
     mock_session.execute.return_value.scalars.return_value.all.return_value = []
 
     customers = service.search_customers_by_email(
@@ -305,7 +306,7 @@ def test_search_customers_by_email_no_results(mock_session):
     mock_session.execute.assert_called_once()
     assert customers == []
 
-def test_search_customers_by_phone(mock_session, existing_customer):
+def test_search_customers_by_phone(mock_session: MagicMock, existing_customer: Customer):
     mock_session.execute.return_value.scalars.return_value.all.return_value = [
         existing_customer
     ]
@@ -318,7 +319,7 @@ def test_search_customers_by_phone(mock_session, existing_customer):
     mock_session.execute.assert_called_once()
     assert customers == [existing_customer]
 
-def test_search_customers_by_phone_no_results(mock_session):
+def test_search_customers_by_phone_no_results(mock_session: MagicMock):
     mock_session.execute.return_value.scalars.return_value.all.return_value = []
 
     customers = service.search_customers_by_phone(

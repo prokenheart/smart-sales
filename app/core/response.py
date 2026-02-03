@@ -3,7 +3,7 @@ from typing import Any
 from enum import Enum
 from pydantic import ValidationError
 
-def success(data: Any = None, status_code: int = 200):
+def success(data: Any = None, status_code: int = 200) -> Response:
     return Response(
         status_code=status_code,
         content_type="application/json",
@@ -13,7 +13,7 @@ def success(data: Any = None, status_code: int = 200):
     )
 
 
-def error(message: str, status_code: int = 400, details: Any = None):
+def error(message: str, status_code: int = 400, details: Any = None) -> Response:
     return Response(
         status_code=status_code,
         content_type="application/json",
@@ -23,7 +23,7 @@ def error(message: str, status_code: int = 400, details: Any = None):
         }
     )
 
-class StatusCode (int, Enum):
+class ResponseStatusCode (int, Enum):
     SUCCESS = 200
     CREATED = 201
     NO_CONTENT = 204

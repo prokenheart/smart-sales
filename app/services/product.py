@@ -51,10 +51,10 @@ def update_product(
     db.refresh(product)
     return product
 
-def delete_product(db: Session, product_id: uuid.UUID) -> uuid.UUID:
+def delete_product(db: Session, product_id: uuid.UUID) -> uuid.UUID | None:
     product = get_product(db, product_id)
     if not product:
-        return False
+        return None
 
     db.delete(product)
     db.commit()

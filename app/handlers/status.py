@@ -12,15 +12,15 @@ from app.services.status import (
     get_all_statuses,
 )
 
-from app.core.response import success, error, StatusCode, errors_from_validation_error
+from app.core.response import success, error, ResponseStatusCode, errors_from_validation_error, Response
 
-def get_status_handler(status_id: str):
+def get_status_handler(status_id: str) -> Response:
     try:
         status_id = StatusIdPath.model_validate({"status_id": status_id}).status_id
     except ValidationError as e:
             return error(
                 message="Invalid status_id",
-                status_code=StatusCode.BAD_REQUEST,
+                status_code=ResponseStatusCode.BAD_REQUEST,
                 details=errors_from_validation_error(e)
             )
     
@@ -31,7 +31,7 @@ def get_status_handler(status_id: str):
             if not status:
                 return error(
                     message="Status not found",
-                    status_code=StatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND
                 )
             
             response = StatusResponse.model_validate(status)
@@ -41,17 +41,17 @@ def get_status_handler(status_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_status_by_code_handler(status_code: str):
+def get_status_by_code_handler(status_code: str) -> Response:
     try:
         status_code = StatusCode.model_validate({"status_code": status_code}).status_code
     except ValidationError as e:
         return error(
             message="Invalid status code",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
 
@@ -62,7 +62,7 @@ def get_status_by_code_handler(status_code: str):
             if not status:
                 return error(
                     message="Status not found",
-                    status_code=StatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND
                 )
             
             response = StatusResponse.model_validate(status)
@@ -72,11 +72,11 @@ def get_status_by_code_handler(status_code: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_all_statuses_handler():
+def get_all_statuses_handler() -> Response:
     try:
         with get_db() as db:
             statuses = get_all_statuses(db)
@@ -87,6 +87,6 @@ def get_all_statuses_handler():
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )

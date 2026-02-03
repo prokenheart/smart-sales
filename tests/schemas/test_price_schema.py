@@ -34,7 +34,7 @@ def test_price_creat_invalid_product_id():
 
 # Số lượng nhỏ hơn hoặc bằng 0
 @pytest.mark.parametrize("amount", [0, -1.5, -10])
-def test_price_create_invalid_amount(amount):
+def test_price_create_invalid_amount(amount: float):
     with pytest.raises(ValidationError) as exc_info:
         PriceCreate(
             product_id=uuid.uuid4(),
@@ -96,12 +96,12 @@ def test_price_update_valid_partial():
 @pytest.mark.parametrize(
     "price_amount",
     [
-        -1,
+        -1.5,
         -10,
         0
     ]
 )
-def test_price_update_invalid_quantity(price_amount):
+def test_price_update_invalid_quantity(price_amount: float):
     with pytest.raises(ValidationError) as exc_info:
         PriceUpdate(
             price_amount=price_amount
@@ -143,7 +143,7 @@ def test_price_id_path_valid():
         str(uuid.uuid4())[:-1] + "@",
     ]
 )
-def test_price_id_path_invalid(price_id):
+def test_price_id_path_invalid(price_id: str):
     with pytest.raises(ValidationError) as exc_info:
         PriceIdPath(
             price_id=price_id

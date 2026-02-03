@@ -68,10 +68,10 @@ def update_price(
     db.refresh(price)
     return price
 
-def delete_price(db: Session, price_id: uuid.UUID) -> uuid.UUID | bool:
+def delete_price(db: Session, price_id: uuid.UUID) -> uuid.UUID | None:
     price = get_price(db, price_id)
     if not price:
-        return False
+        return None
 
     db.delete(price)
     db.commit()

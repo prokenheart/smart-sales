@@ -127,10 +127,10 @@ def update_user_password(
     db.commit()
     db.refresh(user)
 
-def delete_user(db: Session, user_id: uuid.UUID) -> uuid.UUID:
+def delete_user(db: Session, user_id: uuid.UUID) -> uuid.UUID | None:
     user = get_user(db, user_id)
     if not user:
-        return False
+        return None
 
     db.delete(user)
     db.commit()

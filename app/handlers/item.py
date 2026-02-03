@@ -19,16 +19,16 @@ from app.services.item import (
     NotEnoughError
 )
 
-from app.core.response import success, error, StatusCode, errors_from_validation_error
+from app.core.response import success, error, ResponseStatusCode, errors_from_validation_error, Response
 
-def get_item_handler(order_id: str, product_id: str):
+def get_item_handler(order_id: str, product_id: str) -> Response:
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
         product_id = ProductIdPath.model_validate({"product_id": product_id}).product_id
     except ValidationError as e:
             return error(
                 message="Invalid id",
-                status_code=StatusCode.BAD_REQUEST,
+                status_code=ResponseStatusCode.BAD_REQUEST,
                 details=errors_from_validation_error(e)
             )
     
@@ -38,7 +38,7 @@ def get_item_handler(order_id: str, product_id: str):
             if not item:
                 return error(
                     message="Item not found",
-                    status_code=StatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND
                 )
             
             response = ItemResponse.model_validate(item)
@@ -48,11 +48,11 @@ def get_item_handler(order_id: str, product_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_all_items_handler():
+def get_all_items_handler() -> Response:
     try:
         with get_db() as db:
             items = get_all_items(db)
@@ -63,17 +63,17 @@ def get_all_items_handler():
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def get_items_by_order_handler(order_id: str):
+def get_items_by_order_handler(order_id: str) -> Response:
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
         
@@ -87,28 +87,28 @@ def get_items_by_order_handler(order_id: str):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.NOT_FOUND
+            status_code=ResponseStatusCode.NOT_FOUND
         )
     
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
-def update_item_handler(order_id: str, body: dict):
+def update_item_handler(order_id: str, body: dict) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=StatusCode.BAD_REQUEST
+            status_code=ResponseStatusCode.BAD_REQUEST
         )
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
     
@@ -117,7 +117,7 @@ def update_item_handler(order_id: str, body: dict):
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=StatusCode.BAD_REQUEST,
+            status_code=ResponseStatusCode.BAD_REQUEST,
             details=errors_from_validation_error(e)
         )
 
@@ -137,30 +137,30 @@ def update_item_handler(order_id: str, body: dict):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.NOT_FOUND
+            status_code=ResponseStatusCode.NOT_FOUND
         )
     
     except ValueError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.UNPROCESSABLE_ENTITY
+            status_code=ResponseStatusCode.UNPROCESSABLE_ENTITY
         )
     
     except NotEnoughError as e:
         return error(
             message=str(e),
-            status_code=StatusCode.UNPROCESSABLE_ENTITY
+            status_code=ResponseStatusCode.UNPROCESSABLE_ENTITY
         )
     
     except WrongStatus as e:
         return error(
             message=str(e),
-            status_code=StatusCode.UNPROCESSABLE_ENTITY
+            status_code=ResponseStatusCode.UNPROCESSABLE_ENTITY
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=StatusCode.INTERNAL_SERVER_ERROR,
+            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )

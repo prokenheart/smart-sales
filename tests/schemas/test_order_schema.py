@@ -79,7 +79,7 @@ def test_order_id_path_valid():
         str(uuid.uuid4())[:-1] + "@",
     ]
 )
-def test_order_id_path_invalid(order_id):
+def test_order_id_path_invalid(order_id: str):
     with pytest.raises(ValidationError) as exc_info:
         OrderIdPath(
             order_id=order_id

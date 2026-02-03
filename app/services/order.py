@@ -69,10 +69,10 @@ def update_order_status(
     db.refresh(order)
     return order
 
-def delete_order(db: Session, order_id: uuid.UUID) -> uuid.UUID | bool:
+def delete_order(db: Session, order_id: uuid.UUID) -> uuid.UUID | None:
     order = get_order(db, order_id)
     if not order:
-        return False
+        return None
 
     db.delete(order)
     db.commit()

@@ -82,7 +82,7 @@ def update_list_of_item(
         db: Session,
         order_id: uuid.UUID,
         list_items: list[ItemBase]
-    ):
+    ) -> list[Item]:
     order = get_order(db, order_id)
     order.ensure_items_can_be_modified()
 
@@ -105,7 +105,7 @@ def update_list_of_item(
 def delete_list_of_item(
         db: Session,
         order_id: uuid.UUID
-    ):
+    ) -> None:
 
     list_items = get_items_by_order(db, order_id)
     product_cache: dict[uuid.UUID, Product] = {}
@@ -147,7 +147,7 @@ def get_price(db: Session, product_id: uuid.UUID, price_date: date) -> Price:
 def decrease_product_quantity(
         product: Product,
         amount: int
-    ):
+    ) -> None:
     if amount <= 0:
         raise ValueError("Amount must be greater than 0")
 
@@ -159,7 +159,7 @@ def decrease_product_quantity(
 def increase_product_quantity(
         product: Product,
         amount: int
-    ):
+    ) -> None:
     if amount <= 0:
         raise ValueError("Amount must be greater than 0")
 
