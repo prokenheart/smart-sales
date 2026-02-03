@@ -16,21 +16,21 @@ from app.services.product import (
     search_products_by_name
 )
 
-from app.core.response import success, error
+from app.core.response import success, error, StatusCode
 
 
 def create_product_handler(body: dict):
     if body is None:
         return error(
             message="Request body is required",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
     try:
         data = ProductCreate.model_validate(body)
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
         
@@ -51,7 +51,7 @@ def create_product_handler(body: dict):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -61,7 +61,7 @@ def get_product_handler(product_id: str):
     except ValidationError:
             return error(
                 message="Invalid product_id",
-                status_code=400
+                status_code=StatusCode.BAD_REQUEST
             )
     
     try:
@@ -71,7 +71,7 @@ def get_product_handler(product_id: str):
             if not product:
                 return error(
                     message="Product not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
             
             response = ProductResponse.model_validate(product)
@@ -81,7 +81,7 @@ def get_product_handler(product_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -96,7 +96,7 @@ def get_all_products_handler():
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -104,14 +104,14 @@ def update_product_handler(product_id: str, body: dict):
     if body is None:
         return error(
             message="Request body is required",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
     try:
         product_id = ProductIdPath.model_validate({"product_id": product_id}).product_id
     except ValidationError as e:
         return error(
             message="Invalid product_id",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -120,7 +120,7 @@ def update_product_handler(product_id: str, body: dict):
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
 
@@ -137,7 +137,7 @@ def update_product_handler(product_id: str, body: dict):
             if not product:
                 return error(
                     message="Product not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
             
             response = ProductResponse.model_validate(product)
@@ -146,7 +146,7 @@ def update_product_handler(product_id: str, body: dict):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -156,7 +156,7 @@ def delete_product_handler(product_id: str):
     except ValidationError as e:
         return error(
             message="Invalid product_id",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -167,7 +167,7 @@ def delete_product_handler(product_id: str):
             if not deleted_id:
                 return error(
                     message="Product not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
 
             return success(
@@ -177,7 +177,7 @@ def delete_product_handler(product_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -185,7 +185,7 @@ def search_products_handler(query: str):
     if not query or not query.strip():
         return error(
             message="Query parameter is required and cannot be empty",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
 
     try:   
@@ -199,6 +199,6 @@ def search_products_handler(query: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )

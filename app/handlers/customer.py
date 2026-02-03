@@ -23,7 +23,7 @@ from app.services.customer import (
     DuplicateEmailError
 )
 
-from app.core.response import success, error
+from app.core.response import success, error, StatusCode
 class SearchType(str, Enum):
     EMAIL = "email"
     NAME = "name"
@@ -36,7 +36,7 @@ def create_customer_handler(body: dict):
     if body is None:
         return error(
             message="Request body is required",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
     try:
         data = CustomerCreate.model_validate(body)
@@ -48,7 +48,7 @@ def create_customer_handler(body: dict):
         
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=safe_errors
         )
     
@@ -63,19 +63,19 @@ def create_customer_handler(body: dict):
             response = CustomerResponse.model_validate(customer)
             return success(
                 data=response,
-                status_code=201
+                status_code=StatusCode.CREATED
             )
 
     except DuplicateEmailError as e:
         return error(
             message=str(e),
-            status_code=409
+            status_code=StatusCode.CONFLICT
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -85,7 +85,7 @@ def get_customer_handler(customer_id: str):
     except ValidationError:
             return error(
                 message="Invalid customer_id",
-                status_code=400
+                status_code=StatusCode.BAD_REQUEST,
             )
 
     try:
@@ -95,7 +95,7 @@ def get_customer_handler(customer_id: str):
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
             
             response = CustomerResponse.model_validate(customer)
@@ -105,7 +105,7 @@ def get_customer_handler(customer_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -120,7 +120,7 @@ def get_all_customers_handler():
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -130,7 +130,7 @@ def get_customer_by_email_handler(customer_email: str):
     except ValidationError as e:
         return error(
             message="Invalid email parameter",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -141,7 +141,7 @@ def get_customer_by_email_handler(customer_email: str):
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
 
             response = CustomerResponse.model_validate(customer)
@@ -151,7 +151,7 @@ def get_customer_by_email_handler(customer_email: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -159,14 +159,14 @@ def update_customer_handler(customer_id: str, body: dict):
     if body is None:
         return error(
             message="Request body is required",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
     try:
         customer_id = CustomerIdPath.model_validate({"customer_id": customer_id}).customer_id
     except ValidationError as e:
         return error(
             message="Invalid customer_id",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -180,7 +180,7 @@ def update_customer_handler(customer_id: str, body: dict):
         
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=safe_errors
         )
     
@@ -197,7 +197,7 @@ def update_customer_handler(customer_id: str, body: dict):
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
             
             response = CustomerResponse.model_validate(customer)
@@ -206,13 +206,13 @@ def update_customer_handler(customer_id: str, body: dict):
     except DuplicateEmailError as e:
         return error(
             message=str(e),
-            status_code=409
+            status_code=StatusCode.CONFLICT
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -222,7 +222,7 @@ def delete_customer_handler(customer_id: str):
     except ValidationError as e:
         return error(
             message="Invalid customer_id",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -233,7 +233,7 @@ def delete_customer_handler(customer_id: str):
             if not deleted_id:
                 return error(
                     message="Customer not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
 
             return success(
@@ -243,7 +243,7 @@ def delete_customer_handler(customer_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -251,7 +251,7 @@ def search_customers_handler(query: str):
     if not query or not query.strip():
         return error(
             message="Query parameter is required and cannot be empty",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
 
     try:       
@@ -273,7 +273,7 @@ def search_customers_handler(query: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 

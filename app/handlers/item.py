@@ -19,7 +19,7 @@ from app.services.item import (
     NotEnoughError
 )
 
-from app.core.response import success, error
+from app.core.response import success, error, StatusCode
 
 def get_item_handler(order_id: str, product_id: str):
     try:
@@ -28,7 +28,7 @@ def get_item_handler(order_id: str, product_id: str):
     except ValidationError as e:
             return error(
                 message="Invalid id",
-                status_code=400,
+                status_code=StatusCode.BAD_REQUEST,
                 details=e.errors
             )
     
@@ -38,7 +38,7 @@ def get_item_handler(order_id: str, product_id: str):
             if not item:
                 return error(
                     message="Item not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
             
             response = ItemResponse.model_validate(item)
@@ -48,7 +48,7 @@ def get_item_handler(order_id: str, product_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -63,7 +63,7 @@ def get_all_items_handler():
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -73,7 +73,7 @@ def get_items_by_order_handler(order_id: str):
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
         
@@ -87,13 +87,13 @@ def get_items_by_order_handler(order_id: str):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=404
+            status_code=StatusCode.NOT_FOUND
         )
     
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -101,14 +101,14 @@ def update_item_handler(order_id: str, body: dict):
     if body is None:
         return error(
             message="Request body is required",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
     try:
         order_id = OrderIdPath.model_validate({"order_id": order_id}).order_id
     except ValidationError as e:
         return error(
             message="Invalid order_id",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -117,7 +117,7 @@ def update_item_handler(order_id: str, body: dict):
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
 
@@ -137,30 +137,30 @@ def update_item_handler(order_id: str, body: dict):
     except NotFoundError as e:
         return error(
             message=str(e),
-            status_code=404
+            status_code=StatusCode.NOT_FOUND
         )
     
     except ValueError as e:
         return error(
             message=str(e),
-            status_code=422
+            status_code=StatusCode.UNPROCESSABLE_ENTITY
         )
     
     except NotEnoughError as e:
         return error(
             message=str(e),
-            status_code=422
+            status_code=StatusCode.UNPROCESSABLE_ENTITY
         )
     
     except WrongStatus as e:
         return error(
             message=str(e),
-            status_code=422
+            status_code=StatusCode.UNPROCESSABLE_ENTITY
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )

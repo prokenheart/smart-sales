@@ -29,7 +29,7 @@ from app.services.user import (
     DuplicateEmailError
 )
 
-from app.core.response import success, error
+from app.core.response import success, error, StatusCode
 class SearchType(str, Enum):
     EMAIL = "email"
     NAME = "name"
@@ -43,7 +43,7 @@ def create_user_handler(body: dict):
     if body is None:
         return error(
             message="Request body is required",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
     try:
         data = UserCreate.model_validate(body)
@@ -55,7 +55,7 @@ def create_user_handler(body: dict):
         
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=safe_errors
         )
         
@@ -78,19 +78,19 @@ def create_user_handler(body: dict):
     except DuplicateAccountError as e:
         return error(
             message=str(e),
-            status_code=409
+            status_code=StatusCode.CONFLICT
         )
 
     except DuplicateEmailError as e:
         return error(
             message=str(e),
-            status_code=409
+            status_code=StatusCode.CONFLICT
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -100,7 +100,7 @@ def get_user_handler(user_id: str):
     except ValidationError:
             return error(
                 message="Invalid user_id",
-                status_code=400
+                status_code=StatusCode.BAD_REQUEST
             )
     
     try:
@@ -110,7 +110,7 @@ def get_user_handler(user_id: str):
             if not user:
                 return error(
                     message="User not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
             
             response = UserResponse.model_validate(user)
@@ -120,7 +120,7 @@ def get_user_handler(user_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
     
@@ -135,7 +135,7 @@ def get_all_users_handler():
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -147,7 +147,7 @@ def get_user_by_account_handler(user_account: str):
             if not user:
                 return error(
                     message="User not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
 
             response = UserResponse.model_validate(user)
@@ -156,7 +156,7 @@ def get_user_by_account_handler(user_account: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -166,7 +166,7 @@ def get_user_by_email_handler(user_email: str):
     except ValidationError as e:
         return error(
             message="Invalid email parameter",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
 
@@ -177,7 +177,7 @@ def get_user_by_email_handler(user_email: str):
             if not user:
                 return error(
                     message="User not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
 
             response = UserResponse.model_validate(user)
@@ -186,7 +186,7 @@ def get_user_by_email_handler(user_email: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -194,14 +194,14 @@ def update_user_info_handler(user_id: str, body: dict):
     if body is None:
         return error(
             message="Request body is required",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
     try:
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -215,7 +215,7 @@ def update_user_info_handler(user_id: str, body: dict):
         
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=safe_errors
         )
     
@@ -232,7 +232,7 @@ def update_user_info_handler(user_id: str, body: dict):
             if not user:
                 return error(
                     message="User not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
             
             response = UserResponse.model_validate(user)
@@ -241,13 +241,13 @@ def update_user_info_handler(user_id: str, body: dict):
     except DuplicateEmailError as e:
         return error(
             message=str(e),
-            status_code=409
+            status_code=StatusCode.CONFLICT
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -255,14 +255,14 @@ def update_user_password_handler(user_id: str, body: dict):
     if body is None:
         return error(
             message="Request body is required",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
     try:
         user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -271,7 +271,7 @@ def update_user_password_handler(user_id: str, body: dict):
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -281,19 +281,19 @@ def update_user_password_handler(user_id: str, body: dict):
             if not user:
                 return error(
                     message="User not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
 
             if not verify_password(data.old_password, user.user_password):
                 return error(
                     message="Old password is incorrect",
-                    status_code=400
+                    status_code=StatusCode.BAD_REQUEST
                 )
 
             if verify_password(data.new_password, user.user_password):
                 return error(
                     message="New password must be different from old password",
-                    status_code=400
+                    status_code=StatusCode.BAD_REQUEST
                 )
 
             update_user_password(
@@ -302,12 +302,12 @@ def update_user_password_handler(user_id: str, body: dict):
                 data.new_password
             )
 
-            return success(status_code=204)
+            return success(status_code=StatusCode.NO_CONTENT)
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -317,7 +317,7 @@ def delete_user_handler(user_id: str):
     except ValidationError as e:
         return error(
             message="Invalid user_id",
-            status_code=400,
+            status_code=StatusCode.BAD_REQUEST,
             details=e.errors()
         )
     
@@ -328,7 +328,7 @@ def delete_user_handler(user_id: str):
             if not deleted_id:
                 return error(
                     message="User not found",
-                    status_code=404
+                    status_code=StatusCode.NOT_FOUND
                 )
 
             return success(
@@ -338,7 +338,7 @@ def delete_user_handler(user_id: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
@@ -346,7 +346,7 @@ def search_users_handler(query: str):
     if not query or not query.strip():
         return error(
             message="Query parameter is required and cannot be empty",
-            status_code=400
+            status_code=StatusCode.BAD_REQUEST
         )
 
     try:
@@ -370,7 +370,7 @@ def search_users_handler(query: str):
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=500,
+            status_code=StatusCode.INTERNAL_SERVER_ERROR,
             details=str(e)
         )
 
