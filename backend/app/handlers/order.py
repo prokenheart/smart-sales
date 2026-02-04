@@ -1,4 +1,5 @@
 from pydantic import ValidationError
+from datetime import datetime
 from app.database import get_db
 from app.schemas.order import (
     OrderCreate,
@@ -7,7 +8,9 @@ from app.schemas.order import (
     OrderUpdateStatus,
     OrderDateQuery,
     OrderAttachmentResponse,
-    OrderAttachmentUploadURLRequest
+    OrderAttachmentUploadURLRequest,
+    OrderPaginationQuery,
+    OrderPaginationResponse
 )
 
 from app.schemas.user import UserIdPath
@@ -104,13 +107,20 @@ def get_order_handler(order_id: str) -> Response:
             details=str(e)
         )
     
-def get_all_orders_handler() -> Response:
+def get_all_orders_handler(cursor: datetime = None) -> Response:
     try:
         with get_db() as db:
-            orders = get_all_orders(db)
-            return success([
-                OrderResponse.model_validate(order) for order in orders
-            ])
+            if cursor:
+                cursor = OrderPaginationQuery.model_validate({"cursor": cursor}).cursor
+                orders, next_cursor = get_all_orders(db, cursor=cursor)
+            else:
+                orders, next_cursor = get_all_orders(db)
+
+            response = OrderPaginationResponse.model_validate({
+                "orders": [OrderResponse.model_validate(order) for order in orders],
+                "next_cursor": next_cursor
+            })
+            return success(response)
 
     except Exception as e:
         return error(

@@ -49,9 +49,35 @@ def get_orders_by_status(db: Session, status_code: str) -> list[Order]:
     stmt = select(Order).where(Order.status_id == status.status_id)
     return db.execute(stmt).scalars().all()
 
-def get_all_orders(db: Session) -> list[Order]:
-    stmt = select(Order)
-    return db.execute(stmt).scalars().all()
+LIMIT = 20
+
+def get_all_orders(
+    db: Session,
+    limit: int = 20,
+    cursor: datetime | None = None,
+) -> tuple[list[Order], datetime | None]:
+
+    limit = min(limit, LIMIT)
+
+    stmt = (
+        select(Order)
+        .order_by(Order.order_date.desc())
+        .limit(limit + 1)
+    )
+
+    if cursor:
+        stmt = stmt.where(Order.order_date < cursor)
+
+    rows = db.execute(stmt).scalars().all()
+
+    has_next = len(rows) > limit
+    orders = rows[:limit]
+
+    next_cursor = None
+    if has_next:
+        next_cursor = orders[-1].order_date
+
+    return orders, next_cursor
 
 def update_order_status(
         db: Session,

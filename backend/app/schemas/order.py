@@ -50,3 +50,10 @@ class OrderAttachmentUploadURLRequest(BaseModel):
         if v not in allowed:
             raise ValueError("Unsupported content type")
         return v
+    
+class OrderPaginationQuery(BaseModel):
+    cursor: datetime | None = None
+
+class OrderPaginationResponse(BaseModel):
+    orders: list[OrderResponse]
+    next_cursor: datetime | None = None

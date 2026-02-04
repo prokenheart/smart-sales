@@ -41,6 +41,8 @@ def get_all_orders():
     if "order_date" in params:
         return get_orders_by_date_handler(params["order_date"])
 
+    if "cursor" in params:
+        return get_all_orders_handler(params["cursor"])
     return get_all_orders_handler()
 
 @router.patch("/orders/<order_id>")
