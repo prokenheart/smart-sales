@@ -110,11 +110,12 @@ def get_orders_handler(params: dict[str,str | None]) -> Response:
     try:
         with get_db() as db:
             
-            orders, next_cursor = get_orders(db, params)
+            orders, next_cursor, prev_cursor = get_orders(db, params)
 
             response = OrderPaginationResponse.model_validate({
                 "orders": [OrderResponse.model_validate(order) for order in orders],
-                "next_cursor": next_cursor
+                "next_cursor": next_cursor,
+                "prev_cursor": prev_cursor
             })
             return success(response)
     except NotFoundError as e:

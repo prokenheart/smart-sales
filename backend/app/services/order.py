@@ -38,7 +38,7 @@ LIMIT = 20
 def get_orders(
     db: Session,
     query: OrderFilterQuery,
-) -> tuple[list[Order], datetime | None]:
+) -> tuple[list[Order], datetime | None, datetime | None]:
 
     limit = LIMIT
 
@@ -63,22 +63,54 @@ def get_orders(
             Order.order_date >= datetime.combine(query.order_date, datetime.min.time()),
             Order.order_date <= datetime.combine(query.order_date, datetime.max.time()),
         )
-    stmt = stmt.order_by(Order.order_date.desc())
+
+    is_prev = query.direction == "prev"
 
     if query.cursor:
-        stmt = stmt.where(Order.order_date < query.cursor)
+        if is_prev:
+            stmt = stmt.where(Order.order_date > query.cursor)
+        else:
+            stmt = stmt.where(Order.order_date < query.cursor)
+
+    stmt = stmt.order_by(
+        Order.order_date.asc() if is_prev else Order.order_date.desc()
+    )
+
     stmt = stmt.limit(limit + 1)
 
     rows = db.execute(stmt).scalars().all()
 
-    has_next = len(rows) > limit
+    has_more = len(rows) > limit
     orders = rows[:limit]
 
-    next_cursor = None
-    if has_next:
-        next_cursor = orders[-1].order_date
+    if is_prev:
+        orders.reverse()
 
-    return orders, next_cursor
+    has_next = False
+    has_prev = False
+
+    if query.cursor is None:
+        # trang đầu
+        has_prev = False
+        has_next = has_more
+    else:
+        if is_prev:
+            has_prev = has_more
+            has_next = True
+        else:
+            has_prev = True
+            has_next = has_more
+
+    next_cursor = None
+    prev_cursor = None
+
+    if orders:
+        if has_prev:
+            prev_cursor = orders[0].order_date
+        if has_next:
+            next_cursor = orders[-1].order_date
+
+    return orders, next_cursor, prev_cursor
 
 def update_order_status(
         db: Session,

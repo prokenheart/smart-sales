@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, ConfigDict, field_validator
 import uuid
 from datetime import datetime, date
 from decimal import Decimal
+from typing import Literal
 
 class OrderBase(BaseModel):
     customer_id: uuid.UUID
@@ -54,6 +55,7 @@ class OrderAttachmentUploadURLRequest(BaseModel):
 class OrderPaginationResponse(BaseModel):
     orders: list[OrderResponse]
     next_cursor: datetime | None = None
+    prev_cursor: datetime | None = None
 
 class OrderFilterQuery(BaseModel):
     user_id: uuid.UUID | None = None
@@ -61,3 +63,4 @@ class OrderFilterQuery(BaseModel):
     status_code: str | None = None
     order_date: date | None = None
     cursor: datetime | None = None
+    direction: Literal["next", "prev"] | None = None
