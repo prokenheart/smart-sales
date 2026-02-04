@@ -14,10 +14,16 @@ class OrderCreate(OrderBase):
 class OrderIdPath(BaseModel):
     order_id: uuid.UUID
 
+class StatusResponse(BaseModel):
+    status_code: str
+
+    model_config = ConfigDict(from_attributes=True)
+
 class OrderResponse(OrderBase):
     order_id: uuid.UUID
     order_total: Decimal
     status_id: uuid.UUID
+    status: StatusResponse
     order_date: datetime
     updated_at: datetime
 

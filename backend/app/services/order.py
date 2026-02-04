@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select, exists
 from app.models import Order, User, Customer, Status
 import uuid
@@ -42,7 +42,7 @@ def get_orders(
 
     limit = LIMIT
 
-    stmt = select(Order)
+    stmt = select(Order).options(joinedload(Order.status))
 
     if query.user_id:
         if not user_exists(db, query.user_id):
