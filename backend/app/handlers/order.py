@@ -1,30 +1,20 @@
 from pydantic import ValidationError
-from datetime import datetime
 from app.database import get_db
 from app.schemas.order import (
     OrderCreate,
     OrderIdPath,
     OrderResponse,
     OrderUpdateStatus,
-    OrderDateQuery,
     OrderAttachmentResponse,
     OrderAttachmentUploadURLRequest,
-    OrderPaginationQuery,
-    OrderPaginationResponse
+    OrderPaginationResponse,
+    OrderFilterQuery
 )
-
-from app.schemas.user import UserIdPath
-from app.schemas.status import StatusCode
-from app.schemas.customer import CustomerIdPath
 
 from app.services.order import (
     create_order,
     get_order,
-    get_orders_by_user,
-    get_orders_by_customer,
-    get_orders_by_status,
-    get_orders_by_date,
-    get_all_orders,
+    get_orders,
     update_order_status,
     delete_order,
     update_order_attachment_url,
@@ -107,134 +97,32 @@ def get_order_handler(order_id: str) -> Response:
             details=str(e)
         )
     
-def get_all_orders_handler(cursor: datetime = None) -> Response:
+def get_orders_handler(params: dict[str,str | None]) -> Response:
+    try:
+        params = OrderFilterQuery.model_validate(params)
+    except ValidationError as e:
+        return error(
+            message="Invalid query parameters",
+            status_code=ResponseStatusCode.BAD_REQUEST,
+            details=errors_from_validation_error(e)
+        )
+
     try:
         with get_db() as db:
-            if cursor:
-                cursor = OrderPaginationQuery.model_validate({"cursor": cursor}).cursor
-                orders, next_cursor = get_all_orders(db, cursor=cursor)
-            else:
-                orders, next_cursor = get_all_orders(db)
+            
+            orders, next_cursor = get_orders(db, params)
 
             response = OrderPaginationResponse.model_validate({
                 "orders": [OrderResponse.model_validate(order) for order in orders],
                 "next_cursor": next_cursor
             })
             return success(response)
-
-    except Exception as e:
-        return error(
-            message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
-        )
-
-def get_orders_by_user_handler(user_id: str) -> Response:
-    try:
-        user_id = UserIdPath.model_validate({"user_id": user_id}).user_id
-    except ValidationError as e:
-        return error(
-            message="Invalid user_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
-        )
-        
-    try:
-        with get_db() as db:
-            orders = get_orders_by_user(db, user_id)
-            return success([
-                OrderResponse.model_validate(order) for order in orders
-            ])
-    
     except NotFoundError as e:
         return error(
             message=str(e),
             status_code=ResponseStatusCode.NOT_FOUND
         )
-    
-    except Exception as e:
-        return error(
-            message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
-        )
 
-def get_orders_by_customer_handler(customer_id: str) -> Response:
-    try:
-        customer_id = CustomerIdPath.model_validate({"customer_id": customer_id}).customer_id
-    except ValidationError as e:
-        return error(
-            message="Invalid customer_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
-        )
-        
-    try:
-        with get_db() as db:
-            orders = get_orders_by_customer(db, customer_id)
-            return success([
-                OrderResponse.model_validate(order) for order in orders
-            ])
-    
-    except NotFoundError as e:
-        return error(
-            message=str(e),
-            status_code=ResponseStatusCode.NOT_FOUND
-        )
-    
-    except Exception as e:
-        return error(
-            message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
-        )
-
-def get_orders_by_status_handler(status_code: str) -> Response:
-    try:
-        status_code = StatusCode.model_validate({"status_code": status_code}).status_code
-    except ValidationError as e:
-        return error(
-            message="Invalid status code",
-            status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
-        )
-        
-    try:
-        with get_db() as db:
-            orders = get_orders_by_status(db, status_code)
-            return success([
-                OrderResponse.model_validate(order) for order in orders
-            ])
-    
-    except NotFoundError as e:
-        return error(
-            message=str(e),
-            status_code=ResponseStatusCode.NOT_FOUND
-        )
-    
-    except Exception as e:
-        return error(
-            message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
-        )
-
-def get_orders_by_date_handler(date_str: str) -> Response:
-    try:
-        with get_db() as db:
-            date_query = OrderDateQuery.model_validate({"order_date": date_str}).order_date
-            orders = get_orders_by_date(db, date_query)
-            return success([
-                OrderResponse.model_validate(order) for order in orders
-            ])
-    
-    except ValidationError as e:
-        return error(
-            message="Invalid date format",
-            status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
-        )
-    
     except Exception as e:
         return error(
             message="Internal server error",

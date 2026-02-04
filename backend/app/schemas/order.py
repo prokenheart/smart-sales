@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 import uuid
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 
 class OrderBase(BaseModel):
@@ -50,10 +50,14 @@ class OrderAttachmentUploadURLRequest(BaseModel):
         if v not in allowed:
             raise ValueError("Unsupported content type")
         return v
-    
-class OrderPaginationQuery(BaseModel):
-    cursor: datetime | None = None
 
 class OrderPaginationResponse(BaseModel):
     orders: list[OrderResponse]
     next_cursor: datetime | None = None
+
+class OrderFilterQuery(BaseModel):
+    user_id: uuid.UUID | None = None
+    customer_id: uuid.UUID | None = None
+    status_code: str | None = None
+    order_date: date | None = None
+    cursor: datetime | None = None

@@ -2,8 +2,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, exists
 from app.models import Order, User, Customer, Status
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import datetime
 from app.core.logger import logger
+from app.schemas.order import OrderFilterQuery
 
 class NotFoundError(Exception):
     pass
@@ -32,41 +33,41 @@ def get_order(db: Session, order_id: uuid.UUID) -> Order | None:
     stmt = select(Order).where(Order.order_id == order_id)
     return db.execute(stmt).scalar_one_or_none()
 
-def get_orders_by_user(db: Session, user_id: uuid.UUID) -> list[Order]:
-    if not user_exists(db, user_id):
-        raise NotFoundError("User with given ID does not exist.")
-    stmt = select(Order).where(Order.user_id == user_id)
-    return db.execute(stmt).scalars().all()
-
-def get_orders_by_customer(db: Session, customer_id: uuid.UUID) -> list[Order]:
-    if not customer_exists(db, customer_id):
-        raise NotFoundError("Customer with given ID does not exist.")
-    stmt = select(Order).where(Order.customer_id == customer_id)
-    return db.execute(stmt).scalars().all()
-
-def get_orders_by_status(db: Session, status_code: str) -> list[Order]:
-    status = get_status_by_code(db, status_code)
-    stmt = select(Order).where(Order.status_id == status.status_id)
-    return db.execute(stmt).scalars().all()
-
 LIMIT = 20
 
-def get_all_orders(
+def get_orders(
     db: Session,
-    limit: int = 20,
-    cursor: datetime | None = None,
+    query: OrderFilterQuery,
 ) -> tuple[list[Order], datetime | None]:
 
-    limit = min(limit, LIMIT)
+    limit = LIMIT
 
-    stmt = (
-        select(Order)
-        .order_by(Order.order_date.desc())
-        .limit(limit + 1)
-    )
+    stmt = select(Order)
 
-    if cursor:
-        stmt = stmt.where(Order.order_date < cursor)
+    if query.user_id:
+        if not user_exists(db, query.user_id):
+            raise NotFoundError("User with given ID does not exist.")
+        stmt = stmt.where(Order.user_id == query.user_id)
+
+    if query.customer_id:
+        if not customer_exists(db, query.customer_id):
+            raise NotFoundError("Customer with given ID does not exist.")
+        stmt = stmt.where(Order.customer_id == query.customer_id)
+
+    if query.status_code:
+        status = get_status_by_code(db, query.status_code)
+        stmt = stmt.where(Order.status_id == status.status_id)
+
+    if query.order_date:
+        stmt = stmt.where(
+            Order.order_date >= datetime.combine(query.order_date, datetime.min.time()),
+            Order.order_date <= datetime.combine(query.order_date, datetime.max.time()),
+        )
+    stmt = stmt.order_by(Order.order_date.desc())
+
+    if query.cursor:
+        stmt = stmt.where(Order.order_date < query.cursor)
+    stmt = stmt.limit(limit + 1)
 
     rows = db.execute(stmt).scalars().all()
 
@@ -157,18 +158,6 @@ def user_exists(db: Session, user_id: uuid.UUID) -> bool:
 def customer_exists(db: Session, customer_id: uuid.UUID) -> bool:
     stmt = select(exists().where(Customer.customer_id == customer_id))
     return db.execute(stmt).scalar()
-
-def get_orders_by_date(db: Session, order_date: date) -> list[Order]:
-    start = datetime.combine(order_date, datetime.min.time())
-    end = start + timedelta(days=1)
-
-    stmt = (
-        select(Order)
-        .where(Order.order_date >= start)
-        .where(Order.order_date < end)
-    )
-
-    return db.execute(stmt).scalars().all()
 
 def update_order_attachment_url(
         db: Session,
