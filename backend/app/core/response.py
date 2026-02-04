@@ -3,10 +3,17 @@ from typing import Any
 from enum import Enum
 from pydantic import ValidationError
 
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "http://localhost:5173",
+    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+    "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+}
+
 def success(data: Any = None, status_code: int = 200) -> Response:
     return Response(
         status_code=status_code,
         content_type="application/json",
+        headers=CORS_HEADERS,
         body={
             "data": data
         }
@@ -17,6 +24,7 @@ def error(message: str, status_code: int = 400, details: Any = None) -> Response
     return Response(
         status_code=status_code,
         content_type="application/json",
+        headers=CORS_HEADERS,
         body={
             "message": message,
             "details": details
