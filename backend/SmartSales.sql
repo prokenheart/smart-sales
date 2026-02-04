@@ -149,24 +149,23 @@ SELECT
     u.user_id,
     CURRENT_DATE - (FLOOR(RANDOM() * 30))::int + (RANDOM() * INTERVAL '1 day'),
     s.status_id
-FROM generate_series(1, 3) gs
-CROSS JOIN (
+FROM (
     SELECT customer_id
     FROM customer
     ORDER BY RANDOM()
-    LIMIT 2
+    LIMIT 6
 ) c
 CROSS JOIN (
     SELECT user_id
     FROM users
     ORDER BY RANDOM()
-    LIMIT 1
+    LIMIT 3
 ) u
 CROSS JOIN (
     SELECT status_id
     FROM status
     ORDER BY RANDOM()
-    LIMIT 3
+    LIMIT 4
 ) s;
 
 create table item (
