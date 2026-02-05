@@ -121,9 +121,7 @@ create table status (
 
 insert into status (status_name, status_code) VALUES
 ('Pending', 'PENDING'),
-('Processing', 'PROCESSING'),
 ('Paid', 'PAID'),
-('Shipped', 'SHIPPED'),
 ('Delivered', 'DELIVERED'),
 ('Cancelled', 'CANCELLED');
 
