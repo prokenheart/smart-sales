@@ -34,8 +34,8 @@ Globals:
   Api:
     Auth:
       DefaultAuthorizer: NONE
-    BinaryMediaTypes:
-      - multipart/form-data
+
+
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
@@ -53,7 +53,7 @@ Resources:
       Handler: app.main.lambda_handler
       Runtime: python3.12
       Architectures:
-      - x86_64
+        - x86_64
       Environment:
         Variables:
           DB_DRIVER: !Ref DBDriver
@@ -299,7 +299,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /orders/{order_id}/items
             Method: PUT
-
+            
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
