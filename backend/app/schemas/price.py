@@ -35,3 +35,10 @@ class PriceUpdate(BaseModel):
     product_id: uuid.UUID | None = None
     price_amount: Decimal | None = Field(default=None, gt=0)
     price_date: date | None = None
+
+    @field_validator("price_date")
+    @classmethod
+    def validate_price_date(cls, v: date) -> date:
+        if v < date.today():
+            raise ValueError("Price_date must be today or in the future")
+        return v
