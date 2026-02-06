@@ -28,7 +28,7 @@ Parameters:
 
 Globals:
   Function:
-    Timeout: 20
+    Timeout: 25
     LoggingConfig:
       LogFormat: JSON
   Api:
