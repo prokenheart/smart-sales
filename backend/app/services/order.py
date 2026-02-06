@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select, exists
+from sqlalchemy.sql import Select
 from app.models import Order, User, Customer, Status
 import uuid
 from datetime import datetime
@@ -33,18 +34,7 @@ def get_order(db: Session, order_id: uuid.UUID) -> Order | None:
     return db.execute(stmt).scalar_one_or_none()
 
 
-LIMIT = 20
-
-
-def get_orders(
-    db: Session,
-    query: OrderFilterQuery,
-) -> tuple[list[Order], datetime | None, datetime | None]:
-
-    limit = LIMIT
-
-    stmt = select(Order).options(joinedload(Order.status))
-
+def _apply_filters(stmt: Select, db: Session, query: OrderFilterQuery) -> Select:
     if query.user_id:
         if not user_exists(db, query.user_id):
             raise NotFoundError("User with given ID does not exist.")
@@ -60,18 +50,53 @@ def get_orders(
         stmt = stmt.where(Order.status_id == status.status_id)
 
     if query.order_date:
-        stmt = stmt.where(
-            Order.order_date >= datetime.combine(query.order_date, datetime.min.time()),
-            Order.order_date <= datetime.combine(query.order_date, datetime.max.time()),
-        )
+        start = datetime.combine(query.order_date, datetime.min.time())
+        end = datetime.combine(query.order_date, datetime.max.time())
+        stmt = stmt.where(Order.order_date >= start, Order.order_date <= end)
 
-    is_prev = query.direction == "prev"
+    return stmt
 
+
+def _apply_cursor_pagination(
+    stmt: Select, query: OrderFilterQuery, is_prev: bool
+) -> Select:
     if query.cursor:
         if is_prev:
             stmt = stmt.where(Order.order_date > query.cursor)
         else:
             stmt = stmt.where(Order.order_date < query.cursor)
+    return stmt
+
+
+def _get_paging_flags(
+    cursor: datetime | None, is_prev: bool, has_more: bool
+) -> tuple[bool, bool]:
+    if cursor is None:
+        return False, has_more
+
+    if is_prev:
+        return has_more, True
+
+    return True, has_more
+
+
+LIMIT = 20
+
+
+def get_orders(
+    db: Session,
+    query: OrderFilterQuery,
+) -> tuple[list[Order], datetime | None, datetime | None]:
+
+    limit = LIMIT
+
+    stmt = select(Order).options(joinedload(Order.status))
+
+    stmt = _apply_filters(stmt, db, query)
+
+    is_prev = query.direction == "prev"
+
+    stmt = _apply_cursor_pagination(stmt, query, is_prev)
 
     stmt = stmt.order_by(Order.order_date.asc() if is_prev else Order.order_date.desc())
 
@@ -85,20 +110,7 @@ def get_orders(
     if is_prev:
         orders.reverse()
 
-    has_next = False
-    has_prev = False
-
-    if query.cursor is None:
-        # Load first page
-        has_prev = False
-        has_next = has_more
-    else:
-        if is_prev:
-            has_prev = has_more
-            has_next = True
-        else:
-            has_prev = True
-            has_next = has_more
+    has_prev, has_next = _get_paging_flags(query.cursor, is_prev, has_more)
 
     next_cursor = None
     prev_cursor = None
