@@ -125,7 +125,7 @@ def get_orders(
 
 
 def update_order_status(
-    db: Session, order_id: uuid.UUID, status_id: uuid.UUID
+    db: Session, order_id: uuid.UUID, status_code: str
 ) -> Order | None:
     order = get_order(db, order_id)
     if not order:
@@ -133,7 +133,7 @@ def update_order_status(
 
     old_status = get_status(db, order.status_id)
 
-    status = get_status(db, status_id)
+    status = get_status_by_code(db, status_code)
     order.status_id = status.status_id
 
     db.add(order)

@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, date
 from decimal import Decimal
 from typing import Literal
+from app.schemas.status import StatusCode
 
 
 class OrderBase(BaseModel):
@@ -36,9 +37,8 @@ class OrderResponse(OrderBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class OrderUpdateStatus(BaseModel):
-    status_id: uuid.UUID
-
+class OrderUpdateStatus(StatusCode):
+    pass
 
 class OrderDateQuery(BaseModel):
     order_date: datetime

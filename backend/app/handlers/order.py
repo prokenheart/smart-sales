@@ -158,7 +158,7 @@ def update_order_status_handler(order_id: str, body: dict | None) -> Response:
 
     try:
         with get_db() as db:
-            order = update_order_status(db, order_id, data.status_id)
+            order = update_order_status(db, order_id, data.status_code)
 
             if not order:
                 return error(
