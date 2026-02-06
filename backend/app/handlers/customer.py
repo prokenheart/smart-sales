@@ -1,6 +1,7 @@
 from pydantic import ValidationError
 import re
 from enum import Enum
+from http import HTTPStatus
 from app.database import get_db
 from app.schemas.customer import (
     CustomerCreate,
@@ -26,7 +27,6 @@ from app.services.customer import (
 from app.core.response import (
     success,
     error,
-    ResponseStatusCode,
     errors_from_validation_error,
     Response,
 )
@@ -46,14 +46,14 @@ def create_customer_handler(body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
     try:
         data = CustomerCreate.model_validate(body)
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -63,15 +63,15 @@ def create_customer_handler(body: dict | None) -> Response:
                 db, data.customer_name, data.customer_email, data.customer_phone
             )
             response = CustomerResponse.model_validate(customer)
-            return success(data=response, status_code=ResponseStatusCode.CREATED)
+            return success(data=response, status_code=HTTPStatus.CREATED)
 
     except DuplicateEmailError as e:
-        return error(message=str(e), status_code=ResponseStatusCode.CONFLICT)
+        return error(message=str(e), status_code=HTTPStatus.CONFLICT)
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -84,7 +84,7 @@ def get_customer_handler(customer_id: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid customer_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -95,7 +95,7 @@ def get_customer_handler(customer_id: str) -> Response:
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=ResponseStatusCode.NOT_FOUND,
+                    status_code=HTTPStatus.NOT_FOUND,
                 )
 
             response = CustomerResponse.model_validate(customer)
@@ -105,7 +105,7 @@ def get_customer_handler(customer_id: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -121,7 +121,7 @@ def get_all_customers_handler() -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -134,7 +134,7 @@ def get_customer_by_email_handler(customer_email: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid email parameter",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -145,7 +145,7 @@ def get_customer_by_email_handler(customer_email: str) -> Response:
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=ResponseStatusCode.NOT_FOUND,
+                    status_code=HTTPStatus.NOT_FOUND,
                 )
 
             response = CustomerResponse.model_validate(customer)
@@ -154,7 +154,7 @@ def get_customer_by_email_handler(customer_email: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -163,7 +163,7 @@ def update_customer_handler(customer_id: str, body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
     try:
         customer_id = CustomerIdPath.model_validate(
@@ -172,7 +172,7 @@ def update_customer_handler(customer_id: str, body: dict | None) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid customer_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -181,7 +181,7 @@ def update_customer_handler(customer_id: str, body: dict | None) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -198,19 +198,19 @@ def update_customer_handler(customer_id: str, body: dict | None) -> Response:
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=ResponseStatusCode.NOT_FOUND,
+                    status_code=HTTPStatus.NOT_FOUND,
                 )
 
             response = CustomerResponse.model_validate(customer)
             return success(response)
 
     except DuplicateEmailError as e:
-        return error(message=str(e), status_code=ResponseStatusCode.CONFLICT)
+        return error(message=str(e), status_code=HTTPStatus.CONFLICT)
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -223,7 +223,7 @@ def delete_customer_handler(customer_id: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid customer_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -234,7 +234,7 @@ def delete_customer_handler(customer_id: str) -> Response:
             if not deleted_id:
                 return error(
                     message="Customer not found",
-                    status_code=ResponseStatusCode.NOT_FOUND,
+                    status_code=HTTPStatus.NOT_FOUND,
                 )
 
             return success(data={"customer_id": str(deleted_id)})
@@ -242,7 +242,7 @@ def delete_customer_handler(customer_id: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -251,7 +251,7 @@ def search_customers_handler(query: str) -> Response:
     if not query or not query.strip():
         return error(
             message="Query parameter is required and cannot be empty",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
 
     try:
@@ -273,7 +273,7 @@ def search_customers_handler(query: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 

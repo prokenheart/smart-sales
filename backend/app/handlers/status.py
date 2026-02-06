@@ -1,4 +1,5 @@
 from pydantic import ValidationError
+from http import HTTPStatus
 from app.database import get_db
 from app.schemas.status import StatusIdPath, StatusCode, StatusResponse
 
@@ -11,7 +12,6 @@ from app.services.status import (
 from app.core.response import (
     success,
     error,
-    ResponseStatusCode,
     errors_from_validation_error,
     Response,
 )
@@ -23,7 +23,7 @@ def get_status_handler(status_id: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid status_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -33,7 +33,7 @@ def get_status_handler(status_id: str) -> Response:
 
             if not status:
                 return error(
-                    message="Status not found", status_code=ResponseStatusCode.NOT_FOUND
+                    message="Status not found", status_code=HTTPStatus.NOT_FOUND
                 )
 
             response = StatusResponse.model_validate(status)
@@ -43,7 +43,7 @@ def get_status_handler(status_id: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -56,7 +56,7 @@ def get_status_by_code_handler(status_code: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid status code",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -66,7 +66,7 @@ def get_status_by_code_handler(status_code: str) -> Response:
 
             if not status:
                 return error(
-                    message="Status not found", status_code=ResponseStatusCode.NOT_FOUND
+                    message="Status not found", status_code=HTTPStatus.NOT_FOUND
                 )
 
             response = StatusResponse.model_validate(status)
@@ -76,7 +76,7 @@ def get_status_by_code_handler(status_code: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -92,6 +92,6 @@ def get_all_statuses_handler() -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )

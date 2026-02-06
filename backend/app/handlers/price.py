@@ -1,4 +1,5 @@
 from pydantic import ValidationError
+from http import HTTPStatus
 from app.database import get_db
 from app.schemas.price import PriceCreate, PriceIdPath, PriceResponse, PriceUpdate
 from app.schemas.product import ProductIdPath
@@ -17,7 +18,6 @@ from app.services.price import (
 from app.core.response import (
     success,
     error,
-    ResponseStatusCode,
     errors_from_validation_error,
     Response,
 )
@@ -27,14 +27,14 @@ def create_price_handler(body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
     try:
         data = PriceCreate.model_validate(body)
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -48,12 +48,12 @@ def create_price_handler(body: dict | None) -> Response:
             return success(data=response, status_code=201)
 
     except NotFoundError as e:
-        return error(message=str(e), status_code=ResponseStatusCode.NOT_FOUND)
+        return error(message=str(e), status_code=HTTPStatus.NOT_FOUND)
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -64,7 +64,7 @@ def get_price_handler(price_id: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid price_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -73,7 +73,7 @@ def get_price_handler(price_id: str) -> Response:
             price = get_price(db, price_id)
             if not price:
                 return error(
-                    message="Price not found", status_code=ResponseStatusCode.NOT_FOUND
+                    message="Price not found", status_code=HTTPStatus.NOT_FOUND
                 )
 
             response = PriceResponse.model_validate(price)
@@ -83,7 +83,7 @@ def get_price_handler(price_id: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -97,7 +97,7 @@ def get_all_prices_handler() -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -108,7 +108,7 @@ def get_prices_by_product_handler(product_id: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid product_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -118,12 +118,12 @@ def get_prices_by_product_handler(product_id: str) -> Response:
             return success([PriceResponse.model_validate(price) for price in prices])
 
     except NotFoundError as e:
-        return error(message=str(e), status_code=ResponseStatusCode.NOT_FOUND)
+        return error(message=str(e), status_code=HTTPStatus.NOT_FOUND)
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -132,14 +132,14 @@ def update_price_handler(price_id: str, body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
     try:
         price_id = PriceIdPath.model_validate({"price_id": price_id}).price_id
     except ValidationError as e:
         return error(
             message="Invalid price_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -148,7 +148,7 @@ def update_price_handler(price_id: str, body: dict | None) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -162,18 +162,18 @@ def update_price_handler(price_id: str, body: dict | None) -> Response:
             return success(response)
 
     except NotFoundError as e:
-        return error(message=str(e), status_code=ResponseStatusCode.NOT_FOUND)
+        return error(message=str(e), status_code=HTTPStatus.NOT_FOUND)
 
     except PriceInThePass as e:
         return error(
             message=str(e),
-            status_code=ResponseStatusCode.CONFLICT,
+            status_code=HTTPStatus.CONFLICT,
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -184,7 +184,7 @@ def delete_price_handler(price_id: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid price_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -194,7 +194,7 @@ def delete_price_handler(price_id: str) -> Response:
 
             if not deleted_id:
                 return error(
-                    message="Price not found", status_code=ResponseStatusCode.NOT_FOUND
+                    message="Price not found", status_code=HTTPStatus.NOT_FOUND
                 )
 
             return success(data={"price_id": str(deleted_id)})
@@ -202,12 +202,12 @@ def delete_price_handler(price_id: str) -> Response:
     except PriceInThePass as e:
         return error(
             message=str(e),
-            status_code=ResponseStatusCode.CONFLICT,
+            status_code=HTTPStatus.CONFLICT,
         )
 
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )

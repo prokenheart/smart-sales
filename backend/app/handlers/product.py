@@ -1,4 +1,5 @@
 from pydantic import ValidationError
+from http import HTTPStatus
 from app.database import get_db
 from app.schemas.product import (
     ProductCreate,
@@ -19,7 +20,6 @@ from app.services.product import (
 from app.core.response import (
     success,
     error,
-    ResponseStatusCode,
     errors_from_validation_error,
     Response,
 )
@@ -29,14 +29,14 @@ def create_product_handler(body: dict) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
     try:
         data = ProductCreate.model_validate(body)
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -51,7 +51,7 @@ def create_product_handler(body: dict) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -62,7 +62,7 @@ def get_product_handler(product_id: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid product_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -73,7 +73,7 @@ def get_product_handler(product_id: str) -> Response:
             if not product:
                 return error(
                     message="Product not found",
-                    status_code=ResponseStatusCode.NOT_FOUND,
+                    status_code=HTTPStatus.NOT_FOUND,
                 )
 
             response = ProductResponse.model_validate(product)
@@ -83,7 +83,7 @@ def get_product_handler(product_id: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -99,7 +99,7 @@ def get_all_products_handler() -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -108,14 +108,14 @@ def update_product_handler(product_id: str, body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
     try:
         product_id = ProductIdPath.model_validate({"product_id": product_id}).product_id
     except ValidationError as e:
         return error(
             message="Invalid product_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -124,7 +124,7 @@ def update_product_handler(product_id: str, body: dict | None) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid request body",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -141,7 +141,7 @@ def update_product_handler(product_id: str, body: dict | None) -> Response:
             if not product:
                 return error(
                     message="Product not found",
-                    status_code=ResponseStatusCode.NOT_FOUND,
+                    status_code=HTTPStatus.NOT_FOUND,
                 )
 
             response = ProductResponse.model_validate(product)
@@ -150,7 +150,7 @@ def update_product_handler(product_id: str, body: dict | None) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -161,7 +161,7 @@ def delete_product_handler(product_id: str) -> Response:
     except ValidationError as e:
         return error(
             message="Invalid product_id",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
             details=errors_from_validation_error(e),
         )
 
@@ -172,7 +172,7 @@ def delete_product_handler(product_id: str) -> Response:
             if not deleted_id:
                 return error(
                     message="Product not found",
-                    status_code=ResponseStatusCode.NOT_FOUND,
+                    status_code=HTTPStatus.NOT_FOUND,
                 )
 
             return success(data={"product_id": str(deleted_id)})
@@ -180,7 +180,7 @@ def delete_product_handler(product_id: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
 
@@ -189,7 +189,7 @@ def search_products_handler(query: str) -> Response:
     if not query or not query.strip():
         return error(
             message="Query parameter is required and cannot be empty",
-            status_code=ResponseStatusCode.BAD_REQUEST,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
 
     try:
@@ -203,6 +203,6 @@ def search_products_handler(query: str) -> Response:
     except Exception as e:
         return error(
             message="Internal server error",
-            status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
