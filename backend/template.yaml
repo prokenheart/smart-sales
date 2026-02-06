@@ -255,13 +255,13 @@ Resources:
           Type: Api
           Properties: 
             RestApiId: !Ref MyApi
-            Path: /orders/{order_id}/attachment/upload_url
+            Path: /orders/{order_id}/attachment/upload-url
             Method: POST
-        CreateGetURL:
+        CreateViewURL:
           Type: Api
           Properties: 
             RestApiId: !Ref MyApi
-            Path: /orders/{order_id}/attachment/get_url
+            Path: /orders/{order_id}/attachment/view-url
             Method: POST
         DeleteAttachment:
           Type: Api
@@ -273,8 +273,8 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref MyApi
-            Path: /orders/{order_id}/attachment/confirm
-            Method: POST
+            Path: /orders/{order_id}/attachment
+            Method: PUT
         GetItem:
           Type: Api
           Properties:
@@ -299,7 +299,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /orders/{order_id}/items
             Method: PUT
-            
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
