@@ -136,6 +136,8 @@ create table orders (
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_orders_order_date ON orders(order_date);
+
 INSERT INTO orders (
     customer_id,
     user_id,
