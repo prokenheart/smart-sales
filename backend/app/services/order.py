@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import select, exists
+from sqlalchemy import select, exists, func
 from sqlalchemy.sql import Select
 from app.models import Order, User, Customer, Status
 import uuid
@@ -57,27 +57,59 @@ def _apply_filters(stmt: Select, db: Session, query: OrderFilterQuery) -> Select
     return stmt
 
 
+def _apply_page_number_pagination(
+    query: OrderFilterQuery, stmt: Select, limit: int
+) -> Select:
+    if query.page:
+        stmt = stmt.order_by(Order.order_date.desc())
+        stmt = stmt.offset((query.page - 1) * limit)
+    return stmt
+
+
 def _apply_cursor_pagination(
     stmt: Select, query: OrderFilterQuery, is_prev: bool
 ) -> Select:
     if query.cursor:
         if is_prev:
             stmt = stmt.where(Order.order_date > query.cursor)
+            stmt = stmt.order_by(Order.order_date.asc())
         else:
             stmt = stmt.where(Order.order_date < query.cursor)
+            stmt = stmt.order_by(Order.order_date.desc())
     return stmt
 
 
 def _get_paging_flags(
-    cursor: datetime | None, is_prev: bool, has_more: bool
+    cursor: datetime | None, is_prev: bool, has_more: bool, page: int | None = None
 ) -> tuple[bool, bool]:
     if cursor is None:
+        if page is not None and page > 1:
+            return True, has_more
         return False, has_more
 
     if is_prev:
         return has_more, True
 
     return True, has_more
+
+
+def _count_orders(db: Session, query: OrderFilterQuery) -> int:
+    stmt = select(func.count(Order.order_id))
+    stmt = _apply_filters(stmt, db, query)
+    return db.execute(stmt).scalar_one()
+
+def _get_current_page(
+    query: OrderFilterQuery, is_prev: bool
+) -> int:
+    if query.cursor:
+        if is_prev:
+            return query.current_page-1
+        return query.current_page + 1
+    
+    if query.page:
+        return query.page
+
+    return 1
 
 
 LIMIT = 20
@@ -91,15 +123,15 @@ def get_orders(
     limit = LIMIT
 
     stmt = select(Order).options(joinedload(Order.status))
+    if query.page is None and query.cursor is None:
+        stmt = stmt.order_by(Order.order_date.desc())
 
     stmt = _apply_filters(stmt, db, query)
+    
+    stmt = _apply_page_number_pagination(query, stmt, limit)
 
-    is_prev = query.direction == "prev"
-
+    is_prev = query.cursor is not None and query.direction == "prev"
     stmt = _apply_cursor_pagination(stmt, query, is_prev)
-
-    stmt = stmt.order_by(Order.order_date.asc() if is_prev else Order.order_date.desc())
-
     stmt = stmt.limit(limit + 1)
 
     rows = db.execute(stmt).scalars().all()
@@ -110,7 +142,7 @@ def get_orders(
     if is_prev:
         orders.reverse()
 
-    has_prev, has_next = _get_paging_flags(query.cursor, is_prev, has_more)
+    has_prev, has_next = _get_paging_flags(query.cursor, is_prev, has_more, query.page)
 
     next_cursor = None
     prev_cursor = None
@@ -121,7 +153,11 @@ def get_orders(
         if has_next:
             next_cursor = orders[-1].order_date
 
-    return orders, next_cursor, prev_cursor
+    total_count = _count_orders(db, query)
+    total_pages = (total_count + limit - 1) // limit
+    current_page = _get_current_page(query, is_prev)
+
+    return orders, next_cursor, prev_cursor, total_pages, current_page
 
 
 def update_order_status(

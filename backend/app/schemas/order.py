@@ -67,8 +67,10 @@ class OrderAttachmentUploadURLRequest(BaseModel):
 
 class OrderPaginationResponse(BaseModel):
     orders: list[OrderResponse]
-    next_cursor: datetime | None = None
     prev_cursor: datetime | None = None
+    next_cursor: datetime | None = None
+    total_pages: int
+    current_page: int
 
 
 class OrderFilterQuery(BaseModel):
@@ -78,3 +80,5 @@ class OrderFilterQuery(BaseModel):
     order_date: date | None = None
     cursor: datetime | None = None
     direction: Literal["next", "prev"] | None = None
+    current_page: int | None = None
+    page: int | None = None
