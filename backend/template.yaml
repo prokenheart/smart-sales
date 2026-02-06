@@ -155,12 +155,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /prices/{price_id}
             Method: DELETE
-        CreateStatus:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApi
-            Path: /statuses
-            Method: POST
         GetStatus:
           Type: Api
           Properties:
@@ -173,18 +167,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /statuses
             Method: GET     
-        UpdateStatus:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApi
-            Path: /statuses/{status_id}
-            Method: PUT
-        DeleteStatus:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApi
-            Path: /statuses/{status_id}
-            Method: DELETE
         CreateUser:
           Type: Api
           Properties:
