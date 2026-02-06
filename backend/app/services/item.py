@@ -5,6 +5,7 @@ from app.schemas.item import ItemBase
 import uuid
 from datetime import date
 from decimal import Decimal
+from dataclasses import dataclass
 
 
 class NotFoundError(Exception):
@@ -15,16 +16,13 @@ class NotEnoughError(Exception):
     pass
 
 
-from dataclasses import dataclass
-
-
 @dataclass
 class CreateItemResult:
     items: list[Item]
     total_price: Decimal
 
 
-def create_item(
+def _create_item(
     db: Session, order_id: uuid.UUID, product_id: uuid.UUID, item_quantity: int
 ) -> Item:
 
@@ -39,7 +37,7 @@ def create_item(
     return item
 
 
-def create_list_of_item(
+def _create_list_of_item(
     db: Session, order_id: uuid.UUID, list_items: list[ItemBase]
 ) -> CreateItemResult:
 
@@ -52,7 +50,7 @@ def create_list_of_item(
             product_cache[item.product_id] = get_product(db, item.product_id)
         product = product_cache[item.product_id]
         decrease_product_quantity(product, item.item_quantity)
-        new_item = create_item(db, order_id, item.product_id, item.item_quantity)
+        new_item = _create_item(db, order_id, item.product_id, item.item_quantity)
         total_price += new_item.item_price * new_item.item_quantity
 
         created_items.append(new_item)
@@ -88,9 +86,9 @@ def update_list_of_item(
     order.ensure_items_can_be_modified()
 
     try:
-        delete_list_of_item(db, order_id)
+        _delete_list_of_item(db, order_id)
 
-        result = create_list_of_item(db, order_id, list_items)
+        result = _create_list_of_item(db, order_id, list_items)
 
         order.order_total = result.total_price
         db.commit()
@@ -103,7 +101,7 @@ def update_list_of_item(
         raise
 
 
-def delete_list_of_item(db: Session, order_id: uuid.UUID) -> None:
+def _delete_list_of_item(db: Session, order_id: uuid.UUID) -> None:
 
     list_items = get_items_by_order(db, order_id)
     product_cache: dict[uuid.UUID, Product] = {}
