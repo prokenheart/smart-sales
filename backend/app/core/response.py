@@ -9,14 +9,13 @@ CORS_HEADERS = {
     "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
 }
 
+
 def success(data: Any = None, status_code: int = 200) -> Response:
     return Response(
         status_code=status_code,
         content_type="application/json",
         headers=CORS_HEADERS,
-        body={
-            "data": data
-        }
+        body={"data": data},
     )
 
 
@@ -25,13 +24,11 @@ def error(message: str, status_code: int = 400, details: Any = None) -> Response
         status_code=status_code,
         content_type="application/json",
         headers=CORS_HEADERS,
-        body={
-            "message": message,
-            "details": details
-        }
+        body={"message": message, "details": details},
     )
 
-class ResponseStatusCode (int, Enum):
+
+class ResponseStatusCode(int, Enum):
     SUCCESS = 200
     CREATED = 201
     NO_CONTENT = 204
@@ -41,6 +38,7 @@ class ResponseStatusCode (int, Enum):
     UNPROCESSABLE_ENTITY = 422
     INTERNAL_SERVER_ERROR = 500
 
+
 def errors_from_validation_error(e: ValidationError) -> list[dict[str, Any]]:
     errors = []
     for err in e.errors():
@@ -48,7 +46,7 @@ def errors_from_validation_error(e: ValidationError) -> list[dict[str, Any]]:
             "type": err.get("type", ""),
             "loc": err.get("loc", []),
             "msg": err.get("msg", ""),
-            "input": err.get("input", "")
+            "input": err.get("input", ""),
         }
         errors.append(error)
     return errors

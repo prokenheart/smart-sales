@@ -9,9 +9,7 @@ from app.routes.user import router as user_router
 from app.routes.order import router as order_router
 from app.routes.item import router as item_router
 
-app = APIGatewayRestResolver(
-    debug=True
-)
+app = APIGatewayRestResolver(debug=True)
 
 # include routers
 app.include_router(customer_router)
@@ -21,6 +19,7 @@ app.include_router(status_router)
 app.include_router(user_router)
 app.include_router(order_router)
 app.include_router(item_router)
+
 
 @logger.inject_lambda_context
 def lambda_handler(event, context):

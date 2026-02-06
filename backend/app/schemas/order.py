@@ -4,20 +4,25 @@ from datetime import datetime, date
 from decimal import Decimal
 from typing import Literal
 
+
 class OrderBase(BaseModel):
     customer_id: uuid.UUID
     user_id: uuid.UUID
 
+
 class OrderCreate(OrderBase):
     pass
 
+
 class OrderIdPath(BaseModel):
     order_id: uuid.UUID
+
 
 class StatusResponse(BaseModel):
     status_code: str
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class OrderResponse(OrderBase):
     order_id: uuid.UUID
@@ -25,21 +30,26 @@ class OrderResponse(OrderBase):
     status_id: uuid.UUID
     status: StatusResponse
     order_date: datetime
+    order_attachment: str | None
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class OrderUpdateStatus(BaseModel):
     status_id: uuid.UUID
 
+
 class OrderDateQuery(BaseModel):
     order_date: datetime
+
 
 class OrderAttachmentResponse(BaseModel):
     order_id: uuid.UUID
     order_attachment: str
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class OrderAttachmentUploadURLRequest(BaseModel):
     content_type: str = Field(..., alias="contentType")
@@ -49,19 +59,17 @@ class OrderAttachmentUploadURLRequest(BaseModel):
     @field_validator("content_type")
     @classmethod
     def validate_content_type(cls, v: str) -> str:
-        allowed = {
-            "image/png",
-            "image/jpeg",
-            "application/pdf"
-        }
+        allowed = {"image/png", "image/jpeg", "application/pdf"}
         if v not in allowed:
             raise ValueError("Unsupported content type")
         return v
+
 
 class OrderPaginationResponse(BaseModel):
     orders: list[OrderResponse]
     next_cursor: datetime | None = None
     prev_cursor: datetime | None = None
+
 
 class OrderFilterQuery(BaseModel):
     user_id: uuid.UUID | None = None

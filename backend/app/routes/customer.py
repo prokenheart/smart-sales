@@ -6,18 +6,22 @@ from app.handlers.customer import (
     get_customer_by_email_handler,
     search_customers_handler,
     update_customer_handler,
-    delete_customer_handler
+    delete_customer_handler,
 )
+
 router = Router()
+
 
 @router.post("/customers")
 def create_customer():
     body = router.current_event.json_body
     return create_customer_handler(body)
 
+
 @router.get("/customers/<customer_id>")
 def get_customer(customer_id: str):
     return get_customer_handler(customer_id)
+
 
 @router.get("/customers")
 def get_all_customers():
@@ -31,10 +35,12 @@ def get_all_customers():
 
     return get_all_customers_handler()
 
+
 @router.put("/customers/<customer_id>")
 def update_customer(customer_id: str):
     body = router.current_event.json_body
     return update_customer_handler(customer_id, body)
+
 
 @router.delete("/customers/<customer_id>")
 def delete_customer(customer_id: str):

@@ -7,7 +7,7 @@ from app.schemas.customer import (
     CustomerIdPath,
     CustomerEmailQuery,
     CustomerResponse,
-    CustomerUpdate
+    CustomerUpdate,
 )
 
 from app.services.customer import (
@@ -20,23 +20,33 @@ from app.services.customer import (
     search_customers_by_email,
     search_customers_by_phone,
     search_customers_by_name,
-    DuplicateEmailError
+    DuplicateEmailError,
 )
 
-from app.core.response import success, error, ResponseStatusCode, errors_from_validation_error, Response
+from app.core.response import (
+    success,
+    error,
+    ResponseStatusCode,
+    errors_from_validation_error,
+    Response,
+)
+
+
 class SearchType(str, Enum):
     EMAIL = "email"
     NAME = "name"
     PHONE = "phone"
 
+
 PHONE_REGEX = re.compile(r"^\+?[1-9]\d{7,14}$")
 UPPERCASE_REGEX = re.compile(r"[A-Z]")
+
 
 def create_customer_handler(body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=ResponseStatusCode.BAD_REQUEST
+            status_code=ResponseStatusCode.BAD_REQUEST,
         )
     try:
         data = CustomerCreate.model_validate(body)
@@ -44,45 +54,39 @@ def create_customer_handler(body: dict | None) -> Response:
         return error(
             message="Invalid request body",
             status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
+            details=errors_from_validation_error(e),
         )
-    
+
     try:
         with get_db() as db:
             customer = create_customer(
-                db,
-                data.customer_name,
-                data.customer_email,
-                data.customer_phone
+                db, data.customer_name, data.customer_email, data.customer_phone
             )
             response = CustomerResponse.model_validate(customer)
-            return success(
-                data=response,
-                status_code=ResponseStatusCode.CREATED
-            )
+            return success(data=response, status_code=ResponseStatusCode.CREATED)
 
     except DuplicateEmailError as e:
-        return error(
-            message=str(e),
-            status_code=ResponseStatusCode.CONFLICT
-        )
+        return error(message=str(e), status_code=ResponseStatusCode.CONFLICT)
 
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
+            details=str(e),
         )
+
 
 def get_customer_handler(customer_id: str) -> Response:
     try:
-        customer_id = CustomerIdPath.model_validate({"customer_id": customer_id}).customer_id
+        customer_id = CustomerIdPath.model_validate(
+            {"customer_id": customer_id}
+        ).customer_id
     except ValidationError as e:
-            return error(
-                message="Invalid customer_id",
-                status_code=ResponseStatusCode.BAD_REQUEST,
-                details=errors_from_validation_error(e)
-            )
+        return error(
+            message="Invalid customer_id",
+            status_code=ResponseStatusCode.BAD_REQUEST,
+            details=errors_from_validation_error(e),
+        )
 
     try:
         with get_db() as db:
@@ -91,9 +95,9 @@ def get_customer_handler(customer_id: str) -> Response:
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=ResponseStatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND,
                 )
-            
+
             response = CustomerResponse.model_validate(customer)
 
             return success(response)
@@ -102,34 +106,38 @@ def get_customer_handler(customer_id: str) -> Response:
         return error(
             message="Internal server error",
             status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
+            details=str(e),
         )
+
 
 def get_all_customers_handler() -> Response:
     try:
         with get_db() as db:
             customers = get_all_customers(db)
-            return success([
-                CustomerResponse.model_validate(customer) for customer in customers
-            ])
+            return success(
+                [CustomerResponse.model_validate(customer) for customer in customers]
+            )
 
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
+            details=str(e),
         )
+
 
 def get_customer_by_email_handler(customer_email: str) -> Response:
     try:
-        customer_email = CustomerEmailQuery.model_validate({"customer_email": customer_email}).customer_email
+        customer_email = CustomerEmailQuery.model_validate(
+            {"customer_email": customer_email}
+        ).customer_email
     except ValidationError as e:
         return error(
             message="Invalid email parameter",
             status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
+            details=errors_from_validation_error(e),
         )
-    
+
     try:
         with get_db() as db:
             customer = get_customer_by_email(db, customer_email)
@@ -137,44 +145,46 @@ def get_customer_by_email_handler(customer_email: str) -> Response:
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=ResponseStatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND,
                 )
 
             response = CustomerResponse.model_validate(customer)
             return success(response)
-    
 
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
+            details=str(e),
         )
+
 
 def update_customer_handler(customer_id: str, body: dict | None) -> Response:
     if body is None:
         return error(
             message="Request body is required",
-            status_code=ResponseStatusCode.BAD_REQUEST
+            status_code=ResponseStatusCode.BAD_REQUEST,
         )
     try:
-        customer_id = CustomerIdPath.model_validate({"customer_id": customer_id}).customer_id
+        customer_id = CustomerIdPath.model_validate(
+            {"customer_id": customer_id}
+        ).customer_id
     except ValidationError as e:
         return error(
             message="Invalid customer_id",
             status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
+            details=errors_from_validation_error(e),
         )
-    
+
     try:
         data = CustomerUpdate.model_validate(body)
     except ValidationError as e:
         return error(
             message="Invalid request body",
             status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
+            details=errors_from_validation_error(e),
         )
-    
+
     try:
         with get_db() as db:
             customer = update_customer(
@@ -182,41 +192,41 @@ def update_customer_handler(customer_id: str, body: dict | None) -> Response:
                 customer_id,
                 data.customer_name,
                 data.customer_email,
-                data.customer_phone
+                data.customer_phone,
             )
 
             if not customer:
                 return error(
                     message="Customer not found",
-                    status_code=ResponseStatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND,
                 )
-            
+
             response = CustomerResponse.model_validate(customer)
             return success(response)
 
     except DuplicateEmailError as e:
-        return error(
-            message=str(e),
-            status_code=ResponseStatusCode.CONFLICT
-        )
+        return error(message=str(e), status_code=ResponseStatusCode.CONFLICT)
 
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
+            details=str(e),
         )
+
 
 def delete_customer_handler(customer_id: str) -> Response:
     try:
-        customer_id = CustomerIdPath.model_validate({"customer_id": customer_id}).customer_id
+        customer_id = CustomerIdPath.model_validate(
+            {"customer_id": customer_id}
+        ).customer_id
     except ValidationError as e:
         return error(
             message="Invalid customer_id",
             status_code=ResponseStatusCode.BAD_REQUEST,
-            details=errors_from_validation_error(e)
+            details=errors_from_validation_error(e),
         )
-    
+
     try:
         with get_db() as db:
             deleted_id = delete_customer(db, customer_id)
@@ -224,29 +234,28 @@ def delete_customer_handler(customer_id: str) -> Response:
             if not deleted_id:
                 return error(
                     message="Customer not found",
-                    status_code=ResponseStatusCode.NOT_FOUND
+                    status_code=ResponseStatusCode.NOT_FOUND,
                 )
 
-            return success(
-                data={"customer_id": str(deleted_id)}
-            )
+            return success(data={"customer_id": str(deleted_id)})
 
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
+            details=str(e),
         )
+
 
 def search_customers_handler(query: str) -> Response:
     if not query or not query.strip():
         return error(
             message="Query parameter is required and cannot be empty",
-            status_code=ResponseStatusCode.BAD_REQUEST
+            status_code=ResponseStatusCode.BAD_REQUEST,
         )
 
-    try:       
-        with get_db() as db: 
+    try:
+        with get_db() as db:
             keyword = query.strip()
             search_type = detect_search_type(keyword)
 
@@ -257,16 +266,17 @@ def search_customers_handler(query: str) -> Response:
             else:
                 customers = search_customers_by_name(db, keyword)
 
-            return success([
-                CustomerResponse.model_validate(customer) for customer in customers
-            ])
+            return success(
+                [CustomerResponse.model_validate(customer) for customer in customers]
+            )
 
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            details=str(e)
+            details=str(e),
         )
+
 
 def detect_search_type(keyword: str) -> str:
     keyword = keyword.strip()

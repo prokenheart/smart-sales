@@ -8,18 +8,22 @@ from app.handlers.user import (
     search_users_handler,
     update_user_info_handler,
     update_user_password_handler,
-    delete_user_handler
+    delete_user_handler,
 )
+
 router = Router()
+
 
 @router.post("/users")
 def create_user():
     body = router.current_event.json_body
     return create_user_handler(body)
 
+
 @router.get("/users/<user_id>")
 def get_user(user_id: str):
     return get_user_handler(user_id)
+
 
 @router.get("/users")
 def get_all_users():
@@ -36,15 +40,18 @@ def get_all_users():
 
     return get_all_users_handler()
 
+
 @router.patch("/users/<user_id>")
 def update_user_info(user_id: str):
     body = router.current_event.json_body
     return update_user_info_handler(user_id, body)
 
+
 @router.patch("/users/<user_id>/password")
 def update_user_password(user_id: str):
     body = router.current_event.json_body
-    return update_user_password_handler(user_id, body)    
+    return update_user_password_handler(user_id, body)
+
 
 @router.delete("/users/<user_id>")
 def delete_user(user_id: str):

@@ -51,6 +51,7 @@ def generate_presigned_upload_url(
 
     return upload_url, key
 
+
 def generate_presigned_get_url(
     key: str,
     expires_in: int = 300,
@@ -65,6 +66,7 @@ def generate_presigned_get_url(
         ExpiresIn=expires_in,
     )
     return get_url
+
 
 def delete_file_from_s3(key: str):
     s3 = get_s3_client()
