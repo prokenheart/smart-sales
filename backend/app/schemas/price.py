@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 import uuid
 from datetime import datetime
 from decimal import Decimal
@@ -12,7 +12,12 @@ class PriceBase(BaseModel):
 
 
 class PriceCreate(PriceBase):
-    pass
+    @field_validator("price_date")
+    @classmethod
+    def validate_price_date(cls, v: date) -> date:
+        if v < date.today():
+            raise ValueError("Price_date must be today or in the future")
+        return v
 
 
 class PriceIdPath(BaseModel):
