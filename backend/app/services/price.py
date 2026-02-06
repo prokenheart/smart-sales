@@ -57,6 +57,8 @@ def update_price(
     if not price:
         raise NotFoundError("Price with given ID does not exist.")
 
+    price.ensure_price_date_not_in_past()
+
     if product_id is not None:
         if not product_exists(db, product_id):
             raise NotFoundError("Product with given ID does not exist.")
@@ -75,6 +77,8 @@ def delete_price(db: Session, price_id: uuid.UUID) -> uuid.UUID | None:
     price = get_price(db, price_id)
     if not price:
         return None
+
+    price.ensure_price_date_not_in_past()
 
     db.delete(price)
     db.commit()

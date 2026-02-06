@@ -1,8 +1,8 @@
 from pydantic import ValidationError
 from app.database import get_db
 from app.schemas.price import PriceCreate, PriceIdPath, PriceResponse, PriceUpdate
-
 from app.schemas.product import ProductIdPath
+from app.models.price import PriceInThePass
 
 from app.services.price import (
     create_price,
@@ -164,6 +164,12 @@ def update_price_handler(price_id: str, body: dict | None) -> Response:
     except NotFoundError as e:
         return error(message=str(e), status_code=ResponseStatusCode.NOT_FOUND)
 
+    except PriceInThePass as e:
+        return error(
+            message=str(e),
+            status_code=ResponseStatusCode.CONFLICT,
+        )
+
     except Exception as e:
         return error(
             message="Internal server error",
@@ -192,6 +198,12 @@ def delete_price_handler(price_id: str) -> Response:
                 )
 
             return success(data={"price_id": str(deleted_id)})
+
+    except PriceInThePass as e:
+        return error(
+            message=str(e),
+            status_code=ResponseStatusCode.CONFLICT,
+        )
 
     except Exception as e:
         return error(

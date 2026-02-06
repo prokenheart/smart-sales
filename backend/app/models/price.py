@@ -7,6 +7,10 @@ from datetime import datetime, date
 import decimal
 
 
+class PriceInThePass(Exception):
+    pass
+
+
 class Price(Base):
     __tablename__ = "price"
 
@@ -25,3 +29,7 @@ class Price(Base):
     )
 
     product = relationship("Product")
+
+    def ensure_price_date_not_in_past(self) -> None:
+        if self.price_date < date.today():
+            raise PriceInThePass("Cannot update or delete price in the past")
