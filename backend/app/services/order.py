@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import select, exists, func
+from sqlalchemy import select, exists, func, and_, or_
 from sqlalchemy.sql import Select
 from app.models import Order, User, Customer, Status
 import uuid
 from datetime import datetime
 from app.core.logger import logger
-from app.schemas.order import OrderFilterQuery
+from app.schemas.order import OrderFilterQuery, OrderPaginationResponse
 
 
 class NotFoundError(Exception):
@@ -61,7 +61,7 @@ def _apply_page_number_pagination(
     query: OrderFilterQuery, stmt: Select, limit: int
 ) -> Select:
     if query.page:
-        stmt = stmt.order_by(Order.order_date.desc())
+        stmt = stmt.order_by(Order.order_date.desc(), Order.order_id.desc())
         stmt = stmt.offset((query.page - 1) * limit)
     return stmt
 
@@ -69,20 +69,39 @@ def _apply_page_number_pagination(
 def _apply_cursor_pagination(
     stmt: Select, query: OrderFilterQuery, is_prev: bool
 ) -> Select:
-    if query.cursor:
+    if query.cursor_date:
         if is_prev:
-            stmt = stmt.where(Order.order_date > query.cursor)
-            stmt = stmt.order_by(Order.order_date.asc())
+            stmt = stmt.where(
+                or_(
+                    Order.order_date > query.cursor_date,
+                    and_(
+                        Order.order_date == query.cursor_date,
+                        Order.order_id > query.cursor_id,
+                    ),
+                )
+            ).order_by(Order.order_date.asc(), Order.order_id.asc())
         else:
-            stmt = stmt.where(Order.order_date < query.cursor)
-            stmt = stmt.order_by(Order.order_date.desc())
+            stmt = stmt.where(
+                or_(
+                    Order.order_date < query.cursor_date,
+                    and_(
+                        Order.order_date == query.cursor_date,
+                        Order.order_id < query.cursor_id,
+                    ),
+                )
+            ).order_by(Order.order_date.desc(), Order.order_id.desc())
+
     return stmt
 
 
 def _get_paging_flags(
-    cursor: datetime | None, is_prev: bool, has_more: bool, page: int | None = None
+    cursor_date: datetime | None,
+    cursor_id: uuid.UUID | None,
+    is_prev: bool,
+    has_more: bool,
+    page: int | None = None,
 ) -> tuple[bool, bool]:
-    if cursor is None:
+    if cursor_date is None or cursor_id is None:
         if page is not None and page > 1:
             return True, has_more
         return False, has_more
@@ -98,14 +117,13 @@ def _count_orders(db: Session, query: OrderFilterQuery) -> int:
     stmt = _apply_filters(stmt, db, query)
     return db.execute(stmt).scalar_one()
 
-def _get_current_page(
-    query: OrderFilterQuery, is_prev: bool
-) -> int:
-    if query.cursor:
+
+def _get_current_page(query: OrderFilterQuery, is_prev: bool) -> int:
+    if query.cursor_date and query.cursor_id:
         if is_prev:
-            return query.current_page-1
+            return query.current_page - 1
         return query.current_page + 1
-    
+
     if query.page:
         return query.page
 
@@ -118,19 +136,19 @@ LIMIT = 20
 def get_orders(
     db: Session,
     query: OrderFilterQuery,
-) -> tuple[list[Order], datetime | None, datetime | None]:
+) -> OrderPaginationResponse:
 
     limit = LIMIT
 
     stmt = select(Order).options(joinedload(Order.status))
-    if query.page is None and query.cursor is None:
-        stmt = stmt.order_by(Order.order_date.desc())
+    if query.page is None and query.cursor_date is None:
+        stmt = stmt.order_by(Order.order_date.desc(), Order.order_id.desc())
 
     stmt = _apply_filters(stmt, db, query)
-    
+
     stmt = _apply_page_number_pagination(query, stmt, limit)
 
-    is_prev = query.cursor is not None and query.direction == "prev"
+    is_prev = query.cursor_date is not None and query.direction == "prev"
     stmt = _apply_cursor_pagination(stmt, query, is_prev)
     stmt = stmt.limit(limit + 1)
 
@@ -142,22 +160,38 @@ def get_orders(
     if is_prev:
         orders.reverse()
 
-    has_prev, has_next = _get_paging_flags(query.cursor, is_prev, has_more, query.page)
+    has_prev, has_next = _get_paging_flags(
+        query.cursor_date, query.cursor_id, is_prev, has_more, query.page
+    )
 
-    next_cursor = None
-    prev_cursor = None
+    prev_cursor_date = None
+    prev_cursor_id = None
+    next_cursor_date = None
+    next_cursor_id = None
 
     if orders:
         if has_prev:
-            prev_cursor = orders[0].order_date
+            prev_cursor_date = orders[0].order_date
+            prev_cursor_id = orders[0].order_id
         if has_next:
-            next_cursor = orders[-1].order_date
+            next_cursor_date = orders[-1].order_date
+            next_cursor_id = orders[-1].order_id
 
     total_count = _count_orders(db, query)
     total_pages = (total_count + limit - 1) // limit
     current_page = _get_current_page(query, is_prev)
 
-    return orders, next_cursor, prev_cursor, total_pages, current_page
+    order_pagination_response = OrderPaginationResponse(
+        orders=orders,
+        prev_cursor_date=prev_cursor_date,
+        prev_cursor_id=prev_cursor_id,
+        next_cursor_date=next_cursor_date,
+        next_cursor_id=next_cursor_id,
+        total_pages=total_pages,
+        current_page=current_page,
+    )
+
+    return order_pagination_response
 
 
 def update_order_status(

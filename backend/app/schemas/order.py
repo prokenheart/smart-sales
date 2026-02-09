@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 import uuid
 from datetime import datetime, date
 from decimal import Decimal
@@ -40,6 +40,7 @@ class OrderResponse(OrderBase):
 class OrderUpdateStatus(StatusCode):
     pass
 
+
 class OrderDateQuery(BaseModel):
     order_date: datetime
 
@@ -67,8 +68,10 @@ class OrderAttachmentUploadURLRequest(BaseModel):
 
 class OrderPaginationResponse(BaseModel):
     orders: list[OrderResponse]
-    prev_cursor: datetime | None = None
-    next_cursor: datetime | None = None
+    prev_cursor_date: datetime | None = None
+    prev_cursor_id: uuid.UUID | None = None
+    next_cursor_date: datetime | None = None
+    next_cursor_id: uuid.UUID | None = None
     total_pages: int
     current_page: int
 
@@ -78,7 +81,41 @@ class OrderFilterQuery(BaseModel):
     customer_id: uuid.UUID | None = None
     status_code: str | None = None
     order_date: date | None = None
-    cursor: datetime | None = None
+    cursor_date: datetime | None = None
+    cursor_id: uuid.UUID | None = None
     direction: Literal["next", "prev"] | None = None
     current_page: int | None = None
     page: int | None = None
+
+    @model_validator(mode="after")
+    def validate_pagination_rules(self):
+        has_page = self.page is not None
+
+        has_any_cursor_field = any(
+            [
+                self.cursor_date is not None,
+                self.cursor_id is not None,
+                self.direction is not None,
+                self.current_page is not None,
+            ]
+        )
+
+        has_full_cursor = all(
+            [
+                self.cursor_date is not None,
+                self.cursor_id is not None,
+                self.direction is not None,
+                self.current_page is not None,
+            ]
+        )
+        if has_page and has_any_cursor_field:
+            raise ValueError(
+                "Only one pagination method is allowed: page OR cursor pagination fields"
+            )
+
+        if has_any_cursor_field and not has_full_cursor:
+            raise ValueError(
+                "cursor_date, cursor_id, direction, and current_page must be provided together"
+            )
+
+        return self
