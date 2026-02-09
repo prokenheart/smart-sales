@@ -137,6 +137,8 @@ create table orders (
 );
 
 CREATE INDEX idx_orders_order_date ON orders(order_date);
+CREATE INDEX idx_orders_order_date_id ON orders (order_date DESC, order_id DESC);
+
 
 INSERT INTO orders (
     customer_id,
