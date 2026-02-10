@@ -140,7 +140,10 @@ def get_orders(
 
     limit = LIMIT
 
-    stmt = select(Order).options(joinedload(Order.status))
+    stmt = select(Order)
+    stmt = stmt.options(joinedload(Order.status))
+    stmt = stmt.options(joinedload(Order.customer))
+    stmt = stmt.options(joinedload(Order.user))
     if query.page is None and query.cursor_date is None:
         stmt = stmt.order_by(Order.order_date.desc(), Order.order_id.desc())
 

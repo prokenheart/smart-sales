@@ -21,19 +21,33 @@ class OrderIdPath(CamelCaseModel):
 
 
 class StatusResponse(CamelCaseModel):
+    status_id: uuid.UUID
     status_code: str
 
     model_config = ConfigDict(from_attributes=True)
 
+class CustomerResponse(CamelCaseModel):
+    customer_id: uuid.UUID
+    customer_name: str
 
-class OrderResponse(OrderBase):
+    model_config = ConfigDict(from_attributes=True)
+
+class UserResponse(CamelCaseModel):
+    user_id: uuid.UUID
+    user_name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class OrderResponse(CamelCaseModel):
     order_id: uuid.UUID
     order_total: Decimal
-    status_id: uuid.UUID
-    status: StatusResponse
     order_date: datetime
     order_attachment: str | None
     updated_at: datetime
+    status: StatusResponse
+    customer: CustomerResponse
+    user: UserResponse
 
     model_config = ConfigDict(from_attributes=True)
 
