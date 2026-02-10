@@ -73,6 +73,7 @@ class OrderPaginationResponse(CamelCaseModel):
     next_cursor_id: uuid.UUID | None = None
     total_pages: int
     current_page: int
+    total_orders: int
 
 
 class OrderFilterQuery(CamelCaseModel):
