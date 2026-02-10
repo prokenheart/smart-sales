@@ -1,9 +1,10 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import Field, ConfigDict
 import uuid
 from datetime import datetime
+from app.schemas.base_schema import CamelCaseModel
 
 
-class ProductBase(BaseModel):
+class ProductBase(CamelCaseModel):
     product_name: str
     product_description: str | None = None
     product_quantity: int = Field(ge=0)
@@ -13,7 +14,7 @@ class ProductCreate(ProductBase):
     pass
 
 
-class ProductIdPath(BaseModel):
+class ProductIdPath(CamelCaseModel):
     product_id: uuid.UUID
 
 
@@ -24,7 +25,7 @@ class ProductResponse(ProductBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ProductUpdate(BaseModel):
+class ProductUpdate(CamelCaseModel):
     product_name: str | None = None
     product_description: str | None = None
     product_quantity: int | None = Field(default=None, ge=0)

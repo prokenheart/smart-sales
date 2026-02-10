@@ -1,11 +1,12 @@
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from pydantic import Field, ConfigDict, field_validator
 import uuid
 from datetime import datetime
 from decimal import Decimal
 from datetime import date
+from app.schemas.base_schema import CamelCaseModel
 
 
-class PriceBase(BaseModel):
+class PriceBase(CamelCaseModel):
     product_id: uuid.UUID
     price_amount: Decimal = Field(gt=0)
     price_date: date
@@ -20,7 +21,7 @@ class PriceCreate(PriceBase):
         return v
 
 
-class PriceIdPath(BaseModel):
+class PriceIdPath(CamelCaseModel):
     price_id: uuid.UUID
 
 
@@ -31,7 +32,7 @@ class PriceResponse(PriceBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class PriceUpdate(BaseModel):
+class PriceUpdate(CamelCaseModel):
     product_id: uuid.UUID | None = None
     price_amount: Decimal | None = Field(default=None, gt=0)
     price_date: date | None = None

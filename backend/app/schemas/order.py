@@ -1,12 +1,13 @@
-from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
+from pydantic import ConfigDict, field_validator, model_validator
 import uuid
 from datetime import datetime, date
 from decimal import Decimal
 from typing import Literal
 from app.schemas.status import StatusCode
+from app.schemas.base_schema import CamelCaseModel
 
 
-class OrderBase(BaseModel):
+class OrderBase(CamelCaseModel):
     customer_id: uuid.UUID
     user_id: uuid.UUID
 
@@ -15,11 +16,11 @@ class OrderCreate(OrderBase):
     pass
 
 
-class OrderIdPath(BaseModel):
+class OrderIdPath(CamelCaseModel):
     order_id: uuid.UUID
 
 
-class StatusResponse(BaseModel):
+class StatusResponse(CamelCaseModel):
     status_code: str
 
     model_config = ConfigDict(from_attributes=True)
@@ -41,21 +42,19 @@ class OrderUpdateStatus(StatusCode):
     pass
 
 
-class OrderDateQuery(BaseModel):
+class OrderDateQuery(CamelCaseModel):
     order_date: datetime
 
 
-class OrderAttachmentResponse(BaseModel):
+class OrderAttachmentResponse(CamelCaseModel):
     order_id: uuid.UUID
     order_attachment: str
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class OrderAttachmentUploadURLRequest(BaseModel):
-    content_type: str = Field(..., alias="contentType")
-
-    model_config = ConfigDict(populate_by_name=True)
+class OrderAttachmentUploadURLRequest(CamelCaseModel):
+    content_type: str
 
     @field_validator("content_type")
     @classmethod
@@ -66,7 +65,7 @@ class OrderAttachmentUploadURLRequest(BaseModel):
         return v
 
 
-class OrderPaginationResponse(BaseModel):
+class OrderPaginationResponse(CamelCaseModel):
     orders: list[OrderResponse]
     prev_cursor_date: datetime | None = None
     prev_cursor_id: uuid.UUID | None = None
@@ -76,7 +75,7 @@ class OrderPaginationResponse(BaseModel):
     current_page: int
 
 
-class OrderFilterQuery(BaseModel):
+class OrderFilterQuery(CamelCaseModel):
     user_id: uuid.UUID | None = None
     customer_id: uuid.UUID | None = None
     status_code: str | None = None

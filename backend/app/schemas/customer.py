@@ -1,10 +1,11 @@
-from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
+from pydantic import EmailStr, field_validator, ConfigDict
 import uuid
 from datetime import datetime
 import re
+from app.schemas.base_schema import CamelCaseModel
 
 
-class CustomerBase(BaseModel):
+class CustomerBase(CamelCaseModel):
     customer_name: str
     customer_email: EmailStr
     customer_phone: str
@@ -24,11 +25,11 @@ class CustomerCreate(CustomerBase):
     pass
 
 
-class CustomerIdPath(BaseModel):
+class CustomerIdPath(CamelCaseModel):
     customer_id: uuid.UUID
 
 
-class CustomerEmailQuery(BaseModel):
+class CustomerEmailQuery(CamelCaseModel):
     customer_email: EmailStr
 
 
@@ -39,7 +40,7 @@ class CustomerResponse(CustomerBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class CustomerUpdate(BaseModel):
+class CustomerUpdate(CamelCaseModel):
     customer_name: str | None = None
     customer_email: EmailStr | None = None
     customer_phone: str | None = None

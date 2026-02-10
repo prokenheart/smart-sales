@@ -1,10 +1,11 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import Field, ConfigDict
 import uuid
 from datetime import datetime
 from decimal import Decimal
+from app.schemas.base_schema import CamelCaseModel
 
 
-class ItemBase(BaseModel):
+class ItemBase(CamelCaseModel):
     product_id: uuid.UUID
     item_quantity: int = Field(gt=0)
 
@@ -13,7 +14,7 @@ class ItemCreate(ItemBase):
     pass
 
 
-class ItemList(BaseModel):
+class ItemList(CamelCaseModel):
     list_item: list[ItemCreate]
 
 

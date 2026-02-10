@@ -1,10 +1,11 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
+from pydantic import EmailStr, Field, field_validator, ConfigDict
 import uuid
 from datetime import datetime
 import re
+from app.schemas.base_schema import CamelCaseModel
 
 
-class UserBase(BaseModel):
+class UserBase(CamelCaseModel):
     user_name: str
     user_email: EmailStr
     user_phone: str
@@ -26,15 +27,15 @@ class UserCreate(UserBase):
     pass
 
 
-class UserIdPath(BaseModel):
+class UserIdPath(CamelCaseModel):
     user_id: uuid.UUID
 
 
-class UserEmailQuery(BaseModel):
+class UserEmailQuery(CamelCaseModel):
     user_email: EmailStr
 
 
-class UserResponse(BaseModel):
+class UserResponse(CamelCaseModel):
     user_name: str
     user_email: EmailStr
     user_phone: str
@@ -45,7 +46,7 @@ class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UserUpdateInfo(BaseModel):
+class UserUpdateInfo(CamelCaseModel):
     user_name: str | None = None
     user_email: EmailStr | None = None
     user_phone: str | None = None
@@ -64,6 +65,6 @@ class UserUpdateInfo(BaseModel):
         return v
 
 
-class UserUpdatePassword(BaseModel):
+class UserUpdatePassword(CamelCaseModel):
     old_password: str = Field(..., min_length=8)
     new_password: str = Field(..., min_length=8)

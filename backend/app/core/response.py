@@ -1,6 +1,6 @@
 from aws_lambda_powertools.event_handler import Response
 from typing import Any
-from pydantic import ValidationError
+from pydantic import ValidationError, BaseModel
 
 
 CORS_HEADERS = {
@@ -11,6 +11,8 @@ CORS_HEADERS = {
 
 
 def success(data: Any = None, status_code: int = 200) -> Response:
+    if isinstance(data, BaseModel):
+        data = data.model_dump(mode="json", by_alias=True)
     return Response(
         status_code=status_code,
         content_type="application/json",

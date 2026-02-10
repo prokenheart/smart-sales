@@ -1,10 +1,11 @@
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import ConfigDict, field_validator
 import uuid
 from datetime import datetime
 import re
+from app.schemas.base_schema import CamelCaseModel
 
 
-class StatusBase(BaseModel):
+class StatusBase(CamelCaseModel):
     status_name: str
     status_code: str
 
@@ -19,11 +20,11 @@ class StatusBase(BaseModel):
         return v
 
 
-class StatusIdPath(BaseModel):
+class StatusIdPath(CamelCaseModel):
     status_id: uuid.UUID
 
 
-class StatusCode(BaseModel):
+class StatusCode(CamelCaseModel):
     status_code: str
 
     @field_validator("status_code")
