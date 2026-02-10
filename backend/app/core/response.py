@@ -17,7 +17,7 @@ def success(data: Any = None, status_code: int = 200) -> Response:
         status_code=status_code,
         content_type="application/json",
         headers=CORS_HEADERS,
-        body={"data": data},
+        body=data,
     )
 
 
