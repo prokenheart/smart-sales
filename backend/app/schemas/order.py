@@ -86,7 +86,6 @@ class OrderPaginationResponse(CamelCaseModel):
     next_cursor_date: datetime | None = None
     next_cursor_id: uuid.UUID | None = None
     total_pages: int
-    current_page: int
     total_orders: int
 
 
@@ -98,7 +97,6 @@ class OrderFilterQuery(CamelCaseModel):
     cursor_date: datetime | None = None
     cursor_id: uuid.UUID | None = None
     direction: Literal["next", "prev"] | None = None
-    current_page: int | None = None
     page: int | None = None
 
     @model_validator(mode="after")
@@ -110,7 +108,6 @@ class OrderFilterQuery(CamelCaseModel):
                 self.cursor_date is not None,
                 self.cursor_id is not None,
                 self.direction is not None,
-                self.current_page is not None,
             ]
         )
 
@@ -119,7 +116,6 @@ class OrderFilterQuery(CamelCaseModel):
                 self.cursor_date is not None,
                 self.cursor_id is not None,
                 self.direction is not None,
-                self.current_page is not None,
             ]
         )
         if has_page and has_any_cursor_field:

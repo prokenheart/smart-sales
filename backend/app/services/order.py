@@ -118,18 +118,6 @@ def _count_orders(db: Session, query: OrderFilterQuery) -> int:
     return db.execute(stmt).scalar_one()
 
 
-def _get_current_page(query: OrderFilterQuery, is_prev: bool) -> int:
-    if query.cursor_date and query.cursor_id:
-        if is_prev:
-            return query.current_page - 1
-        return query.current_page + 1
-
-    if query.page:
-        return query.page
-
-    return 1
-
-
 LIMIT = 20
 
 
@@ -182,7 +170,6 @@ def get_orders(
 
     total_count = _count_orders(db, query)
     total_pages = (total_count + limit - 1) // limit
-    current_page = _get_current_page(query, is_prev)
 
     order_pagination_response = OrderPaginationResponse(
         orders=orders,
@@ -191,7 +178,6 @@ def get_orders(
         next_cursor_date=next_cursor_date,
         next_cursor_id=next_cursor_id,
         total_pages=total_pages,
-        current_page=current_page,
         total_orders=total_count
     )
 
