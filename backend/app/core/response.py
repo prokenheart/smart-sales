@@ -13,6 +13,8 @@ CORS_HEADERS = {
 def success(data: Any = None, status_code: int = 200) -> Response:
     if isinstance(data, BaseModel):
         data = data.model_dump(mode="json", by_alias=True)
+    elif isinstance(data, list) and all(isinstance(item, BaseModel) for item in data):
+        data = [item.model_dump(mode="json", by_alias=True) for item in data]
     return Response(
         status_code=status_code,
         content_type="application/json",
