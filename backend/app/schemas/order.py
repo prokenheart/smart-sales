@@ -29,6 +29,8 @@ class StatusResponse(CamelCaseModel):
 class CustomerResponse(CamelCaseModel):
     customer_id: uuid.UUID
     customer_name: str
+    customer_phone: str
+    customer_email: str
 
     model_config = ConfigDict(from_attributes=True)
 
