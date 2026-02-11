@@ -18,7 +18,16 @@ class ItemList(CamelCaseModel):
     list_item: list[ItemCreate]
 
 
-class ItemResponse(ItemBase):
+class ProductResponse(CamelCaseModel):
+    product_id: uuid.UUID
+    product_name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ItemResponse(CamelCaseModel):
+    product: ProductResponse
+    item_quantity: int
     item_price: Decimal
     order_id: uuid.UUID
     updated_at: datetime

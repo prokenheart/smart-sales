@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select, exists
 from app.models import Item, Product, Order, Price
 from app.schemas.item import ItemBase
@@ -70,7 +70,9 @@ def get_item(
 def get_items_by_order(db: Session, order_id: uuid.UUID) -> list[Item]:
     if not order_exists(db, order_id):
         raise NotFoundError("Order with given ID does not exist.")
-    stmt = select(Item).where(Item.order_id == order_id)
+    stmt = (
+        select(Item).options(joinedload(Item.product)).where(Item.order_id == order_id)
+    )
     return db.execute(stmt).scalars().all()
 
 
