@@ -31,7 +31,7 @@ export default function OrdersPage() {
 
   const [cursorDate, setCursorDate] = useState<string>();
   const [cursorId, setCursorId] = useState<string>();
-  const [direction, setDirection] = useState<string>();
+  const [direction, setDirection] = useState<"prev" | "next">();
   const [page, setPage] = useState<number>();
 
   useEffect(() => {

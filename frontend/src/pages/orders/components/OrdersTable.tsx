@@ -11,8 +11,9 @@ import {
   Collapse,
   Stack,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactElement } from "react";
+import ViewOrderItems from "./ViewOrderItems";
 
 type Status = {
   statusId: string;
@@ -55,22 +56,6 @@ function getStatusColor(statusCode: string): string {
     default:
       return "gray";
   }
-}
-
-function ViewOrderItems({ orderId }: Readonly<{ orderId: string }>) {
-  useEffect(() => {});
-
-  return (
-    <Button
-      variant="text"
-      onClick={(e) => {
-        e.stopPropagation();
-        console.log("View detail", orderId);
-      }}
-    >
-      View Detail
-    </Button>
-  );
 }
 
 export default function OrdersTable({
@@ -288,7 +273,7 @@ export default function OrdersTable({
                               Change Status
                             </Button>
 
-                            <ViewOrderItems orderId={order.orderId} />
+                            <ViewOrderItems orderId={order.orderId} status={order.status.statusCode}/>
                           </Stack>
                         </Box>
                       </Box>

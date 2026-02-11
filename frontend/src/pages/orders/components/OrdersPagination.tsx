@@ -56,10 +56,10 @@ export default function OrdersPagination({
   nextCursorId: string | undefined;
   setCursorDate: Dispatch<SetStateAction<string | undefined>>;
   setCursorId: Dispatch<SetStateAction<string | undefined>>;
-  setDirection: Dispatch<SetStateAction<string | undefined>>;
+  setDirection: Dispatch<SetStateAction<"prev" | "next" | undefined>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
 }>): ReactElement {
-  const handleCursorPagination = (direction: string) => {
+  const handleCursorPagination = (direction: "prev" | "next") => {
     setDirection(direction);
     if (direction == "prev") {
       setCursorDate(prevCursorDate);
