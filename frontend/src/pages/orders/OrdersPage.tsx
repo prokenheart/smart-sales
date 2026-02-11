@@ -1,9 +1,9 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import OrdersTable from "./components/OrdersTable";
 import OrdersPagination from "./components/OrdersPagination";
-import type { Order } from "./components/OrdersTable";
+import type { Order } from "./types/order";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -66,7 +66,18 @@ export default function OrdersPage() {
 
   return (
     <Box>
-      <Typography>Orders Page</Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h5">Orders</Typography>
+
+        <Button variant="contained">Add Order</Button>
+      </Box>
       <OrdersTable
         orders={orders}
         totalOrders={totalOrders}

@@ -14,34 +14,7 @@ import {
 import { useState } from "react";
 import type { ReactElement } from "react";
 import ViewOrderItems from "./ViewOrderItems";
-
-type Status = {
-  statusId: string;
-  statusCode: string;
-};
-
-type Customer = {
-  customerId: string;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
-};
-
-type User = {
-  userId: string;
-  userName: string;
-};
-
-export type Order = {
-  orderId: string;
-  orderTotal: string;
-  orderDate: string;
-  orderAttachment: string | null;
-  updatedAt: string;
-  status: Status;
-  customer: Customer;
-  user: User;
-};
+import type { Order } from "../types/order";
 
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
