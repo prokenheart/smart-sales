@@ -5,6 +5,8 @@ import OrdersTable from "./components/OrdersTable";
 import OrdersPagination from "./components/OrdersPagination";
 import type { Order } from "./components/OrdersTable";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 type OrdersResponse = {
   orders: Order[];
   prevCursorDate: string | null;
@@ -35,17 +37,14 @@ export default function OrdersPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get<OrdersResponse>(
-          "https://jw2lw7o6pi.execute-api.ap-southeast-2.amazonaws.com/Prod/orders",
-          {
-            params: {
-              page: page,
-              cursorDate: cursorDate,
-              cursorId: cursorId,
-              direction: direction,
-            },
-          }
-        );
+        const res = await axios.get<OrdersResponse>(`${API_URL}/orders`, {
+          params: {
+            page: page,
+            cursorDate: cursorDate,
+            cursorId: cursorId,
+            direction: direction,
+          },
+        });
         console.log(currentPage, page, cursorDate);
         setOrders(res.data.orders);
         setPrevCursorDate(res.data.prevCursorDate ?? undefined);
