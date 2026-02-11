@@ -1,7 +1,4 @@
-import {
-  Box,
-  Typography
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import OrdersTable from "./components/OrdersTable";
@@ -19,16 +16,13 @@ type OrdersResponse = {
   totalOrders: number;
 };
 
-
-
-
-
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [prevCursorDate, setPrevCursorDate] = useState<string>();
   const [prevCursorId, setPrevCursorId] = useState<string>();
   const [nextCursorDate, setNextCursorDate] = useState<string>();
   const [nextCursorId, setNextCursorId] = useState<string>();
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalOrders, setTotalOrders] = useState<number>(0);
