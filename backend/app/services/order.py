@@ -178,7 +178,8 @@ def get_orders(
         next_cursor_date=next_cursor_date,
         next_cursor_id=next_cursor_id,
         total_pages=total_pages,
-        total_orders=total_count
+        total_orders=total_count,
+        orders_per_page=LIMIT
     )
 
     return order_pagination_response
