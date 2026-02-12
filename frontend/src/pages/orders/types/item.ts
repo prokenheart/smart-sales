@@ -7,6 +7,11 @@ export type Item = {
   product: Product;
   itemQuantity: number;
   itemPrice: number;
-  orderId: string;
-  updatedAt: string;
+  orderId: string | undefined;
+  updatedAt: string | undefined;
 };
+
+export type ItemPost = {
+  productId: string;
+  itemQuantity: number;
+}

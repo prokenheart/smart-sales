@@ -3,7 +3,7 @@ type Status = {
   statusCode: string;
 };
 
-type Customer = {
+export type Customer = {
   customerId: string;
   customerName: string;
   customerPhone: string;

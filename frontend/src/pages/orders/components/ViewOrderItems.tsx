@@ -4,36 +4,18 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   CircularProgress,
-  TextField,
   Tooltip,
-  Box
+  Box,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import type { ReactElement, Dispatch, SetStateAction } from "react";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { IoIosAdd } from "react-icons/io";
+import OrderItemsTable from "./OrderItemsTable";
+import UpdateOrderItems from "./UpdateOrderItems";
+import type { Item } from "../types/item";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-type Product = {
-  productId: string;
-  productName: string;
-};
-
-type Item = {
-  product: Product;
-  itemQuantity: number;
-  itemPrice: number;
-  orderId: string;
-  updatedAt: string;
-};
 
 function PopUpItemList({
   open,
@@ -61,23 +43,6 @@ function PopUpItemList({
     setMode("view");
   };
 
-  const handleChangeQuantity = (productId: string, value: number) => {
-    setEditItems((prev) =>
-      prev.map((item) =>
-        item.product.productId === productId
-          ? { ...item, itemQuantity: value }
-          : item
-      )
-    );
-  };
-
-  const handleDelete = (productId: string) => {
-    setEditItems((prev) =>
-      prev.filter((item) => item.product.productId !== productId)
-    );
-  };
-
-  const data = mode === "view" ? items : editItems;
   return (
     <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
       <DialogTitle>Order Items</DialogTitle>
@@ -86,66 +51,7 @@ function PopUpItemList({
         {loading ? (
           <CircularProgress />
         ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Product</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Price</TableCell>
-                <TableCell>Total</TableCell>
-                {mode == "edit" && <TableCell></TableCell>}
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {data.map((item) => (
-                <TableRow key={item.product.productId}>
-                  <TableCell>{item.product.productName}</TableCell>
-                  <TableCell>
-                    {" "}
-                    {mode === "view" ? (
-                      item.itemQuantity
-                    ) : (
-                      <TextField
-                        type="number"
-                        size="small"
-                        value={item.itemQuantity}
-                        onChange={(e) =>
-                          handleChangeQuantity(
-                            item.product.productId,
-                            Number(e.target.value)
-                          )
-                        }
-                      />
-                    )}
-                  </TableCell>
-                  <TableCell>{item.itemPrice}</TableCell>
-                  <TableCell>
-                    {(item.itemQuantity * item.itemPrice).toFixed(2)}
-                  </TableCell>
-                  {mode == "edit" && (
-                    <TableCell>
-                      <Button
-                        color="error"
-                        onClick={() => handleDelete(item.product.productId)}
-                      >
-                        <FaRegTrashAlt />
-                      </Button>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-              {mode === "edit" && (
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    <Button>
-                      <IoIosAdd size={30} />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <OrderItemsTable items={items} selectedItems={editItems} itemMode={mode} setSelectedItems={setEditItems} />
         )}
       </DialogContent>
 
@@ -167,14 +73,7 @@ function PopUpItemList({
           </Tooltip>
         ) : (
           <>
-            <Button
-              variant="contained"
-              onClick={() => {
-                console.log("SAVE DATA", editItems);
-              }}
-            >
-              Save
-            </Button>
+            <UpdateOrderItems editItems={editItems} />
 
             <Button color="error" onClick={handleCancel}>
               Cancel

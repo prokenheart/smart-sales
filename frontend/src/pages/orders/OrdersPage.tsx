@@ -4,6 +4,7 @@ import axios from "axios";
 import OrdersTable from "./components/OrdersTable";
 import OrdersPagination from "./components/OrdersPagination";
 import type { Order } from "./types/order";
+import OrderForm from "./components/OrderForm";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -16,6 +17,7 @@ type OrdersResponse = {
   totalPages: number;
   currentPage: number;
   totalOrders: number;
+  ordersPerPage: number;
 };
 
 export default function OrdersPage() {
@@ -28,41 +30,59 @@ export default function OrdersPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalOrders, setTotalOrders] = useState<number>(0);
+  const [ordersPerPage, setOrdersPerPage] = useState<number>(1);
 
   const [cursorDate, setCursorDate] = useState<string>();
   const [cursorId, setCursorId] = useState<string>();
   const [direction, setDirection] = useState<"prev" | "next">();
   const [page, setPage] = useState<number>();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await axios.get<OrdersResponse>(`${API_URL}/orders`, {
-          params: {
-            page: page,
-            cursorDate: cursorDate,
-            cursorId: cursorId,
-            direction: direction,
-          },
-        });
-        console.log(currentPage, page, cursorDate);
-        setOrders(res.data.orders);
-        setPrevCursorDate(res.data.prevCursorDate ?? undefined);
-        setPrevCursorId(res.data.prevCursorId ?? undefined);
-        setNextCursorDate(res.data.nextCursorDate ?? undefined);
-        setNextCursorId(res.data.nextCursorId ?? undefined);
-        setTotalPages(res.data.totalPages);
-        setTotalOrders(res.data.totalOrders);
+  const [open, setOpen] = useState<boolean>(false);
+  const [mode, setMode] = useState<"create" | "update">();
 
-        setCursorDate(undefined);
-        setCursorId(undefined);
-        setDirection(undefined);
-        setPage(undefined);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
-      }
-    })();
+  const [isPosted, setIsPosted] = useState<boolean>(false);
+
+  const handleCreateOrder = () => {
+    setMode("create");
+    setOpen(true);
+  };
+
+  const fetchOrders = async () => {
+    const res = await axios.get<OrdersResponse>(`${API_URL}/orders`, {
+      params: {
+        page,
+        cursorDate,
+        cursorId,
+        direction,
+      },
+    });
+
+    setOrders(res.data.orders);
+    setPrevCursorDate(res.data.prevCursorDate ?? undefined);
+    setPrevCursorId(res.data.prevCursorId ?? undefined);
+    setNextCursorDate(res.data.nextCursorDate ?? undefined);
+    setNextCursorId(res.data.nextCursorId ?? undefined);
+    setTotalPages(res.data.totalPages);
+    setTotalOrders(res.data.totalOrders);
+    setOrdersPerPage(res.data.ordersPerPage);
+
+    setCursorDate(undefined);
+    setCursorId(undefined);
+    setDirection(undefined);
+    setPage(undefined);
+  };
+
+  useEffect(() => {
+    fetchOrders();
   }, [currentPage]);
+
+  useEffect(() => {
+    if (isPosted) {
+      fetchOrders();
+      setOpen(false)
+      setIsPosted(false);
+    }
+  }, [isPosted]);
 
   return (
     <Box>
@@ -76,12 +96,21 @@ export default function OrdersPage() {
       >
         <Typography variant="h5">Orders</Typography>
 
-        <Button variant="contained">Add Order</Button>
+        <Button variant="contained" onClick={handleCreateOrder}>
+          Add Order
+        </Button>
+        <OrderForm
+          open={open}
+          setOpen={setOpen}
+          mode={mode}
+          setIsPosted={setIsPosted}
+        />
       </Box>
       <OrdersTable
         orders={orders}
         totalOrders={totalOrders}
         currentPage={currentPage}
+        ordersPerPage={ordersPerPage}
       />
       <OrdersPagination
         currentPage={currentPage}
