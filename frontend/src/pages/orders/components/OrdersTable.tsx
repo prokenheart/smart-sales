@@ -11,7 +11,7 @@ import {
   Collapse,
   Stack,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import type { ReactElement } from "react";
 import ViewOrderItems from "./ViewOrderItems";
 import type { Order } from "../types/order";
@@ -35,10 +35,12 @@ export default function OrdersTable({
   orders,
   totalOrders,
   currentPage,
+  ordersPerPage,
 }: Readonly<{
   orders: Order[];
-  totalOrders: number | undefined;
-  currentPage: number | undefined;
+  totalOrders: number;
+  currentPage: number;
+  ordersPerPage: number;
 }>): ReactElement {
   const [expandedOrderId, setExpandedOrderId] = useState<string | undefined>(
     undefined
@@ -85,7 +87,7 @@ export default function OrdersTable({
           {orders.map((order, index) => {
             const isExpanded = expandedOrderId === order.orderId;
             return (
-              <>
+              <Fragment key={order.orderId}>
                 <TableRow
                   key={order.orderId}
                   hover
@@ -94,7 +96,7 @@ export default function OrdersTable({
                   }
                 >
                   <TableCell>
-                    {orders.length * ((currentPage ?? 0) - 1) + index + 1}
+                    {ordersPerPage * ((currentPage ?? 0) - 1) + index + 1}
                   </TableCell>
                   <TableCell
                     sx={{
@@ -253,7 +255,7 @@ export default function OrdersTable({
                     </Collapse>
                   </TableCell>
                 </TableRow>
-              </>
+              </Fragment>
             );
           })}
         </TableBody>
