@@ -97,6 +97,7 @@ class OrderFilterQuery(CamelCaseModel):
     customer_id: uuid.UUID | None = None
     status_code: str | None = None
     order_date: date | None = None
+    search: str | None = None
     cursor_date: datetime | None = None
     cursor_id: uuid.UUID | None = None
     direction: Literal["next", "prev"] | None = None

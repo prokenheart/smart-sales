@@ -36,13 +36,9 @@ def get_order(db: Session, order_id: uuid.UUID) -> Order | None:
 
 def _apply_filters(stmt: Select, db: Session, query: OrderFilterQuery) -> Select:
     if query.user_id:
-        if not user_exists(db, query.user_id):
-            raise NotFoundError("User with given ID does not exist.")
         stmt = stmt.where(Order.user_id == query.user_id)
 
     if query.customer_id:
-        if not customer_exists(db, query.customer_id):
-            raise NotFoundError("Customer with given ID does not exist.")
         stmt = stmt.where(Order.customer_id == query.customer_id)
 
     if query.status_code:
@@ -53,6 +49,22 @@ def _apply_filters(stmt: Select, db: Session, query: OrderFilterQuery) -> Select
         start = datetime.combine(query.order_date, datetime.min.time())
         end = datetime.combine(query.order_date, datetime.max.time())
         stmt = stmt.where(Order.order_date >= start, Order.order_date <= end)
+
+    if query.search:
+        stmt = (
+            stmt.join(Order.customer)
+                .join(Order.user)
+                .join(Order.status)
+                .where(
+                    or_(
+                        Customer.customer_name.ilike(f"%{query.search}%"),
+                        Customer.customer_phone.ilike(f"%{query.search}%"),
+                        User.user_name.ilike(f"%{query.search}%"),
+                        User.user_phone.ilike(f"%{query.search}%"),
+                        Status.status_code.ilike(f"%{query.search}%")
+                    )
+                )
+        )
 
     return stmt
 
@@ -132,6 +144,7 @@ def get_orders(
     stmt = stmt.options(joinedload(Order.status))
     stmt = stmt.options(joinedload(Order.customer))
     stmt = stmt.options(joinedload(Order.user))
+    stmt = stmt.distinct()
     if query.page is None and query.cursor_date is None:
         stmt = stmt.order_by(Order.order_date.desc(), Order.order_id.desc())
 
