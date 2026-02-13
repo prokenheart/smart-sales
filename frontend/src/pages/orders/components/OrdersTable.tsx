@@ -11,9 +11,9 @@ import {
   Collapse,
   Stack,
 } from "@mui/material";
-import { useState, Fragment } from "react";
-import type { ReactElement } from "react";
-import ViewOrderItems from "./ViewOrderItems";
+import { useState, Fragment, useEffect } from "react";
+import type { ReactElement, Dispatch, SetStateAction } from "react";
+import OrderForm from "./OrderForm";
 import type { Order } from "../types/order";
 
 function getStatusColor(statusCode: string): string {
@@ -36,15 +36,30 @@ export default function OrdersTable({
   totalOrders,
   currentPage,
   ordersPerPage,
+  setOrders,
 }: Readonly<{
   orders: Order[];
   totalOrders: number;
   currentPage: number;
   ordersPerPage: number;
+  setOrders: Dispatch<SetStateAction<Order[]>>;
 }>): ReactElement {
   const [expandedOrderId, setExpandedOrderId] = useState<string | undefined>(
     undefined
   );
+
+  const [openOrderForm, setOpenOrderForm] = useState<boolean>(false);
+  const [isUpdated, setIsUpdated] = useState<boolean>(false);
+  const [updatedOrder, setUpdatedOrder] = useState<Order>();
+
+  useEffect(() => {
+    if (isUpdated && updatedOrder != undefined) {
+      setOpenOrderForm(false);
+      setOrders((prev) =>
+        prev.map((o) => (o.orderId === updatedOrder.orderId ? updatedOrder : o))
+      );
+    }
+  }, [isUpdated, updatedOrder]);
 
   return (
     <Box
@@ -66,9 +81,8 @@ export default function OrdersTable({
           <col style={{ width: "15%" }} />
           <col style={{ width: "10%" }} />
           <col style={{ width: "10%" }} />
-          <col style={{ width: "10%" }} />
-          <col style={{ width: "10%" }} />
-          <col style={{ width: "10%" }} />
+          <col style={{ width: "15%" }} />
+          <col style={{ width: "15%" }} />
         </colgroup>
         <TableHead>
           <TableRow>
@@ -79,7 +93,6 @@ export default function OrdersTable({
             <TableCell>Order Total</TableCell>
             <TableCell>Status</TableCell>
             <TableCell>Order Date</TableCell>
-            <TableCell>Updated At</TableCell>
             <TableCell>Attachment</TableCell>
           </TableRow>
         </TableHead>
@@ -109,7 +122,7 @@ export default function OrdersTable({
                   </TableCell>
                   <TableCell>{order.customer.customerName}</TableCell>
                   <TableCell>{order.user.userName}</TableCell>
-                  <TableCell>{order.orderTotal}</TableCell>
+                  <TableCell>{Number(order.orderTotal).toFixed(2)}</TableCell>
                   <TableCell
                     sx={{
                       fontWeight: 600,
@@ -119,10 +132,7 @@ export default function OrdersTable({
                     {order.status.statusCode}
                   </TableCell>
                   <TableCell>
-                    {new Date(order.orderDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(order.updatedAt).toLocaleDateString()}
+                    {new Date(order.orderDate).toLocaleString()}
                   </TableCell>
                   <TableCell
                     sx={{
@@ -136,7 +146,7 @@ export default function OrdersTable({
                 </TableRow>
                 <TableRow>
                   <TableCell
-                    colSpan={9}
+                    colSpan={8}
                     sx={{
                       padding: 0,
                       borderBottom: isExpanded ? "1px solid #ddd" : "none",
@@ -198,7 +208,7 @@ export default function OrdersTable({
                               >
                                 Total:
                               </Typography>{" "}
-                              {order.orderTotal}
+                              {Number(order.orderTotal).toFixed(2)}
                             </Typography>
 
                             <Typography variant="body2">
@@ -231,11 +241,20 @@ export default function OrdersTable({
                               variant="contained"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                console.log("Update order", order.orderId);
+                                setOpenOrderForm(true);
                               }}
                             >
                               Update
                             </Button>
+
+                            <OrderForm
+                              open={openOrderForm}
+                              setOpen={setOpenOrderForm}
+                              mode="update"
+                              setIsPosted={setIsUpdated}
+                              order={order}
+                              setUpdatedOrder={setUpdatedOrder}
+                            />
 
                             <Button
                               variant="outlined"
@@ -247,8 +266,6 @@ export default function OrdersTable({
                             >
                               Change Status
                             </Button>
-
-                            <ViewOrderItems orderId={order.orderId} status={order.status.statusCode}/>
                           </Stack>
                         </Box>
                       </Box>
@@ -262,7 +279,7 @@ export default function OrdersTable({
         <TableFooter>
           <TableRow>
             <TableCell
-              colSpan={9}
+              colSpan={8}
               sx={{
                 position: "sticky",
                 bottom: 0,

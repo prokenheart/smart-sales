@@ -38,12 +38,10 @@ export default function OrdersPage() {
   const [page, setPage] = useState<number>();
 
   const [open, setOpen] = useState<boolean>(false);
-  const [mode, setMode] = useState<"create" | "update">();
 
   const [isPosted, setIsPosted] = useState<boolean>(false);
 
   const handleCreateOrder = () => {
-    setMode("create");
     setOpen(true);
   };
 
@@ -78,9 +76,12 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (isPosted) {
-      fetchOrders();
-      setOpen(false)
+      setOpen(false);
       setIsPosted(false);
+      if(currentPage==1)
+        fetchOrders()
+      else
+        setCurrentPage(1);
     }
   }, [isPosted]);
 
@@ -102,7 +103,7 @@ export default function OrdersPage() {
         <OrderForm
           open={open}
           setOpen={setOpen}
-          mode={mode}
+          mode="create"
           setIsPosted={setIsPosted}
         />
       </Box>
@@ -111,6 +112,7 @@ export default function OrdersPage() {
         totalOrders={totalOrders}
         currentPage={currentPage}
         ordersPerPage={ordersPerPage}
+        setOrders={setOrders}
       />
       <OrdersPagination
         currentPage={currentPage}
