@@ -5,7 +5,7 @@ import {
   DialogTitle,
   DialogActions,
   Button,
-  TextField,
+  Typography
 } from "@mui/material";
 import type { Dispatch, SetStateAction } from "react";
 import CustomerSelect from "./CustomerSelect";
@@ -107,7 +107,16 @@ export default function OrderForm({
             )}
 
             {mode == "update" && (
-              <TextField value={order?.customer.customerName} disabled />
+              <Typography variant="body2">
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{ fontWeight: 600 }}
+                >
+                  Customer Name:
+                </Typography>{" "}
+                {order?.customer.customerName}
+              </Typography>
             )}
 
             <OrderItemsTable
