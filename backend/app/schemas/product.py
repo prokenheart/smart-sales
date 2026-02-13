@@ -2,6 +2,7 @@ from pydantic import Field, ConfigDict
 import uuid
 from datetime import datetime
 from app.schemas.base_schema import CamelCaseModel
+from decimal import Decimal
 
 
 class ProductBase(CamelCaseModel):
@@ -18,9 +19,16 @@ class ProductIdPath(CamelCaseModel):
     product_id: uuid.UUID
 
 
+class PriceResponse(CamelCaseModel):
+    price_id: uuid.UUID
+    price_amount: Decimal | None = Field(default=None, gt=0)
+
+    model_config = ConfigDict(from_attributes=True)
+
 class ProductResponse(ProductBase):
     product_id: uuid.UUID
     updated_at: datetime
+    prices: list[PriceResponse]
 
     model_config = ConfigDict(from_attributes=True)
 

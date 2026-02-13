@@ -1,5 +1,5 @@
 from sqlalchemy import String, Integer, TIMESTAMP, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from app.models import Base
 import uuid
@@ -17,4 +17,10 @@ class Product(Base):
     product_quantity: Mapped[int] = mapped_column(Integer, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=text("CURRENT_TIMESTAMP")
+    )
+
+    prices = relationship(
+        "Price",
+        back_populates="product",
+        order_by="desc(Price.price_date)"
     )

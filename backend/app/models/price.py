@@ -28,7 +28,7 @@ class Price(Base):
         TIMESTAMP, server_default=text("CURRENT_TIMESTAMP")
     )
 
-    product = relationship("Product")
+    product = relationship("Product", back_populates="prices")
 
     def ensure_price_date_not_in_past(self) -> None:
         if self.price_date < date.today():

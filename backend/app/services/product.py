@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select
 from app.models import Product
 import uuid
@@ -63,6 +63,17 @@ def delete_product(db: Session, product_id: uuid.UUID) -> uuid.UUID | None:
     return product_id
 
 
+
 def search_products_by_name(db: Session, name_query: str) -> list[Product]:
-    stmt = select(Product).where(Product.product_name.ilike(f"%{name_query}%"))
-    return db.execute(stmt).scalars().all()
+    stmt = (
+        select(Product)
+        .where(Product.product_name.ilike(f"%{name_query}%"))
+        .options(joinedload(Product.prices))
+    )
+
+    products = db.execute(stmt).unique().scalars().all()
+
+    for p in products:
+        p.prices = p.prices[:1]
+
+    return products
