@@ -53,7 +53,7 @@ export default function CustomerSelect({
       }
       onInputChange={(_, value) => setKeyword(value)}
       renderInput={(params) => (
-        <TextField {...params} label="Search Customer" size="small" />
+        <TextField {...params} label="Select Customer" size="small" />
       )}
       isOptionEqualToValue={(option, value) =>
         option.customerId === value.customerId

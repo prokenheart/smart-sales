@@ -56,7 +56,7 @@ export default function ProductSelect({
         </li>
       )}
       renderInput={(params) => (
-        <TextField {...params} label="Search Product" size="small" />
+        <TextField {...params} label="Select Product" size="small" />
       )}
       isOptionEqualToValue={(option, value) =>
         option.productId === value.productId
