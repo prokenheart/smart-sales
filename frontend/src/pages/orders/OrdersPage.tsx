@@ -5,6 +5,7 @@ import OrdersTable from "./components/OrdersTable";
 import OrdersPagination from "./components/OrdersPagination";
 import type { Order } from "./types/order";
 import OrderForm from "./components/OrderForm";
+import SearchBox from "./components/SearchBox";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,6 +42,8 @@ export default function OrdersPage() {
 
   const [isPosted, setIsPosted] = useState<boolean>(false);
 
+  const [search, setSearch] = useState<string>("");
+
   const handleCreateOrder = () => {
     setOpen(true);
   };
@@ -52,6 +55,7 @@ export default function OrdersPage() {
         cursorDate,
         cursorId,
         direction,
+        search
       },
     });
 
@@ -74,14 +78,17 @@ export default function OrdersPage() {
     fetchOrders();
   }, [currentPage]);
 
+  useEffect(()=>{
+    if (currentPage === 1) fetchOrders();
+    else setCurrentPage(1);
+  }, [search])
+
   useEffect(() => {
     if (isPosted) {
       setOpen(false);
       setIsPosted(false);
-      if(currentPage==1)
-        fetchOrders()
-      else
-        setCurrentPage(1);
+      if (currentPage === 1) fetchOrders();
+      else setCurrentPage(1);
     }
   }, [isPosted]);
 
@@ -97,9 +104,17 @@ export default function OrdersPage() {
       >
         <Typography variant="h5">Orders</Typography>
 
-        <Button variant="contained" onClick={handleCreateOrder}>
-          Add Order
-        </Button>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <SearchBox
+            value={search}
+            onChange={setSearch}
+            delay={500}
+          />
+          <Button variant="contained" onClick={handleCreateOrder}>
+            Add Order
+          </Button>
+        </Box>
+
         <OrderForm
           open={open}
           setOpen={setOpen}
@@ -107,6 +122,7 @@ export default function OrdersPage() {
           setIsPosted={setIsPosted}
         />
       </Box>
+
       <OrdersTable
         orders={orders}
         totalOrders={totalOrders}
