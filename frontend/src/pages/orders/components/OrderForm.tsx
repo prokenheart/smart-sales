@@ -12,9 +12,9 @@ import CustomerSelect from "./CustomerSelect";
 import type { Customer, Order } from "../types/order";
 import type { Item } from "../types/item";
 import { useEffect, useState } from "react";
-import OrderItemsTable from "./ItemListTable";
-import CreateOrder from "./CreateOrderButton";
-import UpdateOrder from "./UpdateOrderButton";
+import ItemListTable from "./ItemListTable";
+import CreateOrderButton from "./CreateOrderButton";
+import UpdateOrderButton from "./UpdateOrderButton";
 import ConfirmDialog from "../../../components/ConfirmDialog";
 import { getItemList } from "../../../services/order";
 
@@ -122,7 +122,7 @@ export default function OrderForm({
                 </Typography>
               )}
 
-              <OrderItemsTable
+              <ItemListTable
                 items={[]}
                 selectedItems={selectedItems}
                 itemMode="edit"
@@ -133,7 +133,7 @@ export default function OrderForm({
               {selectedCustomer &&
                 selectedItems.length > 0 &&
                 mode == "create" && (
-                  <CreateOrder
+                  <CreateOrderButton
                     customer={selectedCustomer}
                     items={selectedItems}
                     setIsPosted={setIsPosted}
@@ -145,7 +145,7 @@ export default function OrderForm({
               {selectedCustomer &&
                 selectedItems.length > 0 &&
                 mode == "update" && (
-                  <UpdateOrder
+                  <UpdateOrderButton
                     order={order}
                     items={selectedItems}
                     setIsPosted={setIsPosted}

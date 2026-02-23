@@ -15,7 +15,7 @@ import ProductSelect from "./ProductSelect";
 import type { Product } from "../types/product";
 import ConfirmDialog from "../../../components/ConfirmDialog";
 
-export default function OrderItemsTable({
+export default function ItemListTable({
   items,
   selectedItems,
   itemMode,

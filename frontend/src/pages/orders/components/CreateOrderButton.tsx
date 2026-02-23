@@ -4,7 +4,7 @@ import type { Customer } from "../types/order";
 import type { Dispatch, SetStateAction } from "react";
 import { createOrder, createItem } from "../../../services/order";
 
-export default function CreateOrder({
+export default function CreateOrderButton({
   customer,
   items,
   setIsPosted,
