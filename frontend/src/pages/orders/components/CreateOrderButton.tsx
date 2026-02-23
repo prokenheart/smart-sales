@@ -32,11 +32,13 @@ export default function CreateOrder({
     }));
 
     try {
-      const res = await createItem(orderId, itemPosts);
-      if (res.status == 200) {
-        setSelectedCustomer(undefined);
-        setSelectedItems([]);
-        setIsPosted(true);
+      if (orderId != undefined) {
+        const res = await createItem(orderId, itemPosts);
+        if (res.status == 200) {
+          setSelectedCustomer(undefined);
+          setSelectedItems([]);
+          setIsPosted(true);
+        }
       }
     } catch (error) {
       console.error("UPDATE FAILED", error);
