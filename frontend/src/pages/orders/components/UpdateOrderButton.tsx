@@ -1,24 +1,23 @@
 import { Button } from "@mui/material";
 import type { Item, ItemPost } from "../types/item";
 import type { Order, Customer } from "../types/order";
-import type { Dispatch, SetStateAction } from "react";
+import { useContext, type Dispatch, type SetStateAction } from "react";
 import { createItem } from "../../../services/order";
+import { UpdateTableContext } from "../context/UpdateTableContext";
 
 export default function UpdateOrderButton({
   order,
   items,
-  setIsPosted,
   setSelectedCustomer,
   setSelectedItems,
-  setUpdatedOrder,
 }: Readonly<{
   order: Order | undefined;
   items: Item[];
-  setIsPosted: Dispatch<SetStateAction<boolean>>;
   setSelectedCustomer: Dispatch<SetStateAction<Customer | undefined>>;
   setSelectedItems: Dispatch<SetStateAction<Item[]>>;
-  setUpdatedOrder?: Dispatch<SetStateAction<Order | undefined>>;
 }>) {
+  const updateTable = useContext(UpdateTableContext);
+
   const calcOrderTotal = (items: Item[]): number => {
     return items.reduce((sum, item) => {
       return sum + item.itemQuantity * item.itemPrice;
@@ -39,15 +38,15 @@ export default function UpdateOrderButton({
 
           if (!order) return;
 
-          setUpdatedOrder?.({
+          updateTable?.setUpdatedOrder?.({
             ...order,
             orderTotal: newTotal,
           });
 
           setSelectedCustomer(undefined);
           setSelectedItems([]);
+          updateTable?.setIsUpdated(true);
 
-          setIsPosted(true);
         }
       }
     } catch (error) {

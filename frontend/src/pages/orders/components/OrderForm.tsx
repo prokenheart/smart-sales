@@ -22,16 +22,12 @@ export default function OrderForm({
   open,
   setOpen,
   mode,
-  setIsPosted,
   order,
-  setUpdatedOrder,
 }: Readonly<{
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   mode: "create" | "update" | undefined;
-  setIsPosted: Dispatch<SetStateAction<boolean>>;
   order?: Order;
-  setUpdatedOrder?: Dispatch<SetStateAction<Order | undefined>>;
 }>) {
   const [selectedCustomer, setSelectedCustomer] = useState<
     Customer | undefined
@@ -136,7 +132,6 @@ export default function OrderForm({
                   <CreateOrderButton
                     customer={selectedCustomer}
                     items={selectedItems}
-                    setIsPosted={setIsPosted}
                     setSelectedCustomer={setSelectedCustomer}
                     setSelectedItems={setSelectedItems}
                   />
@@ -148,10 +143,8 @@ export default function OrderForm({
                   <UpdateOrderButton
                     order={order}
                     items={selectedItems}
-                    setIsPosted={setIsPosted}
                     setSelectedCustomer={setSelectedCustomer}
                     setSelectedItems={setSelectedItems}
-                    setUpdatedOrder={setUpdatedOrder}
                   />
                 )}
 

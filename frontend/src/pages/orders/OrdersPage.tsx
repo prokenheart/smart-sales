@@ -6,6 +6,7 @@ import type { Order } from "./types/order";
 import OrderForm from "./components/OrderForm";
 import SearchBox from "./components/SearchBox";
 import { getOrders } from "../../services/order";
+import { OrderRefreshContext } from "./context/OrderRefreshContext";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -26,7 +27,7 @@ export default function OrdersPage() {
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const [isPosted, setIsPosted] = useState<boolean>(false);
+  const [shouldRefreshOrder, setShouldRefreshOrder] = useState<boolean>(false);
 
   const [search, setSearch] = useState<string>("");
 
@@ -62,13 +63,13 @@ export default function OrdersPage() {
   }, [search]);
 
   useEffect(() => {
-    if (isPosted) {
+    if (shouldRefreshOrder) {
       setOpen(false);
-      setIsPosted(false);
+      setShouldRefreshOrder(false);
       if (currentPage === 1) fetchOrders();
       else setCurrentPage(1);
     }
-  }, [isPosted]);
+  }, [shouldRefreshOrder]);
 
   return (
     <Box>
@@ -89,12 +90,13 @@ export default function OrdersPage() {
           </Button>
         </Box>
 
-        <OrderForm
-          open={open}
-          setOpen={setOpen}
-          mode="create"
-          setIsPosted={setIsPosted}
-        />
+        <OrderRefreshContext.Provider value={{setShouldRefreshOrder}}>
+          <OrderForm
+            open={open}
+            setOpen={setOpen}
+            mode="create"
+          />
+        </OrderRefreshContext.Provider>
       </Box>
 
       <OrdersTable

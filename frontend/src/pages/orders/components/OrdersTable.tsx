@@ -15,6 +15,7 @@ import { useState, Fragment, useEffect } from "react";
 import type { ReactElement, Dispatch, SetStateAction } from "react";
 import OrderForm from "./OrderForm";
 import type { Order } from "../types/order";
+import { UpdateTableContext } from "../context/UpdateTableContext";
 
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
@@ -58,8 +59,10 @@ export default function OrdersTable({
       setOrders((prev) =>
         prev.map((o) => (o.orderId === updatedOrder.orderId ? updatedOrder : o))
       );
+      setIsUpdated(false);
+      setUpdatedOrder(undefined);
     }
-  }, [isUpdated, updatedOrder]);
+  }, [isUpdated]);
 
   return (
     <Box
@@ -247,14 +250,16 @@ export default function OrdersTable({
                               Update
                             </Button>
 
-                            <OrderForm
-                              open={openOrderForm}
-                              setOpen={setOpenOrderForm}
-                              mode="update"
-                              setIsPosted={setIsUpdated}
-                              order={order}
-                              setUpdatedOrder={setUpdatedOrder}
-                            />
+                            <UpdateTableContext.Provider
+                              value={{ setIsUpdated, setUpdatedOrder }}
+                            >
+                              <OrderForm
+                                open={openOrderForm}
+                                setOpen={setOpenOrderForm}
+                                mode="update"
+                                order={order}
+                              />
+                            </UpdateTableContext.Provider>
 
                             <Button
                               variant="outlined"
