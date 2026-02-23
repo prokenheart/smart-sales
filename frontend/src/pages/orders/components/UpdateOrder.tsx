@@ -1,10 +1,8 @@
 import { Button } from "@mui/material";
 import type { Item, ItemPost } from "../types/item";
-import axios from "axios";
 import type { Order, Customer } from "../types/order";
 import type { Dispatch, SetStateAction } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { createItem } from "../../../services/order";
 
 export default function UpdateOrder({
   order,
@@ -34,9 +32,7 @@ export default function UpdateOrder({
     }));
 
     try {
-      const res = await axios.put(`${API_URL}/orders/${order?.orderId}/items`, {
-        listItem: itemPosts,
-      });
+      const res = await createItem(order?.orderId, itemPosts);
       if (res.status == 200) {
         const newTotal = calcOrderTotal(items).toString();
 

@@ -1,25 +1,11 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import OrdersTable from "./components/OrdersTable";
 import OrdersPagination from "./components/OrdersPagination";
 import type { Order } from "./types/order";
 import OrderForm from "./components/OrderForm";
 import SearchBox from "./components/SearchBox";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-type OrdersResponse = {
-  orders: Order[];
-  prevCursorDate: string | null;
-  prevCursorId: string | null;
-  nextCursorDate: string | null;
-  nextCursorId: string | null;
-  totalPages: number;
-  currentPage: number;
-  totalOrders: number;
-  ordersPerPage: number;
-};
+import { getOrders } from "../../services/order";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -49,15 +35,7 @@ export default function OrdersPage() {
   };
 
   const fetchOrders = async () => {
-    const res = await axios.get<OrdersResponse>(`${API_URL}/orders`, {
-      params: {
-        page,
-        cursorDate,
-        cursorId,
-        direction,
-        search
-      },
-    });
+    const res = await getOrders(page, cursorDate, cursorId, direction, search);
 
     setOrders(res.data.orders);
     setPrevCursorDate(res.data.prevCursorDate ?? undefined);
@@ -78,10 +56,10 @@ export default function OrdersPage() {
     fetchOrders();
   }, [currentPage]);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (currentPage === 1) fetchOrders();
     else setCurrentPage(1);
-  }, [search])
+  }, [search]);
 
   useEffect(() => {
     if (isPosted) {
@@ -105,11 +83,7 @@ export default function OrdersPage() {
         <Typography variant="h5">Orders</Typography>
 
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          <SearchBox
-            value={search}
-            onChange={setSearch}
-            delay={500}
-          />
+          <SearchBox value={search} onChange={setSearch} delay={500} />
           <Button variant="contained" onClick={handleCreateOrder}>
             Add Order
           </Button>

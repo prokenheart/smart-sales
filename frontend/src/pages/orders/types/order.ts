@@ -25,3 +25,15 @@ export type Order = {
   customer: Customer;
   user: User;
 };
+
+export type OrdersResponse = {
+  orders: Order[];
+  prevCursorDate: string | null;
+  prevCursorId: string | null;
+  nextCursorDate: string | null;
+  nextCursorId: string | null;
+  totalPages: number;
+  currentPage: number;
+  totalOrders: number;
+  ordersPerPage: number;
+};
