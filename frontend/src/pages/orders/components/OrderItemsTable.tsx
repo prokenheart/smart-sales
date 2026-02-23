@@ -13,6 +13,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
 import ProductSelect from "./ProductSelect";
 import type { Product } from "../types/product";
+import ConfirmDelete from "./ConfirmDelete";
 
 export default function OrderItemsTable({
   items,
@@ -34,6 +35,9 @@ export default function OrderItemsTable({
   >(undefined);
 
   const [selectedProduct, setSelectedProduct] = useState<Product>();
+  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [deleteId, setDeleteId] = useState<string>();
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   const handleChangeQuantity = (productId: string, value: number) => {
     setSelectedItems((prev) =>
@@ -45,10 +49,21 @@ export default function OrderItemsTable({
     );
   };
 
+  useEffect(()=>{
+    if(confirmDelete && deleteId){
+      setOpenConfirm(false);
+      setSelectedItems((prev) =>
+        prev.filter((item) => item.product.productId !== deleteId)
+      );
+      setDeleteId(undefined);
+      setConfirmDelete(false)
+    }
+
+  }, [confirmDelete]);
+
   const handleDelete = (productId: string) => {
-    setSelectedItems((prev) =>
-      prev.filter((item) => item.product.productId !== productId)
-    );
+    setDeleteId(productId);
+    setOpenConfirm(true);
   };
   const data = itemMode === "view" ? items : selectedItems;
 
@@ -70,8 +85,7 @@ export default function OrderItemsTable({
     }
   }, [selectedProduct]);
 
-  return (
-    <Table>
+  return (<><Table>
       <TableHead>
         <TableRow>
           <TableCell>Product</TableCell>
@@ -165,5 +179,8 @@ export default function OrderItemsTable({
         )}
       </TableBody>
     </Table>
+    <ConfirmDelete openConfirm={openConfirm} setOpenConfirm={setOpenConfirm} setConfirmDelete={setConfirmDelete} setDeleteId={setDeleteId}/>
+  </>
+    
   );
 }

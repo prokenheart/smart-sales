@@ -5,7 +5,7 @@ import {
   DialogTitle,
   DialogActions,
   Button,
-  Typography
+  Typography,
 } from "@mui/material";
 import type { Dispatch, SetStateAction } from "react";
 import CustomerSelect from "./CustomerSelect";
@@ -16,6 +16,7 @@ import OrderItemsTable from "./OrderItemsTable";
 import CreateOrder from "./CreateOrder";
 import UpdateOrder from "./UpdateOrder";
 import axios from "axios";
+import ConfirmClose from "./ConfirmClose";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -38,6 +39,8 @@ export default function OrderForm({
     Customer | undefined
   >();
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
+  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [confirmClose, setConfirmClose] = useState<boolean>(false);
 
   useEffect(() => {
     if (mode == "update") {
@@ -55,6 +58,15 @@ export default function OrderForm({
     }
   }, [open]);
 
+  useEffect(()=>{
+    if(confirmClose){
+      setOpenConfirm(false);
+      setConfirmClose(false);
+      handleCancel();
+    }
+  }, [confirmClose])
+
+
   const handleCancel = () => {
     setOpen(false);
     setSelectedCustomer(undefined);
@@ -62,102 +74,105 @@ export default function OrderForm({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={() => setOpen(false)}
-      fullWidth
-      maxWidth="md"
-      sx={{
-        "& .MuiDialog-paper": {
-          borderRadius: 3,
-          p: 1,
-        },
-      }}
-    >
-      <Box
-        component="form"
+    <>
+      <Dialog
+        open={open}
+        onClose={()=>{setOpenConfirm(true)}}
+        fullWidth
+        maxWidth="md"
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 0,
+          "& .MuiDialog-paper": {
+            borderRadius: 3,
+            p: 1,
+          },
         }}
       >
-        <DialogTitle
+        <Box
+          component="form"
           sx={{
-            fontWeight: 600,
-            fontSize: "20px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 0,
           }}
         >
-          {mode === "create" ? "Create Order" : "Update Order"}
-        </DialogTitle>
-        <Box>
-          <DialogContent
+          <DialogTitle
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-              pt: 1,
+              fontWeight: 600,
+              fontSize: "20px",
             }}
           >
-            {mode == "create" && (
-              <CustomerSelect
-                selectedCustomer={selectedCustomer}
-                setSelectedCustomer={setSelectedCustomer}
+            {mode === "create" ? "Create Order" : "Update Order"}
+          </DialogTitle>
+          <Box>
+            <DialogContent
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+                pt: 1,
+              }}
+            >
+              {mode == "create" && (
+                <CustomerSelect
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                />
+              )}
+
+              {mode == "update" && (
+                <Typography variant="body2">
+                  <Typography
+                    variant="body2"
+                    component="span"
+                    sx={{ fontWeight: 600 }}
+                  >
+                    Customer Name:
+                  </Typography>{" "}
+                  {order?.customer.customerName}
+                </Typography>
+              )}
+
+              <OrderItemsTable
+                items={[]}
+                selectedItems={selectedItems}
+                itemMode="edit"
+                setSelectedItems={setSelectedItems}
               />
-            )}
+            </DialogContent>
+            <DialogActions>
+              {selectedCustomer &&
+                selectedItems.length > 0 &&
+                mode == "create" && (
+                  <CreateOrder
+                    customer={selectedCustomer}
+                    items={selectedItems}
+                    setIsPosted={setIsPosted}
+                    setSelectedCustomer={setSelectedCustomer}
+                    setSelectedItems={setSelectedItems}
+                  />
+                )}
 
-            {mode == "update" && (
-              <Typography variant="body2">
-                <Typography
-                  variant="body2"
-                  component="span"
-                  sx={{ fontWeight: 600 }}
-                >
-                  Customer Name:
-                </Typography>{" "}
-                {order?.customer.customerName}
-              </Typography>
-            )}
+              {selectedCustomer &&
+                selectedItems.length > 0 &&
+                mode == "update" && (
+                  <UpdateOrder
+                    order={order}
+                    items={selectedItems}
+                    setIsPosted={setIsPosted}
+                    setSelectedCustomer={setSelectedCustomer}
+                    setSelectedItems={setSelectedItems}
+                    setUpdatedOrder={setUpdatedOrder}
+                  />
+                )}
 
-            <OrderItemsTable
-              items={[]}
-              selectedItems={selectedItems}
-              itemMode="edit"
-              setSelectedItems={setSelectedItems}
-            />
-          </DialogContent>
-          <DialogActions>
-            {selectedCustomer &&
-              selectedItems.length > 0 &&
-              mode == "create" && (
-                <CreateOrder
-                  customer={selectedCustomer}
-                  items={selectedItems}
-                  setIsPosted={setIsPosted}
-                  setSelectedCustomer={setSelectedCustomer}
-                  setSelectedItems={setSelectedItems}
-                />
-              )}
-
-            {selectedCustomer &&
-              selectedItems.length > 0 &&
-              mode == "update" && (
-                <UpdateOrder
-                  order={order}
-                  items={selectedItems}
-                  setIsPosted={setIsPosted}
-                  setSelectedCustomer={setSelectedCustomer}
-                  setSelectedItems={setSelectedItems}
-                  setUpdatedOrder={setUpdatedOrder}
-                />
-              )}
-
-            <Button color="error" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </DialogActions>
+              <Button color="error" onClick={()=>{setOpenConfirm(true)}}>
+                Cancel
+              </Button>
+            </DialogActions>
+          </Box>
         </Box>
-      </Box>
-    </Dialog>
+      </Dialog>
+      <ConfirmClose openConfirm={openConfirm} setOpenConfirm={setOpenConfirm} setConfirmClose={setConfirmClose}/>
+    </>
   );
 }
