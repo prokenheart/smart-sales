@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { OrdersResponse, Order } from "../pages/orders/types/order";
-import type { ItemPost } from "../pages/orders/types/item";
+import type { ItemPost, Item } from "../pages/orders/types/item";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const USER_ID = import.meta.env.VITE_USER_ID;
@@ -34,10 +34,18 @@ export const createOrder = async (customerId: string) => {
   return res;
 };
 
-export const createItem = async (orderId: string | undefined, itemPosts: ItemPost[]) => {
+export const createItem = async (
+  orderId: string,
+  itemPosts: ItemPost[]
+) => {
   const res = await axios.put(`${API_URL}/orders/${orderId}/items`, {
     listItem: itemPosts,
   });
 
+  return res;
+};
+
+export const getItemList = async (orderId: string) => {
+  const res = await axios.get<[Item]>(`${API_URL}/orders/${orderId}/items`);
   return res;
 };

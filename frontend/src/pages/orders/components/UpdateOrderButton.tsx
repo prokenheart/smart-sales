@@ -32,21 +32,23 @@ export default function UpdateOrder({
     }));
 
     try {
-      const res = await createItem(order?.orderId, itemPosts);
-      if (res.status == 200) {
-        const newTotal = calcOrderTotal(items).toString();
+      if (order != undefined) {
+        const res = await createItem(order.orderId, itemPosts);
+        if (res.status == 200) {
+          const newTotal = calcOrderTotal(items).toString();
 
-        if (!order) return;
+          if (!order) return;
 
-        setUpdatedOrder?.({
-          ...order,
-          orderTotal: newTotal,
-        });
+          setUpdatedOrder?.({
+            ...order,
+            orderTotal: newTotal,
+          });
 
-        setSelectedCustomer(undefined);
-        setSelectedItems([]);
+          setSelectedCustomer(undefined);
+          setSelectedItems([]);
 
-        setIsPosted(true);
+          setIsPosted(true);
+        }
       }
     } catch (error) {
       console.error("UPDATE FAILED", error);

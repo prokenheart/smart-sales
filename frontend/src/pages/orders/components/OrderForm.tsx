@@ -12,13 +12,11 @@ import CustomerSelect from "./CustomerSelect";
 import type { Customer, Order } from "../types/order";
 import type { Item } from "../types/item";
 import { useEffect, useState } from "react";
-import OrderItemsTable from "./OrderItemsTable";
-import CreateOrder from "./CreateOrder";
-import UpdateOrder from "./UpdateOrder";
-import axios from "axios";
-import ConfirmClose from "./ConfirmClose";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import OrderItemsTable from "./ItemListTable";
+import CreateOrder from "./CreateOrderButton";
+import UpdateOrder from "./UpdateOrderButton";
+import ConfirmDialog from "../../../components/ConfirmDialog";
+import { getItemList } from "../../../services/order";
 
 export default function OrderForm({
   open,
@@ -40,32 +38,22 @@ export default function OrderForm({
   >();
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
   const [openConfirm, setOpenConfirm] = useState<boolean>(false);
-  const [confirmClose, setConfirmClose] = useState<boolean>(false);
 
   useEffect(() => {
     if (mode == "update") {
       (async () => {
         try {
-          const res = await axios.get<[Item]>(
-            `${API_URL}/orders/${order?.orderId}/items`
-          );
-          setSelectedItems(res.data);
-          setSelectedCustomer(order?.customer);
+          if (order != undefined) {
+            const res = await getItemList(order.orderId);
+            setSelectedItems(res.data);
+            setSelectedCustomer(order.customer);
+          }
         } catch (err) {
           console.error("Error fetching orders:", err);
         }
       })();
     }
   }, [open]);
-
-  useEffect(()=>{
-    if(confirmClose){
-      setOpenConfirm(false);
-      setConfirmClose(false);
-      handleCancel();
-    }
-  }, [confirmClose])
-
 
   const handleCancel = () => {
     setOpen(false);
@@ -77,7 +65,9 @@ export default function OrderForm({
     <>
       <Dialog
         open={open}
-        onClose={()=>{setOpenConfirm(true)}}
+        onClose={() => {
+          setOpenConfirm(true);
+        }}
         fullWidth
         maxWidth="md"
         sx={{
@@ -165,14 +155,28 @@ export default function OrderForm({
                   />
                 )}
 
-              <Button color="error" onClick={()=>{setOpenConfirm(true)}}>
+              <Button
+                color="error"
+                onClick={() => {
+                  setOpenConfirm(true);
+                }}
+              >
                 Cancel
               </Button>
             </DialogActions>
           </Box>
         </Box>
       </Dialog>
-      <ConfirmClose openConfirm={openConfirm} setOpenConfirm={setOpenConfirm} setConfirmClose={setConfirmClose}/>
+      <ConfirmDialog
+        open={openConfirm}
+        title="Confirm Close"
+        description="Are you sure to exit without saving"
+        onCancel={() => setOpenConfirm(false)}
+        onConfirm={() => {
+          setOpenConfirm(false);
+          handleCancel();
+        }}
+      />
     </>
   );
 }
