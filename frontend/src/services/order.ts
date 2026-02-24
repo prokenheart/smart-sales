@@ -54,3 +54,9 @@ export const createViewAttachmentURL = async (orderId: string) => {
   const res = await axios.post(`${API_URL}/orders/${orderId}/attachment/view-url`);
   return res;
 };
+export const updateOrderStatus = async (orderId: string, statusCode: string) => {
+  const res = await axios.patch<Order>(`${API_URL}/orders/${orderId}`, {
+    statusCode: statusCode
+  })
+  return res;
+}
