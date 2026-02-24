@@ -49,3 +49,10 @@ export const getItemList = async (orderId: string) => {
   const res = await axios.get<[Item]>(`${API_URL}/orders/${orderId}/items`);
   return res;
 };
+
+export const updateOrderStatus = async (orderId: string, statusCode: string) => {
+  const res = await axios.patch<Order>(`${API_URL}/orders/${orderId}`, {
+    statusCode: statusCode
+  })
+  return res;
+}
