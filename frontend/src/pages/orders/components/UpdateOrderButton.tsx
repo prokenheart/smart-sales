@@ -43,14 +43,13 @@ const UpdateOrderButton = ({
 
           if (!order) return;
 
+          setSelectedCustomer(undefined);
+          setSelectedItems([]);
+
           updateTable?.setUpdatedOrder?.({
             ...order,
             orderTotal: newTotal,
           });
-
-          setSelectedCustomer(undefined);
-          setSelectedItems([]);
-          updateTable?.setIsUpdated(true);
         }
       }
     } catch (error) {

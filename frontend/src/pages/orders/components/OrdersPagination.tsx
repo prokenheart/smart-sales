@@ -1,5 +1,6 @@
 import type { ReactElement, Dispatch, SetStateAction } from "react";
 import { Stack, Button } from "@mui/material";
+import type { CursorState, CursorResponse } from "../types/cursor";
 
 const OrdersNumberPagination = ({
   currentPage,
@@ -38,36 +39,35 @@ const OrdersPagination = ({
   currentPage,
   totalPages,
   setPage,
-  prevCursorDate,
-  prevCursorId,
-  nextCursorDate,
-  nextCursorId,
-  setCursorDate,
-  setCursorId,
-  setDirection,
+  cursorResponse,
+  setCursorState,
   setCurrentPage,
 }: Readonly<{
   currentPage: number;
   totalPages: number;
   setPage: Dispatch<SetStateAction<number | undefined>>;
-  prevCursorDate: string | undefined;
-  prevCursorId: string | undefined;
-  nextCursorDate: string | undefined;
-  nextCursorId: string | undefined;
-  setCursorDate: Dispatch<SetStateAction<string | undefined>>;
-  setCursorId: Dispatch<SetStateAction<string | undefined>>;
-  setDirection: Dispatch<SetStateAction<"prev" | "next" | undefined>>;
+  cursorResponse: CursorResponse | undefined
+  setCursorState: Dispatch<SetStateAction<CursorState | undefined>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
 }>): ReactElement => {
   const handleCursorPagination = (direction: "prev" | "next") => {
-    setDirection(direction);
     if (direction == "prev") {
-      setCursorDate(prevCursorDate);
-      setCursorId(prevCursorId);
+      setCursorState({
+        cursor: {
+          cursorDate: cursorResponse?.prev.cursorDate,
+          cursorId: cursorResponse?.prev.cursorId
+        },
+        direction
+      });
       setCurrentPage(currentPage - 1);
     } else if (direction == "next") {
-      setCursorDate(nextCursorDate);
-      setCursorId(nextCursorId);
+      setCursorState({
+        cursor: {
+          cursorDate: cursorResponse?.next.cursorDate,
+          cursorId: cursorResponse?.next.cursorId
+        },
+        direction: direction
+      });
       setCurrentPage(currentPage + 1);
     }
   };
@@ -80,7 +80,7 @@ const OrdersPagination = ({
       spacing={1}
     >
       <Button
-        disabled={!prevCursorDate}
+        disabled={!cursorResponse?.prev.cursorDate}
         onClick={() => handleCursorPagination("prev")}
       >
         {"<"}
@@ -92,7 +92,7 @@ const OrdersPagination = ({
         setCurrentPage={setCurrentPage}
       />
       <Button
-        disabled={!nextCursorDate}
+        disabled={!cursorResponse?.next.cursorDate}
         onClick={() => handleCursorPagination("next")}
       >
         {">"}

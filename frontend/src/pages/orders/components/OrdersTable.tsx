@@ -50,19 +50,18 @@ const OrdersTable = ({
   );
 
   const [openOrderForm, setOpenOrderForm] = useState<boolean>(false);
-  const [isUpdated, setIsUpdated] = useState<boolean>(false);
+
   const [updatedOrder, setUpdatedOrder] = useState<Order>();
 
   useEffect(() => {
-    if (isUpdated && updatedOrder != undefined) {
+    if (updatedOrder != undefined) {
       setOpenOrderForm(false);
       setOrders((prev) =>
         prev.map((o) => (o.orderId === updatedOrder.orderId ? updatedOrder : o))
       );
-      setIsUpdated(false);
       setUpdatedOrder(undefined);
     }
-  }, [isUpdated]);
+  }, [updatedOrder]);
 
   return (
     <Box
@@ -249,7 +248,7 @@ const OrdersTable = ({
                             </Button>
 
                             <UpdateTableContext.Provider
-                              value={{ setIsUpdated, setUpdatedOrder }}
+                              value={{ setUpdatedOrder }}
                             >
                               <OrderForm
                                 open={openOrderForm}
