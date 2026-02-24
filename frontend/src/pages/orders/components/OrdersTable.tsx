@@ -16,6 +16,8 @@ import type { ReactElement, Dispatch, SetStateAction } from "react";
 import OrderForm from "./OrderForm";
 import type { Order } from "../types/order";
 import { UpdateTableContext } from "../context/UpdateTableContext";
+import ConfirmDialog from "../../../components/ConfirmDialog";
+import { updateOrderStatus } from "../../../services/order";
 
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
@@ -52,6 +54,32 @@ const OrdersTable = ({
   const [openOrderForm, setOpenOrderForm] = useState<boolean>(false);
 
   const [updatedOrder, setUpdatedOrder] = useState<Order>();
+
+  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string>();
+
+  const handleCancelOrder = async (orderId: string) => {
+    try {
+      const res = await updateOrderStatus(orderId, "CANCELLED");
+      if (res.status === 200) {
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.orderId === orderId
+              ? {
+                  ...o,
+                  status: {
+                    ...o.status,
+                    statusCode: "CANCELLED",
+                  },
+                }
+              : o
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Cancel Order Failed: ", error);
+    }
+  };
 
   useEffect(() => {
     if (updatedOrder != undefined) {
@@ -257,16 +285,17 @@ const OrdersTable = ({
                                 order={order}
                               />
                             </UpdateTableContext.Provider>
-
                             <Button
-                              variant="outlined"
-                              color="warning"
+                              variant="contained"
+                              color="error"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                console.log("Change status", order.orderId);
+                                setOpenConfirm(true);
+                                setSelectedOrderId(order.orderId);
                               }}
+                              disabled={order.status.statusCode === "CANCELLED"} 
                             >
-                              Change Status
+                              Cancel
                             </Button>
                           </Stack>
                         </Box>
@@ -297,6 +326,21 @@ const OrdersTable = ({
           </TableRow>
         </TableFooter>
       </Table>
+      <ConfirmDialog
+        open={openConfirm}
+        title="Cancel Order"
+        description="Are you sure to cancel this order?"
+        onCancel={() => {
+          setOpenConfirm(false);
+          setSelectedOrderId(undefined);
+        }}
+        onConfirm={async () => {
+          if (selectedOrderId != undefined)
+            await handleCancelOrder(selectedOrderId);
+          setOpenConfirm(false);
+          setSelectedOrderId(undefined);
+        }}
+      />
     </Box>
   );
 };
