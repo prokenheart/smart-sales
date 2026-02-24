@@ -1,5 +1,5 @@
 import type { ReactElement, Dispatch, SetStateAction } from "react";
-import { Box, Button } from "@mui/material";
+import { Stack, Button } from "@mui/material";
 
 const OrdersNumberPagination = ({
   currentPage,
@@ -20,7 +20,7 @@ const OrdersNumberPagination = ({
   };
 
   return (
-    <Box sx={{ display: "flex", gap: 1 }}>
+    <Stack direction="row" spacing={1}>
       {pages.map((page) => (
         <Button
           key={page}
@@ -30,7 +30,7 @@ const OrdersNumberPagination = ({
           {page}
         </Button>
       ))}
-    </Box>
+    </Stack>
   );
 };
 
@@ -73,13 +73,11 @@ const OrdersPagination = ({
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: "1",
-      }}
+    <Stack
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      spacing={1}
     >
       <Button
         disabled={!prevCursorDate}
@@ -99,7 +97,7 @@ const OrdersPagination = ({
       >
         {">"}
       </Button>
-    </Box>
+    </Stack>
   );
 };
 

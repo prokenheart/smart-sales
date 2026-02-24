@@ -160,12 +160,10 @@ const OrdersTable = ({
                         <Typography variant="h6" sx={{ mb: 2 }}>
                           Order Detail
                         </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            gap: 4,
-                          }}
+                        <Stack
+                          direction="row"
+                          justifyContent="center"
+                          spacing={4}
                         >
                           <Box sx={{ flex: 1 }}>
                             <Typography variant="body2">
@@ -236,7 +234,7 @@ const OrdersTable = ({
                               {order.orderAttachment ?? "None"}
                             </Typography>
                           </Box>
-                        </Box>
+                        </Stack>
 
                         <Box sx={{ mt: 2 }}>
                           <Stack direction="row" spacing={2}>

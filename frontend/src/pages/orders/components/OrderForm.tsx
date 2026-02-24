@@ -1,11 +1,11 @@
 import {
-  Box,
   Dialog,
   DialogContent,
   DialogTitle,
   DialogActions,
   Button,
   Typography,
+  Stack,
 } from "@mui/material";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 import CustomerSelect from "./CustomerSelect";
@@ -73,14 +73,7 @@ const OrderForm = ({
           },
         }}
       >
-        <Box
-          component="form"
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 0,
-          }}
-        >
+        <Stack component="form">
           <DialogTitle
             sx={{
               fontWeight: 600,
@@ -89,15 +82,13 @@ const OrderForm = ({
           >
             {mode === "create" ? "Create Order" : "Update Order"}
           </DialogTitle>
-          <Box>
-            <DialogContent
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 1,
-                pt: 1,
-              }}
-            >
+
+          <DialogContent
+            sx={{
+              pt: 1,
+            }}
+          >
+            <Stack spacing={1}>
               {mode == "create" && (
                 <CustomerSelect
                   selectedCustomer={selectedCustomer}
@@ -124,41 +115,41 @@ const OrderForm = ({
                 itemMode="edit"
                 setSelectedItems={setSelectedItems}
               />
-            </DialogContent>
-            <DialogActions>
-              {selectedCustomer &&
-                selectedItems.length > 0 &&
-                mode == "create" && (
-                  <CreateOrderButton
-                    customer={selectedCustomer}
-                    items={selectedItems}
-                    setSelectedCustomer={setSelectedCustomer}
-                    setSelectedItems={setSelectedItems}
-                  />
-                )}
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            {selectedCustomer &&
+              selectedItems.length > 0 &&
+              mode == "create" && (
+                <CreateOrderButton
+                  customer={selectedCustomer}
+                  items={selectedItems}
+                  setSelectedCustomer={setSelectedCustomer}
+                  setSelectedItems={setSelectedItems}
+                />
+              )}
 
-              {selectedCustomer &&
-                selectedItems.length > 0 &&
-                mode == "update" && (
-                  <UpdateOrderButton
-                    order={order}
-                    items={selectedItems}
-                    setSelectedCustomer={setSelectedCustomer}
-                    setSelectedItems={setSelectedItems}
-                  />
-                )}
+            {selectedCustomer &&
+              selectedItems.length > 0 &&
+              mode == "update" && (
+                <UpdateOrderButton
+                  order={order}
+                  items={selectedItems}
+                  setSelectedCustomer={setSelectedCustomer}
+                  setSelectedItems={setSelectedItems}
+                />
+              )}
 
-              <Button
-                color="error"
-                onClick={() => {
-                  setOpenConfirm(true);
-                }}
-              >
-                Cancel
-              </Button>
-            </DialogActions>
-          </Box>
-        </Box>
+            <Button
+              color="error"
+              onClick={() => {
+                setOpenConfirm(true);
+              }}
+            >
+              Cancel
+            </Button>
+          </DialogActions>
+        </Stack>
       </Dialog>
       <ConfirmDialog
         open={openConfirm}

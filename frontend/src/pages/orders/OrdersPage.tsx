@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Button, Typography, Stack } from "@mui/material";
 import { useEffect, useState, type ReactElement } from "react";
 import OrdersTable from "./components/OrdersTable";
 import OrdersPagination from "./components/OrdersPagination";
@@ -72,28 +72,26 @@ const OrdersPage = (): ReactElement => {
   }, [shouldRefreshOrder]);
 
   return (
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
+    <>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
       >
         <Typography variant="h5">Orders</Typography>
 
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+        <Stack direction="row" spacing={2} alignItems="center">
           <SearchBox value={search} onChange={setSearch} delay={500} />
           <Button variant="contained" onClick={handleCreateOrder}>
             Add Order
           </Button>
-        </Box>
+        </Stack>
 
         <OrderRefreshContext.Provider value={{ setShouldRefreshOrder }}>
           <OrderForm open={open} setOpen={setOpen} mode="create" />
         </OrderRefreshContext.Provider>
-      </Box>
+      </Stack>
 
       <OrdersTable
         orders={orders}
@@ -115,7 +113,7 @@ const OrdersPage = (): ReactElement => {
         setDirection={setDirection}
         setCurrentPage={setCurrentPage}
       />
-    </Box>
+    </>
   );
 };
 
