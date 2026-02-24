@@ -16,6 +16,8 @@ import type { ReactElement, Dispatch, SetStateAction } from "react";
 import OrderForm from "./OrderForm";
 import type { Order } from "../types/order";
 import { UpdateTableContext } from "../context/UpdateTableContext";
+import AttachmentPreviewButton from "./AttachmentPreviewButton";
+import AttachmentPreviewDialog from "./AttachmentPreviewDialog";
 
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
@@ -52,6 +54,9 @@ const OrdersTable = ({
   const [openOrderForm, setOpenOrderForm] = useState<boolean>(false);
 
   const [updatedOrder, setUpdatedOrder] = useState<Order>();
+
+  const [openViewDialog, setOpenViewDialog] = useState<boolean>(false);
+  const [viewURL, setViewURL] = useState<string>();
 
   useEffect(() => {
     if (updatedOrder != undefined) {
@@ -143,7 +148,9 @@ const OrdersTable = ({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {order.orderAttachment}
+                    {order.orderAttachment != null && (
+                      <AttachmentPreviewButton orderId={order.orderId} setViewURL={setViewURL} setOpenViewDialog={setOpenViewDialog}/>
+                    )}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -297,6 +304,8 @@ const OrdersTable = ({
           </TableRow>
         </TableFooter>
       </Table>
+      
+      <AttachmentPreviewDialog viewURL={viewURL} open={openViewDialog} setOpen={setOpenViewDialog} setViewURL={setViewURL}/>
     </Box>
   );
 };
