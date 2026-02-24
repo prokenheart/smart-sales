@@ -320,7 +320,7 @@ def create_order_attachment_get_url_handler(order_id: str) -> Response:
     try:
         get_url = generate_presigned_get_url(key=s3_key, expires_in=300)
 
-        response = {"get_url": get_url}
+        response = {"getUrl": get_url}
         return success(response)
 
     except Exception as e:
