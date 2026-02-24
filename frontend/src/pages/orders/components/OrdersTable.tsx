@@ -32,7 +32,7 @@ function getStatusColor(statusCode: string): string {
   }
 }
 
-export default function OrdersTable({
+const OrdersTable = ({
   orders,
   totalOrders,
   currentPage,
@@ -44,7 +44,7 @@ export default function OrdersTable({
   currentPage: number;
   ordersPerPage: number;
   setOrders: Dispatch<SetStateAction<Order[]>>;
-}>): ReactElement {
+}>): ReactElement => {
   const [expandedOrderId, setExpandedOrderId] = useState<string | undefined>(
     undefined
   );
@@ -302,4 +302,6 @@ export default function OrdersTable({
       </Table>
     </Box>
   );
-}
+};
+
+export default OrdersTable;

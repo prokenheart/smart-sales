@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import OrdersTable from "./components/OrdersTable";
 import OrdersPagination from "./components/OrdersPagination";
 import type { Order } from "./types/order";
@@ -8,7 +8,7 @@ import SearchBox from "./components/SearchBox";
 import { getOrders } from "../../services/order";
 import { OrderRefreshContext } from "./context/OrderRefreshContext";
 
-export default function OrdersPage() {
+const OrdersPage = (): ReactElement => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [prevCursorDate, setPrevCursorDate] = useState<string>();
   const [prevCursorId, setPrevCursorId] = useState<string>();
@@ -90,12 +90,8 @@ export default function OrdersPage() {
           </Button>
         </Box>
 
-        <OrderRefreshContext.Provider value={{setShouldRefreshOrder}}>
-          <OrderForm
-            open={open}
-            setOpen={setOpen}
-            mode="create"
-          />
+        <OrderRefreshContext.Provider value={{ setShouldRefreshOrder }}>
+          <OrderForm open={open} setOpen={setOpen} mode="create" />
         </OrderRefreshContext.Provider>
       </Box>
 
@@ -121,4 +117,6 @@ export default function OrdersPage() {
       />
     </Box>
   );
-}
+};
+
+export default OrdersPage;

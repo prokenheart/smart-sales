@@ -7,10 +7,11 @@ import {
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { MdOutlineDashboard, MdOutlineShoppingCart } from "react-icons/md";
+import type { ReactElement } from "react";
 
 const drawerWidth = 160;
 
-export default function Navigation() {
+const Navigation = (): ReactElement => {
   const location = useLocation();
 
   return (
@@ -73,4 +74,6 @@ export default function Navigation() {
       </List>
     </Drawer>
   );
-}
+};
+
+export default Navigation;

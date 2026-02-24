@@ -1,17 +1,23 @@
 import { Autocomplete, TextField } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type ReactElement,
+  type SetStateAction,
+} from "react";
 import type { Product } from "../types/product";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function ProductSelect({
+const ProductSelect = ({
   selectedProduct,
   setSelectedProduct,
 }: Readonly<{
   selectedProduct: Product | undefined;
   setSelectedProduct: Dispatch<SetStateAction<Product | undefined>>;
-}>) {
+}>): ReactElement => {
   const [products, setProducts] = useState<Product[]>([]);
 
   const [keyword, setKeyword] = useState("");
@@ -24,7 +30,6 @@ export default function ProductSelect({
 
     return () => clearTimeout(timer);
   }, [keyword]);
-
 
   useEffect(() => {
     if (!debouncedKeyword.trim()) {
@@ -42,7 +47,7 @@ export default function ProductSelect({
 
     fetchProducts();
   }, [debouncedKeyword]);
-    
+
   return (
     <Autocomplete
       options={products}
@@ -63,4 +68,6 @@ export default function ProductSelect({
       }
     />
   );
-}
+};
+
+export default ProductSelect;

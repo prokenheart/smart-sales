@@ -7,7 +7,7 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
 import CustomerSelect from "./CustomerSelect";
 import type { Customer, Order } from "../types/order";
 import type { Item } from "../types/item";
@@ -18,7 +18,7 @@ import UpdateOrderButton from "./UpdateOrderButton";
 import ConfirmDialog from "../../../components/ConfirmDialog";
 import { getItemList } from "../../../services/order";
 
-export default function OrderForm({
+const OrderForm = ({
   open,
   setOpen,
   mode,
@@ -28,7 +28,7 @@ export default function OrderForm({
   setOpen: Dispatch<SetStateAction<boolean>>;
   mode: "create" | "update" | undefined;
   order?: Order;
-}>) {
+}>): ReactElement => {
   const [selectedCustomer, setSelectedCustomer] = useState<
     Customer | undefined
   >();
@@ -172,4 +172,6 @@ export default function OrderForm({
       />
     </>
   );
-}
+};
+
+export default OrderForm;

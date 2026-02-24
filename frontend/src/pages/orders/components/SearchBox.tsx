@@ -1,7 +1,7 @@
 import { TextField, InputAdornment, IconButton } from "@mui/material";
 import { MdCancel } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 
 type SearchBoxProps = {
   value: string;
@@ -10,12 +10,12 @@ type SearchBoxProps = {
   delay?: number;
 };
 
-export default function SearchBox({
+const SearchBox = ({
   value,
   onChange,
   placeholder = "Search Order...",
   delay = 400,
-}: Readonly<SearchBoxProps>) {
+}: Readonly<SearchBoxProps>): ReactElement => {
   const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
@@ -55,4 +55,6 @@ export default function SearchBox({
       }}
     />
   );
-}
+};
+
+export default SearchBox;

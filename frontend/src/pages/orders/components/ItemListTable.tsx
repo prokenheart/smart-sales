@@ -1,4 +1,10 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type ReactElement,
+  type SetStateAction,
+} from "react";
 import type { Item } from "../types/item";
 import {
   Table,
@@ -15,7 +21,7 @@ import ProductSelect from "./ProductSelect";
 import type { Product } from "../types/product";
 import ConfirmDialog from "../../../components/ConfirmDialog";
 
-export default function ItemListTable({
+const ItemListTable = ({
   items,
   selectedItems,
   itemMode,
@@ -25,7 +31,7 @@ export default function ItemListTable({
   selectedItems: Item[];
   itemMode: "view" | "edit";
   setSelectedItems: Dispatch<SetStateAction<Item[]>>;
-}>) {
+}>): ReactElement => {
   const [newRow, setNewRow] = useState<
     | {
         productId: string;
@@ -189,4 +195,6 @@ export default function ItemListTable({
       />
     </>
   );
-}
+};
+
+export default ItemListTable;

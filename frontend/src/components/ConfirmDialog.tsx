@@ -6,6 +6,7 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material";
+import type { ReactElement } from "react";
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -15,13 +16,13 @@ type ConfirmDialogProps = {
   onCancel: () => void;
 };
 
-export default function ConfirmDialog({
+const ConfirmDialog = ({
   open,
   title,
   description,
   onConfirm,
   onCancel,
-}: Readonly<ConfirmDialogProps>) {
+}: Readonly<ConfirmDialogProps>): ReactElement => {
   return (
     <Dialog
       open={open}
@@ -33,12 +34,18 @@ export default function ConfirmDialog({
       <DialogTitle>
         <Typography variant="h6">{title}</Typography>
       </DialogTitle>
-      <DialogContent><Typography variant="body2">{description}</Typography></DialogContent>
+      <DialogContent>
+        <Typography variant="body2">{description}</Typography>
+      </DialogContent>
 
       <DialogActions>
         <Button onClick={onCancel}>No</Button>
-        <Button onClick={onConfirm} color="warning">Yes</Button>
+        <Button onClick={onConfirm} color="warning">
+          Yes
+        </Button>
       </DialogActions>
     </Dialog>
   );
-}
+};
+
+export default ConfirmDialog;

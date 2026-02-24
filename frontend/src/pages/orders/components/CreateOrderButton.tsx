@@ -1,11 +1,16 @@
 import { Button } from "@mui/material";
 import type { Item, ItemPost } from "../types/item";
 import type { Customer } from "../types/order";
-import { useContext, type Dispatch, type SetStateAction } from "react";
+import {
+  useContext,
+  type Dispatch,
+  type ReactElement,
+  type SetStateAction,
+} from "react";
 import { createOrder, createItem } from "../../../services/order";
 import { OrderRefreshContext } from "../context/OrderRefreshContext";
 
-export default function CreateOrderButton({
+const CreateOrderButton = ({
   customer,
   items,
   setSelectedCustomer,
@@ -15,7 +20,7 @@ export default function CreateOrderButton({
   items: Item[];
   setSelectedCustomer: Dispatch<SetStateAction<Customer | undefined>>;
   setSelectedItems: Dispatch<SetStateAction<Item[]>>;
-}>) {
+}>): ReactElement => {
   const refresh = useContext(OrderRefreshContext);
 
   const handleSave = async () => {
@@ -46,10 +51,11 @@ export default function CreateOrderButton({
     }
   };
 
-
   return (
     <Button variant="contained" onClick={handleSave}>
       Save
     </Button>
   );
-}
+};
+
+export default CreateOrderButton;

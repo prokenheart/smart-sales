@@ -1,11 +1,16 @@
 import { Button } from "@mui/material";
 import type { Item, ItemPost } from "../types/item";
 import type { Order, Customer } from "../types/order";
-import { useContext, type Dispatch, type SetStateAction } from "react";
+import {
+  useContext,
+  type Dispatch,
+  type ReactElement,
+  type SetStateAction,
+} from "react";
 import { createItem } from "../../../services/order";
 import { UpdateTableContext } from "../context/UpdateTableContext";
 
-export default function UpdateOrderButton({
+const UpdateOrderButton = ({
   order,
   items,
   setSelectedCustomer,
@@ -15,7 +20,7 @@ export default function UpdateOrderButton({
   items: Item[];
   setSelectedCustomer: Dispatch<SetStateAction<Customer | undefined>>;
   setSelectedItems: Dispatch<SetStateAction<Item[]>>;
-}>) {
+}>): ReactElement => {
   const updateTable = useContext(UpdateTableContext);
 
   const calcOrderTotal = (items: Item[]): number => {
@@ -46,7 +51,6 @@ export default function UpdateOrderButton({
           setSelectedCustomer(undefined);
           setSelectedItems([]);
           updateTable?.setIsUpdated(true);
-
         }
       }
     } catch (error) {
@@ -59,4 +63,6 @@ export default function UpdateOrderButton({
       Save
     </Button>
   );
-}
+};
+
+export default UpdateOrderButton;

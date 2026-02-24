@@ -1,7 +1,7 @@
 import type { ReactElement, Dispatch, SetStateAction } from "react";
 import { Box, Button } from "@mui/material";
 
-function OrdersNumberPagination({
+const OrdersNumberPagination = ({
   currentPage,
   totalPages,
   setPage,
@@ -11,7 +11,7 @@ function OrdersNumberPagination({
   totalPages: number;
   setPage: Dispatch<SetStateAction<number | undefined>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
-}>): ReactElement {
+}>): ReactElement => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   const handlePageNumberPagination = (page: number) => {
@@ -32,9 +32,9 @@ function OrdersNumberPagination({
       ))}
     </Box>
   );
-}
+};
 
-export default function OrdersPagination({
+const OrdersPagination = ({
   currentPage,
   totalPages,
   setPage,
@@ -58,7 +58,7 @@ export default function OrdersPagination({
   setCursorId: Dispatch<SetStateAction<string | undefined>>;
   setDirection: Dispatch<SetStateAction<"prev" | "next" | undefined>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
-}>): ReactElement {
+}>): ReactElement => {
   const handleCursorPagination = (direction: "prev" | "next") => {
     setDirection(direction);
     if (direction == "prev") {
@@ -101,4 +101,6 @@ export default function OrdersPagination({
       </Button>
     </Box>
   );
-}
+};
+
+export default OrdersPagination;
