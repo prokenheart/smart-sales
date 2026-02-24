@@ -63,6 +63,7 @@ const CustomerSelect = ({
       isOptionEqualToValue={(option, value) =>
         option.customerId === value.customerId
       }
+      fullWidth
     />
   );
 };

@@ -6,12 +6,13 @@ import {
   Button,
   Typography,
   Stack,
+  Box,
 } from "@mui/material";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 import CustomerSelect from "./CustomerSelect";
 import type { Customer, Order } from "../types/order";
 import type { Item } from "../types/item";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ItemListTable from "./ItemListTable";
 import CreateOrderButton from "./CreateOrderButton";
 import UpdateOrderButton from "./UpdateOrderButton";
@@ -34,6 +35,14 @@ const OrderForm = ({
   >();
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
   const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+
+  const totalOrder = useMemo(() => {
+    const total = selectedItems.reduce((sum, item) => {
+      return sum + item.itemQuantity * item.itemPrice;
+    }, 0);
+
+    return total.toFixed(2);
+  }, [selectedItems]);
 
   useEffect(() => {
     if (mode == "update") {
@@ -89,25 +98,45 @@ const OrderForm = ({
             }}
           >
             <Stack spacing={1}>
-              {mode == "create" && (
-                <CustomerSelect
-                  selectedCustomer={selectedCustomer}
-                  setSelectedCustomer={setSelectedCustomer}
-                />
-              )}
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Box width="50%">
+                  {mode == "create" && (
+                    <CustomerSelect
+                      selectedCustomer={selectedCustomer}
+                      setSelectedCustomer={setSelectedCustomer}
+                    />
+                  )}
 
-              {mode == "update" && (
+                  {mode == "update" && (
+                    <Typography variant="body2">
+                      <Typography
+                        variant="body2"
+                        component="span"
+                        sx={{ fontWeight: 600 }}
+                      >
+                        Customer Name:
+                      </Typography>{" "}
+                      {order?.customer.customerName}
+                    </Typography>
+                  )}
+                </Box>
+
                 <Typography variant="body2">
                   <Typography
                     variant="body2"
                     component="span"
                     sx={{ fontWeight: 600 }}
                   >
-                    Customer Name:
+                    Total Order:
                   </Typography>{" "}
-                  {order?.customer.customerName}
+                  {totalOrder}
                 </Typography>
-              )}
+              </Stack>
 
               <ItemListTable
                 items={[]}
