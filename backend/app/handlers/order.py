@@ -12,6 +12,8 @@ from app.schemas.order import (
     OrderFilterQuery,
 )
 
+from app.schemas.s3_schema import ViewURLResponse, UploadURLResponse, S3Key
+
 from app.services.order import (
     create_order,
     get_order,
@@ -238,11 +240,11 @@ def create_order_attachment_upload_url_handler(
             content_type=content_type, expires_in=300
         )
 
-        response = {
+        response = UploadURLResponse.model_validate({
             "upload_url": upload_url,
             "s3_key": s3_key,
             "max_file_size": MAX_FILE_SIZE,
-        }
+        })
         return success(response)
 
     except Exception as e:
@@ -260,7 +262,7 @@ def confirm_order_attachment_handler(order_id: str, body: dict | None) -> Respon
             status_code=HTTPStatus.BAD_REQUEST,
         )
 
-    s3_key = body.get("s3_key")
+    s3_key = S3Key.model_validate(body).s3_key
     if not s3_key:
         return error("s3_key is required", 400)
 
@@ -320,7 +322,7 @@ def create_order_attachment_get_url_handler(order_id: str) -> Response:
     try:
         get_url = generate_presigned_get_url(key=s3_key, expires_in=300)
 
-        response = {"getUrl": get_url}
+        response = ViewURLResponse.model_validate({"get_url": get_url})
         return success(response)
 
     except Exception as e:
