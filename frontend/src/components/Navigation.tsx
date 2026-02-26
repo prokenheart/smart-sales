@@ -11,6 +11,33 @@ import type { ReactElement } from "react";
 
 const drawerWidth = 160;
 
+const menuItemSx = {
+  borderRadius: "8px",
+  "&.Mui-selected": {
+    backgroundColor: "#1976d2",
+    color: "white",
+    boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
+  },
+  "&.Mui-selected:hover": {
+    backgroundColor: "#1565c0",
+  },
+};
+
+const menuItems = [
+  {
+    label: "Dashboard",
+    path: "/",
+    icon: <MdOutlineDashboard size={22} />,
+    isActive: (pathname: string) => pathname === "/",
+  },
+  {
+    label: "Orders",
+    path: "/orders",
+    icon: <MdOutlineShoppingCart size={22} />,
+    isActive: (pathname: string) => pathname.startsWith("/orders"),
+  },
+];
+
 const Navigation = (): ReactElement => {
   const location = useLocation();
 
@@ -28,49 +55,20 @@ const Navigation = (): ReactElement => {
       }}
     >
       <List sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <ListItemButton
-          component={Link}
-          to="/"
-          selected={location.pathname === "/"}
-          sx={{
-            borderRadius: "8px",
-            "&.Mui-selected": {
-              backgroundColor: "#1976d2",
-              color: "white",
-              boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
-            },
-            "&.Mui-selected:hover": {
-              backgroundColor: "#1565c0",
-            },
-          }}
-        >
-          <ListItemIcon sx={{ minWidth: 35, color: "inherit" }}>
-            <MdOutlineDashboard size={22} />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItemButton>
-
-        <ListItemButton
-          component={Link}
-          to="/orders"
-          selected={location.pathname.startsWith("/orders")}
-          sx={{
-            borderRadius: "8px",
-            "&.Mui-selected": {
-              backgroundColor: "#1976d2",
-              color: "white",
-              boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
-            },
-            "&.Mui-selected:hover": {
-              backgroundColor: "#1565c0",
-            },
-          }}
-        >
-          <ListItemIcon sx={{ minWidth: 35, color: "inherit" }}>
-            <MdOutlineShoppingCart size={22} />
-          </ListItemIcon>
-          <ListItemText primary="Orders" />
-        </ListItemButton>
+        {menuItems.map((item) => (
+          <ListItemButton
+            key={item.path}
+            component={Link}
+            to={item.path}
+            selected={item.isActive(location.pathname)}
+            sx={menuItemSx}
+          >
+            <ListItemIcon sx={{ minWidth: 35, color: "inherit" }}>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.label} />
+          </ListItemButton>
+        ))}
       </List>
     </Drawer>
   );
