@@ -28,6 +28,14 @@ import ConfirmDialog from "@components/ConfirmDialog";
 
 import { updateOrderStatus } from "@services/order";
 
+import FilePicker from "./FilePicker";
+import FilePreviewDialog from "./FilePreviewDialog";
+import {
+  createUploadAttachmentURL,
+  uploadAttachment,
+  updateAttachmentLink,
+} from "../../../services/order";
+
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
     case OrderStatus.Pending:
@@ -66,7 +74,8 @@ const OrdersTable = ({
 
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [viewURL, setViewURL] = useState<string | null>(null);
-  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState<boolean>(false);
+  const [isOpenConfirmDialog, setIsOpenConfirmDialog] =
+    useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string>();
 
   const handleCancelOrder = async (orderId: string) => {
@@ -99,6 +108,77 @@ const OrdersTable = ({
 
     setIsOpenConfirmDialog(false);
     setSelectedOrderId(undefined);
+  };
+  
+  const [uploadOrder, setUploadOrder] = useState<Order>();
+
+  const [openViewDialog, setOpenViewDialog] = useState<boolean>(false);
+  const [viewURL, setViewURL] = useState<string>();
+
+  const [file, setFile] = useState<File>();
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
+  const [preview, setPreview] = useState<string>();
+
+  const handleSelect = (file: File, order: Order) => {
+    setUploadOrder(order);
+    setFile(file);
+    setOpenPreviewDialog(true);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+    }
+  };
+
+  const handleCancelUpload = () => {
+    setFile(undefined);
+    setOpenPreviewDialog(false);
+    setPreview(undefined);
+  };
+
+  const handleCreateUploadURL = async (order: Order) => {
+    try {
+      if (file != undefined) {
+        const res = await createUploadAttachmentURL(order.orderId, file.type);
+        return res.data;
+      }
+    } catch (error) {
+      console.error("Create pre-signed url failed", error);
+    }
+  };
+
+  const handleUploadToS3 = async (preSignedUrl: string) => {
+    try {
+      if (file != undefined) {
+        await uploadAttachment(preSignedUrl, file);
+      }
+    } catch (error) {
+      console.error("Upload file to s3 bucket failed", error);
+    }
+  };
+
+  const handleUpdateAttachmentLink = async (order: Order, s3Key: string) => {
+    try {
+      await updateAttachmentLink(order.orderId, s3Key);
+    } catch (error) {
+      console.error("Upload attachment link to database failed", error);
+    }
+  };
+
+  const handleUpload = async (order: Order) => {
+    try {
+      const { uploadUrl, s3Key } = await handleCreateUploadURL(order);
+
+      await handleUploadToS3(uploadUrl);
+      await handleUpdateAttachmentLink(order, s3Key);
+
+      order.orderAttachment = s3Key;
+      setUpdatedOrder(order);
+      setFile(undefined);
+      setOpenPreviewDialog(false);
+      setPreview(undefined);
+    } catch (error) {
+      console.error("Upload flow failed", error);
+    }
   };
 
   useEffect(() => {
@@ -286,7 +366,10 @@ const OrdersTable = ({
                               >
                                 Attachment:
                               </Typography>{" "}
-                              {order.orderAttachment ?? "None"}
+                              <FilePicker
+                                onSelect={handleSelect}
+                                order={order}
+                              />
                             </Typography>
                           </Box>
                         </Stack>
@@ -370,6 +453,14 @@ const OrdersTable = ({
           setSelectedOrderId(undefined);
         }}
         onConfirm={handleConfirmCancelOrder}
+      />
+      <FilePreviewDialog
+        open={openPreviewDialog}
+        preview={preview}
+        onCancel={handleCancelUpload}
+        onConfirm={() => {
+          if (uploadOrder) handleUpload(uploadOrder);
+        }}
       />
     </Box>
   );
