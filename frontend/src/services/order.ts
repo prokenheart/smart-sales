@@ -34,10 +34,7 @@ export const createOrder = async (customerId: string) => {
   return res;
 };
 
-export const createItem = async (
-  orderId: string,
-  itemPosts: ItemPost[]
-) => {
+export const createItem = async (orderId: string, itemPosts: ItemPost[]) => {
   const res = await axios.put(`${API_URL}/orders/${orderId}/items`, {
     listItem: itemPosts,
   });
@@ -51,6 +48,38 @@ export const getItemList = async (orderId: string) => {
 };
 
 export const createViewAttachmentURL = async (orderId: string) => {
-  const res = await axios.post(`${API_URL}/orders/${orderId}/attachment/view-url`);
+  const res = await axios.post(
+    `${API_URL}/orders/${orderId}/attachment/view-url`
+  );
+  return res;
+};
+
+export const createUploadAttachmentURL = async (
+  orderId: string,
+  contentType: string
+) => {
+  const res = await axios.post(
+    `${API_URL}/orders/${orderId}/attachment/upload-url`,
+    {
+      contentType: contentType,
+    }
+  );
+  return res;
+};
+
+export const uploadAttachment = async (preSignedUrl: string, file: File) => {
+  const res = await axios.put(preSignedUrl, file, {
+    headers: {
+      "Content-Type": file.type,
+    },
+  });
+
+  return res;
+};
+
+export const updateAttachmentLink = async (orderId: string, s3Key: string) => {
+  const res = await axios.put(`${API_URL}/orders/${orderId}/attachment`, {
+    s3Key: s3Key,
+  });
   return res;
 };
