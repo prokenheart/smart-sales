@@ -13,13 +13,17 @@ const drawerWidth = 160;
 
 const menuItemSx = {
   borderRadius: "8px",
+  color: "white",
   "&.Mui-selected": {
-    backgroundColor: "#1976d2",
-    color: "white",
+    backgroundColor: "white",
+    color: "#1976d2",
     boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
   },
   "&.Mui-selected:hover": {
-    backgroundColor: "#1565c0",
+    backgroundColor: "#f5f5f5",
+  },
+  "&:hover": {
+    transform: "translateX(6px)",
   },
 };
 
@@ -51,6 +55,7 @@ const Navigation = (): ReactElement => {
           width: drawerWidth,
           boxSizing: "border-box",
           padding: "10px",
+          backgroundColor: "#1976d2",
         },
       }}
     >
