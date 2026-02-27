@@ -12,14 +12,13 @@ const AttachmentPreviewDialog = ({
   setOpen: Dispatch<SetStateAction<boolean>>;
   setViewURL: Dispatch<SetStateAction<string | undefined>>;
 }>): ReactElement => {
+  const handleClose = (): void => {
+    setOpen(false);
+    setViewURL(undefined);
+  };
+
   return (
-    <Dialog
-      open={open}
-      onClose={() => {
-        setOpen(false);
-        setViewURL(undefined);
-      }}
-    >
+    <Dialog open={open} onClose={handleClose}>
       <DialogContent>
         <img
           src={viewURL}
