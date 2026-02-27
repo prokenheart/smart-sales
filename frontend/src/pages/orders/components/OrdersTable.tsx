@@ -149,7 +149,11 @@ const OrdersTable = ({
                     }}
                   >
                     {order.orderAttachment != null && (
-                      <AttachmentPreviewButton orderId={order.orderId} setViewURL={setViewURL} setOpenViewDialog={setOpenViewDialog}/>
+                      <AttachmentPreviewButton
+                        orderId={order.orderId}
+                        setViewURL={setViewURL}
+                        setOpenViewDialog={setOpenViewDialog}
+                      />
                     )}
                   </TableCell>
                 </TableRow>
@@ -304,8 +308,13 @@ const OrdersTable = ({
           </TableRow>
         </TableFooter>
       </Table>
-      
-      <AttachmentPreviewDialog viewURL={viewURL} open={openViewDialog} setOpen={setOpenViewDialog} setViewURL={setViewURL}/>
+
+      <AttachmentPreviewDialog
+        viewURL={viewURL}
+        open={openViewDialog}
+        setOpen={setOpenViewDialog}
+        setViewURL={setViewURL}
+      />
     </Box>
   );
 };

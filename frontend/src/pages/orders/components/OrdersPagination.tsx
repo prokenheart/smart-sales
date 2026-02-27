@@ -46,7 +46,7 @@ const OrdersPagination = ({
   currentPage: number;
   totalPages: number;
   setPage: Dispatch<SetStateAction<number | undefined>>;
-  cursorResponse: CursorResponse | undefined
+  cursorResponse: CursorResponse | undefined;
   setCursorState: Dispatch<SetStateAction<CursorState | undefined>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
 }>): ReactElement => {
@@ -55,18 +55,18 @@ const OrdersPagination = ({
       setCursorState({
         cursor: {
           cursorDate: cursorResponse?.prev.cursorDate,
-          cursorId: cursorResponse?.prev.cursorId
+          cursorId: cursorResponse?.prev.cursorId,
         },
-        direction
+        direction,
       });
       setCurrentPage(currentPage - 1);
     } else if (direction == "next") {
       setCursorState({
         cursor: {
           cursorDate: cursorResponse?.next.cursorDate,
-          cursorId: cursorResponse?.next.cursorId
+          cursorId: cursorResponse?.next.cursorId,
         },
-        direction: direction
+        direction: direction,
       });
       setCurrentPage(currentPage + 1);
     }
