@@ -56,7 +56,7 @@ const OrdersTable = ({
   const [updatedOrder, setUpdatedOrder] = useState<Order>();
 
   const [openViewDialog, setOpenViewDialog] = useState<boolean>(false);
-  const [viewURL, setViewURL] = useState<string>();
+  const [viewURL, setViewURL] = useState<string | null>(null);
 
   useEffect(() => {
     if (updatedOrder != undefined) {

@@ -7,21 +7,21 @@ const AttachmentPreviewDialog = ({
   setOpen,
   setViewURL,
 }: Readonly<{
-  viewURL: string | undefined;
+  viewURL: string | null;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setViewURL: Dispatch<SetStateAction<string | undefined>>;
+  setViewURL: Dispatch<SetStateAction<string | null>>;
 }>): ReactElement => {
   const handleClose = (): void => {
     setOpen(false);
-    setViewURL(undefined);
+    setViewURL(null);
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogContent>
         <img
-          src={viewURL}
+          src={viewURL ?? ""}
           alt="Preview"
           style={{
             width: "100%",

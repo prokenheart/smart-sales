@@ -8,7 +8,7 @@ const AttachmentPreviewButton = ({
   setOpenViewDialog,
 }: Readonly<{
   orderId: string;
-  setViewURL: Dispatch<SetStateAction<string | undefined>>;
+  setViewURL: Dispatch<SetStateAction<string | null>>;
   setOpenViewDialog: Dispatch<SetStateAction<boolean>>;
 }>): ReactElement => {
   const createUrl = async () => {
