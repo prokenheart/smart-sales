@@ -16,7 +16,7 @@ const OrdersPage = (): ReactElement => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  
+
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [ordersPerPage, setOrdersPerPage] = useState<number>(1);
 
@@ -47,12 +47,12 @@ const OrdersPage = (): ReactElement => {
     setCursorResponse({
       prev: {
         cursorDate: res.data.prevCursorDate ?? undefined,
-        cursorId: res.data.prevCursorId ?? undefined
+        cursorId: res.data.prevCursorId ?? undefined,
       },
       next: {
         cursorDate: res.data.nextCursorDate ?? undefined,
-        cursorId: res.data.nextCursorId ?? undefined
-      }
+        cursorId: res.data.nextCursorId ?? undefined,
+      },
     });
     setTotalPages(res.data.totalPages);
     setTotalOrders(res.data.totalOrders);
