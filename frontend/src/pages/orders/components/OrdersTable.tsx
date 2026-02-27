@@ -148,7 +148,7 @@ const OrdersTable = ({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {order.orderAttachment != null && (
+                    {order.orderAttachment && (
                       <AttachmentPreviewButton
                         orderId={order.orderId}
                         setViewURL={setViewURL}
