@@ -113,7 +113,7 @@ const OrdersTable = ({
   const [uploadOrder, setUploadOrder] = useState<Order>();
 
   const [openViewDialog, setOpenViewDialog] = useState<boolean>(false);
-  const [viewURL, setViewURL] = useState<string>();
+  const [viewURL, setViewURL] = useState<string | null>(null);
 
   const [file, setFile] = useState<File>();
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
@@ -139,6 +139,7 @@ const OrdersTable = ({
     try {
       if (file != undefined) {
         const res = await createUploadAttachmentURL(order.orderId, file.type);
+        console.log("Create pre-signed url response", res.status, res.data.s3Key);
         return res.data;
       }
     } catch (error) {
@@ -149,7 +150,8 @@ const OrdersTable = ({
   const handleUploadToS3 = async (preSignedUrl: string) => {
     try {
       if (file != undefined) {
-        await uploadAttachment(preSignedUrl, file);
+        const res =  await uploadAttachment(preSignedUrl, file);
+        console.log("Upload to s3 response", res.status);
       }
     } catch (error) {
       console.error("Upload file to s3 bucket failed", error);
