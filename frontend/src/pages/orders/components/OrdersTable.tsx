@@ -71,16 +71,16 @@ const OrdersTable = ({
       const res = await updateOrderStatus(orderId, OrderStatus.Cancelled);
       if (res.status === HttpStatusCode.Ok) {
         setOrders((prev) =>
-          prev.map((o) =>
-            o.orderId === orderId
+          prev.map((order) =>
+            order.orderId === orderId
               ? {
-                  ...o,
+                  ...order,
                   status: {
-                    ...o.status,
+                    ...order.status,
                     statusCode: OrderStatus.Cancelled,
                   },
                 }
-              : o
+              : order
           )
         );
       }
