@@ -10,7 +10,7 @@ const OrdersNumberPagination = ({
 }: Readonly<{
   currentPage: number;
   totalPages: number;
-  setPage: Dispatch<SetStateAction<number | undefined>>;
+  setPage: Dispatch<SetStateAction<number | null>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
 }>): ReactElement => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -45,26 +45,26 @@ const OrdersPagination = ({
 }: Readonly<{
   currentPage: number;
   totalPages: number;
-  setPage: Dispatch<SetStateAction<number | undefined>>;
-  cursorResponse: CursorResponse | undefined;
-  setCursorState: Dispatch<SetStateAction<CursorState | undefined>>;
+  setPage: Dispatch<SetStateAction<number | null>>;
+  cursorResponse: CursorResponse | null;
+  setCursorState: Dispatch<SetStateAction<CursorState>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
 }>): ReactElement => {
   const handleCursorPagination = (direction: "prev" | "next") => {
-    if (direction == "prev") {
+    if (direction == "prev" && cursorResponse) {
       setCursorState({
         cursor: {
-          cursorDate: cursorResponse?.prev.cursorDate,
-          cursorId: cursorResponse?.prev.cursorId,
+          cursorDate: cursorResponse.prev.cursorDate,
+          cursorId: cursorResponse.prev.cursorId,
         },
         direction,
       });
       setCurrentPage(currentPage - 1);
-    } else if (direction == "next") {
+    } else if (direction == "next" && cursorResponse) {
       setCursorState({
         cursor: {
-          cursorDate: cursorResponse?.next.cursorDate,
-          cursorId: cursorResponse?.next.cursorId,
+          cursorDate: cursorResponse.next.cursorDate,
+          cursorId: cursorResponse.next.cursorId,
         },
         direction: direction,
       });

@@ -6,11 +6,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 const USER_ID = import.meta.env.VITE_USER_ID;
 
 export const getOrders = async (
-  page: number | undefined,
-  cursorDate: string | undefined,
-  cursorId: string | undefined,
-  direction: string | undefined,
-  search: string | undefined
+  page: number | null,
+  cursorDate: string | null,
+  cursorId: string | null,
+  direction: string | null,
+  search: string | null
 ) => {
   const res = await axios.get<OrdersResponse>(`${API_URL}/orders`, {
     params: {

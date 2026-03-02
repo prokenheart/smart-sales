@@ -1,11 +1,11 @@
 export type CursorState = {
 	cursor: Cursor;
-  direction: "prev" | "next" | undefined;
+  direction: "prev" | "next" | null;
 };
 
 type Cursor = {
-  cursorDate: string | undefined;
-  cursorId: string | undefined;
+  cursorDate: string | null;
+  cursorId: string | null;
 };
 
 export type CursorResponse = {
