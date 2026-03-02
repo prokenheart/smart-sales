@@ -38,7 +38,7 @@ const OrderForm = ({
     Customer | undefined
   >();
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState(false);
 
   const totalOrder = useMemo(() => {
     const total = selectedItems.reduce((sum, item) => {
@@ -75,7 +75,7 @@ const OrderForm = ({
       <Dialog
         open={open}
         onClose={() => {
-          setOpenConfirm(true);
+          setIsOpenConfirmDialog(true);
         }}
         fullWidth
         maxWidth="md"
@@ -176,7 +176,7 @@ const OrderForm = ({
             <Button
               color="error"
               onClick={() => {
-                setOpenConfirm(true);
+                setIsOpenConfirmDialog(true);
               }}
             >
               Cancel
@@ -185,12 +185,12 @@ const OrderForm = ({
         </Stack>
       </Dialog>
       <ConfirmDialog
-        open={openConfirm}
+        isOpen={isOpenConfirmDialog}
         title="Confirm Close"
         description="Are you sure to exit without saving"
-        onCancel={() => setOpenConfirm(false)}
+        onCancel={() => setIsOpenConfirmDialog(false)}
         onConfirm={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirmDialog(false);
           handleCancel();
         }}
       />

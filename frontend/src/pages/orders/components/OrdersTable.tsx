@@ -65,6 +65,7 @@ const OrdersTable = ({
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [viewURL, setViewURL] = useState<string | null>(null);
   const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string>();
 
   const handleCancelOrder = async (orderId: string) => {
@@ -307,7 +308,7 @@ const OrdersTable = ({
                               color="error"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setOpenConfirm(true);
+                                setIsOpenConfirmDialog(true);
                                 setSelectedOrderId(order.orderId);
                               }}
                               disabled={isDisabled}
@@ -351,17 +352,17 @@ const OrdersTable = ({
         setViewURL={setViewURL}
       />
       <ConfirmDialog
-        open={openConfirm}
+        isOpen={isOpenConfirmDialog}
         title="Cancel Order"
         description="Are you sure to cancel this order?"
         onCancel={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirmDialog(false);
           setSelectedOrderId(undefined);
         }}
         onConfirm={async () => {
           if (selectedOrderId != undefined)
             await handleCancelOrder(selectedOrderId);
-          setOpenConfirm(false);
+          setIsOpenConfirmDialog(false);
           setSelectedOrderId(undefined);
         }}
       />
