@@ -138,6 +138,8 @@ const OrdersTable = ({
         <TableBody>
           {orders.map((order, index) => {
             const isExpanded = expandedOrderId === order.orderId;
+            const isDisabled =
+              order.status.statusCode === OrderStatus.Cancelled;
             return (
               <Fragment key={order.orderId}>
                 <TableRow
@@ -308,10 +310,7 @@ const OrdersTable = ({
                                 setOpenConfirm(true);
                                 setSelectedOrderId(order.orderId);
                               }}
-                              disabled={
-                                order.status.statusCode ===
-                                OrderStatus.Cancelled
-                              }
+                              disabled={isDisabled}
                             >
                               Cancel
                             </Button>
