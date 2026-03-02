@@ -91,6 +91,15 @@ const OrdersTable = ({
     }
   };
 
+  const handleConfirmCancelOrder = async () => {
+    if (selectedOrderId === undefined) return;
+
+    await handleCancelOrder(selectedOrderId);
+
+    setIsOpenConfirmDialog(false);
+    setSelectedOrderId(undefined);
+  };
+
   useEffect(() => {
     if (updatedOrder != undefined) {
       setOpenOrderForm(false);
@@ -359,12 +368,7 @@ const OrdersTable = ({
           setIsOpenConfirmDialog(false);
           setSelectedOrderId(undefined);
         }}
-        onConfirm={async () => {
-          if (selectedOrderId != undefined)
-            await handleCancelOrder(selectedOrderId);
-          setIsOpenConfirmDialog(false);
-          setSelectedOrderId(undefined);
-        }}
+        onConfirm={handleConfirmCancelOrder}
       />
     </Box>
   );
