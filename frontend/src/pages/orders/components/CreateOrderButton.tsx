@@ -1,14 +1,13 @@
 import { Button } from "@mui/material";
-import type { Item, ItemPost } from "../types/item";
-import type { Customer } from "../types/order";
-import {
-  useContext,
-  type Dispatch,
-  type ReactElement,
-  type SetStateAction,
-} from "react";
-import { createOrder, createItem } from "../../../services/order";
-import { OrderRefreshContext } from "../context/OrderRefreshContext";
+import { useContext } from "react";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
+
+import { OrderRefreshContext } from "@orders/context/OrderRefreshContext";
+
+import type { Item, ItemPost } from "@orders/types/item";
+import type { Customer } from "@orders/types/order";
+
+import { createOrder, createItem } from "@services/order";
 
 const CreateOrderButton = ({
   customer,

@@ -13,13 +13,16 @@ import {
 } from "@mui/material";
 import { useState, Fragment, useEffect } from "react";
 import type { ReactElement, Dispatch, SetStateAction } from "react";
-import OrderForm from "./OrderForm";
-import type { Order } from "../types/order";
-import { UpdateTableContext } from "../context/UpdateTableContext";
-import AttachmentPreviewButton from "./AttachmentPreviewButton";
-import AttachmentPreviewDialog from "./AttachmentPreviewDialog";
-import ConfirmDialog from "../../../components/ConfirmDialog";
-import { updateOrderStatus } from "../../../services/order";
+
+import OrderForm from "@orders/components/OrderForm";
+
+import { UpdateTableContext } from "@orders/context/UpdateTableContext";
+
+import type { Order } from "@orders/types/order";
+
+import ConfirmDialog from "@components/ConfirmDialog";
+
+import { updateOrderStatus } from "@services/order";
 
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
