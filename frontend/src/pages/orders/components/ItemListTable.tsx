@@ -1,12 +1,4 @@
 import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type ReactElement,
-  type SetStateAction,
-} from "react";
-import type { Item } from "../types/item";
-import {
   Table,
   TableHead,
   TableBody,
@@ -15,11 +7,17 @@ import {
   Button,
   TextField,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
-import ProductSelect from "./ProductSelect";
-import type { Product } from "../types/product";
-import ConfirmDialog from "../../../components/ConfirmDialog";
+
+import ProductSelect from "@orders/components/ProductSelect";
+
+import type { Product } from "@orders/types/product";
+import type { Item } from "@orders/types/item";
+
+import ConfirmDialog from "@components/ConfirmDialog";
 
 const ItemListTable = ({
   items,
