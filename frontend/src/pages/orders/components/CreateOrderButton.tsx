@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import { useContext } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
+import { HttpStatusCode } from "axios";
 
 import { OrderRefreshContext } from "@orders/context/OrderRefreshContext";
 
@@ -39,7 +40,7 @@ const CreateOrderButton = ({
     try {
       if (orderId != undefined) {
         const res = await createItem(orderId, itemPosts);
-        if (res.status == 200) {
+        if (res.status == HttpStatusCode.Ok) {
           setSelectedCustomer(undefined);
           setSelectedItems([]);
           refresh?.setShouldRefreshOrder(true);
