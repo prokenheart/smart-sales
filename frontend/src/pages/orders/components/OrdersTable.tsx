@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useState, Fragment, useEffect } from "react";
 import type { ReactElement, Dispatch, SetStateAction } from "react";
+import { HttpStatusCode } from "axios";
 
 import OrderForm from "@orders/components/OrderForm";
 
@@ -69,7 +70,7 @@ const OrdersTable = ({
   const handleCancelOrder = async (orderId: string) => {
     try {
       const res = await updateOrderStatus(orderId, OrderStatus.Cancelled);
-      if (res.status === 200) {
+      if (res.status === HttpStatusCode.Ok) {
         setOrders((prev) =>
           prev.map((o) =>
             o.orderId === orderId
@@ -307,7 +308,10 @@ const OrdersTable = ({
                                 setOpenConfirm(true);
                                 setSelectedOrderId(order.orderId);
                               }}
-                              disabled={order.status.statusCode === OrderStatus.Cancelled} 
+                              disabled={
+                                order.status.statusCode ===
+                                OrderStatus.Cancelled
+                              }
                             >
                               Cancel
                             </Button>
