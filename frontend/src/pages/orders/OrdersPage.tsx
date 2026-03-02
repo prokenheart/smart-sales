@@ -12,7 +12,9 @@ import type { CursorResponse, CursorState } from "./types/cursor";
 const OrdersPage = (): ReactElement => {
   const [orders, setOrders] = useState<Order[]>([]);
 
-  const [cursorResponse, setCursorResponse] = useState<CursorResponse>();
+  const [cursorResponse, setCursorResponse] = useState<CursorResponse | null>(
+    null
+  );
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -20,9 +22,15 @@ const OrdersPage = (): ReactElement => {
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [ordersPerPage, setOrdersPerPage] = useState<number>(1);
 
-  const [page, setPage] = useState<number>();
+  const [page, setPage] = useState<number | null>(null);
 
-  const [cursorState, setCursorState] = useState<CursorState>();
+  const [cursorState, setCursorState] = useState<CursorState>({
+    cursor: {
+      cursorDate: null,
+      cursorId: null,
+    },
+    direction: null,
+  });
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -44,22 +52,31 @@ const OrdersPage = (): ReactElement => {
     );
 
     setOrders(res.data.orders);
-    setCursorResponse({
-      prev: {
-        cursorDate: res.data.prevCursorDate ?? undefined,
-        cursorId: res.data.prevCursorId ?? undefined,
-      },
-      next: {
-        cursorDate: res.data.nextCursorDate ?? undefined,
-        cursorId: res.data.nextCursorId ?? undefined,
-      },
-    });
+    if (res.data) {
+      setCursorResponse({
+        prev: {
+          cursorDate: res.data.prevCursorDate,
+          cursorId: res.data.prevCursorId,
+        },
+        next: {
+          cursorDate: res.data.nextCursorDate,
+          cursorId: res.data.nextCursorId,
+        },
+      });
+    }
+
     setTotalPages(res.data.totalPages);
     setTotalOrders(res.data.totalOrders);
     setOrdersPerPage(res.data.ordersPerPage);
 
-    setCursorState(undefined);
-    setPage(undefined);
+    setCursorState({
+      cursor: {
+        cursorDate: null,
+        cursorId: null,
+      },
+      direction: null,
+    });
+    setPage(null);
   };
 
   useEffect(() => {
