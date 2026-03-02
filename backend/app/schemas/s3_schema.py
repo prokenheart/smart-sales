@@ -1,12 +1,12 @@
 from app.schemas.base_schema import CamelCaseModel
 
-class ViewURLResponse(CamelCaseModel):
+class ViewUrlResponse(CamelCaseModel):
     get_url: str
 
-class UploadURLResponse(CamelCaseModel):
+class UploadUrlResponse(CamelCaseModel):
     upload_url: str
     s3_key: str
     max_file_size: int
 
-class S3Key(CamelCaseModel):
+class S3KeyParams(CamelCaseModel):
     s3_key: str
