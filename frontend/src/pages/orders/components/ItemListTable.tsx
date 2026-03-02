@@ -39,7 +39,7 @@ const ItemListTable = ({
   >(undefined);
 
   const [selectedProduct, setSelectedProduct] = useState<Product>();
-  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState(false);
   const [deleteId, setDeleteId] = useState<string>();
 
   const handleChangeQuantity = (productId: string, value: number) => {
@@ -127,7 +127,7 @@ const ItemListTable = ({
                     color="error"
                     onClick={() => {
                       setDeleteId(item.product.productId);
-                      setOpenConfirm(true);
+                      setIsOpenConfirmDialog(true);
                     }}
                   >
                     <FaRegTrashAlt />
@@ -179,15 +179,15 @@ const ItemListTable = ({
         </TableBody>
       </Table>
       <ConfirmDialog
-        open={openConfirm}
+        isOpen={isOpenConfirmDialog}
         title="Confirm Delete"
         description="Are you sure to delete this"
         onCancel={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirmDialog(false);
           setDeleteId(undefined);
         }}
         onConfirm={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirmDialog(false);
           handleDelete();
         }}
       />

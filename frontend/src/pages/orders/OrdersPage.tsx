@@ -28,14 +28,14 @@ const OrdersPage = (): ReactElement => {
 
   const [cursorState, setCursorState] = useState<CursorState>();
 
-  const [open, setOpen] = useState<boolean>(false);
+  const [isOpenForm, setIsOpenForm] = useState(false);
 
-  const [shouldRefreshOrder, setShouldRefreshOrder] = useState<boolean>(false);
+  const [shouldRefreshOrder, setShouldRefreshOrder] = useState(false);
 
   const [search, setSearch] = useState<string>("");
 
   const handleCreateOrder = () => {
-    setOpen(true);
+    setIsOpenForm(true);
   };
 
   const fetchOrders = async () => {
@@ -77,7 +77,7 @@ const OrdersPage = (): ReactElement => {
 
   useEffect(() => {
     if (shouldRefreshOrder) {
-      setOpen(false);
+      setIsOpenForm(false);
       setShouldRefreshOrder(false);
       if (currentPage === 1) fetchOrders();
       else setCurrentPage(1);
@@ -102,7 +102,7 @@ const OrdersPage = (): ReactElement => {
         </Stack>
 
         <OrderRefreshContext.Provider value={{ setShouldRefreshOrder }}>
-          <OrderForm open={open} setOpen={setOpen} mode="create" />
+          <OrderForm open={isOpenForm} setOpen={setIsOpenForm} mode="create" />
         </OrderRefreshContext.Provider>
       </Stack>
 
