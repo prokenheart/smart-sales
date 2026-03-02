@@ -1,13 +1,17 @@
 import { Button, Typography, Stack } from "@mui/material";
 import { useEffect, useState, type ReactElement } from "react";
-import OrdersTable from "./components/OrdersTable";
-import OrdersPagination from "./components/OrdersPagination";
-import type { Order } from "./types/order";
-import OrderForm from "./components/OrderForm";
-import SearchBox from "./components/SearchBox";
-import { getOrders } from "../../services/order";
-import { OrderRefreshContext } from "./context/OrderRefreshContext";
-import type { CursorResponse, CursorState } from "./types/cursor";
+
+import OrdersTable from "@orders/components/OrdersTable";
+import OrdersPagination from "@orders/components/OrdersPagination";
+import OrderForm from "@orders/components/OrderForm";
+import SearchBox from "@orders/components/SearchBox";
+
+import { OrderRefreshContext } from "@orders/context/OrderRefreshContext";
+
+import type { CursorResponse, CursorState } from "@orders/types/cursor";
+import type { Order } from "@orders/types/order";
+
+import { getOrders } from "@services/order";
 
 const OrdersPage = (): ReactElement => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -16,7 +20,7 @@ const OrdersPage = (): ReactElement => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  
+
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [ordersPerPage, setOrdersPerPage] = useState<number>(1);
 
@@ -47,12 +51,12 @@ const OrdersPage = (): ReactElement => {
     setCursorResponse({
       prev: {
         cursorDate: res.data.prevCursorDate ?? undefined,
-        cursorId: res.data.prevCursorId ?? undefined
+        cursorId: res.data.prevCursorId ?? undefined,
       },
       next: {
         cursorDate: res.data.nextCursorDate ?? undefined,
-        cursorId: res.data.nextCursorId ?? undefined
-      }
+        cursorId: res.data.nextCursorId ?? undefined,
+      },
     });
     setTotalPages(res.data.totalPages);
     setTotalOrders(res.data.totalOrders);

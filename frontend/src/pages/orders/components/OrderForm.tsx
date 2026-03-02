@@ -8,16 +8,20 @@ import {
   Stack,
   Box,
 } from "@mui/material";
-import type { Dispatch, ReactElement, SetStateAction } from "react";
-import CustomerSelect from "./CustomerSelect";
-import type { Customer, Order } from "../types/order";
-import type { Item } from "../types/item";
 import { useEffect, useMemo, useState } from "react";
-import ItemListTable from "./ItemListTable";
-import CreateOrderButton from "./CreateOrderButton";
-import UpdateOrderButton from "./UpdateOrderButton";
-import ConfirmDialog from "../../../components/ConfirmDialog";
-import { getItemList } from "../../../services/order";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
+
+import CustomerSelect from "@orders/components/CustomerSelect";
+import ItemListTable from "@orders/components/ItemListTable";
+import CreateOrderButton from "@orders/components/CreateOrderButton";
+import UpdateOrderButton from "@orders/components/UpdateOrderButton";
+
+import type { Customer, Order } from "@orders/types/order";
+import type { Item } from "@orders/types/item";
+
+import ConfirmDialog from "@components/ConfirmDialog";
+
+import { getItemList } from "@services/order";
 
 const OrderForm = ({
   open,

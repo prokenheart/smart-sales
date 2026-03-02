@@ -1,7 +1,7 @@
 import { TextField, InputAdornment, IconButton } from "@mui/material";
+import { useEffect, useState, type ReactElement } from "react";
 import { MdCancel } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
-import { useEffect, useState, type ReactElement } from "react";
 
 type SearchBoxProps = {
   value: string;
