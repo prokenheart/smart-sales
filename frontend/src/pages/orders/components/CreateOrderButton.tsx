@@ -1,10 +1,7 @@
 import { Button } from "@mui/material";
 import { useContext } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
-<<<<<<< HEAD
 import { HttpStatusCode } from "axios";
-=======
->>>>>>> f2522dc (refactor: replace relative imports with typescript path aliases)
 
 import { OrderRefreshContext } from "@orders/context/OrderRefreshContext";
 
