@@ -56,6 +56,7 @@ const OrdersPage = (): ReactElement => {
     );
 
     setOrders(res.data.orders);
+<<<<<<< HEAD
     if (res.data) {
       setCursorResponse({
         prev: {
@@ -69,6 +70,18 @@ const OrdersPage = (): ReactElement => {
       });
     }
 
+=======
+    setCursorResponse({
+      prev: {
+        cursorDate: res.data.prevCursorDate ?? undefined,
+        cursorId: res.data.prevCursorId ?? undefined,
+      },
+      next: {
+        cursorDate: res.data.nextCursorDate ?? undefined,
+        cursorId: res.data.nextCursorId ?? undefined,
+      },
+    });
+>>>>>>> f2522dc (refactor: replace relative imports with typescript path aliases)
     setTotalPages(res.data.totalPages);
     setTotalOrders(res.data.totalOrders);
     setOrdersPerPage(res.data.ordersPerPage);
