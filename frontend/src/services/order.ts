@@ -69,8 +69,8 @@ export const createUploadAttachmentURL = async (
   return res;
 };
 
-export const uploadAttachment = async (preSignedUrl: string, file: File) => {
-  const res = await axios.put(preSignedUrl, file, {
+export const uploadAttachment = async (uploadUrl: string, file: File) => {
+  const res = await axios.put(uploadUrl, file, {
     headers: {
       "Content-Type": file.type,
     },
