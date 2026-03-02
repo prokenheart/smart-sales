@@ -62,7 +62,8 @@ const OrdersTable = ({
 
   const [updatedOrder, setUpdatedOrder] = useState<Order>();
 
-  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState<boolean>(false);
+  const [isOpenConfirmDialog, setIsOpenConfirmDialog] =
+    useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string>();
 
   const handleCancelOrder = async (orderId: string) => {
@@ -86,6 +87,15 @@ const OrdersTable = ({
     } catch (error) {
       console.error("Cancel Order Failed: ", error);
     }
+  };
+
+  const handleConfirmCancelOrder = async () => {
+    if (selectedOrderId === undefined) return;
+
+    await handleCancelOrder(selectedOrderId);
+
+    setIsOpenConfirmDialog(false);
+    setSelectedOrderId(undefined);
   };
 
   useEffect(() => {
@@ -343,12 +353,7 @@ const OrdersTable = ({
           setIsOpenConfirmDialog(false);
           setSelectedOrderId(undefined);
         }}
-        onConfirm={async () => {
-          if (selectedOrderId != undefined)
-            await handleCancelOrder(selectedOrderId);
-          setIsOpenConfirmDialog(false);
-          setSelectedOrderId(undefined);
-        }}
+        onConfirm={handleConfirmCancelOrder}
       />
     </Box>
   );
