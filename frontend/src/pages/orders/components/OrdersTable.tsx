@@ -19,6 +19,7 @@ import OrderForm from "@orders/components/OrderForm";
 import { UpdateTableContext } from "@orders/context/UpdateTableContext";
 
 import type { Order } from "@orders/types/order";
+import { OrderStatus } from "@orders/types/status";
 
 import ConfirmDialog from "@components/ConfirmDialog";
 
@@ -26,13 +27,13 @@ import { updateOrderStatus } from "@services/order";
 
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
-    case "PENDING":
+    case OrderStatus.Pending:
       return "goldenrod";
-    case "PAID":
+    case OrderStatus.Paid:
       return "dodgerblue";
-    case "DELIVERED":
+    case OrderStatus.Delivered:
       return "green";
-    case "CANCELLED":
+    case OrderStatus.Cancelled:
       return "red";
     default:
       return "gray";
@@ -67,7 +68,7 @@ const OrdersTable = ({
 
   const handleCancelOrder = async (orderId: string) => {
     try {
-      const res = await updateOrderStatus(orderId, "CANCELLED");
+      const res = await updateOrderStatus(orderId, OrderStatus.Cancelled);
       if (res.status === 200) {
         setOrders((prev) =>
           prev.map((o) =>
@@ -76,7 +77,7 @@ const OrdersTable = ({
                   ...o,
                   status: {
                     ...o.status,
-                    statusCode: "CANCELLED",
+                    statusCode: OrderStatus.Cancelled,
                   },
                 }
               : o
@@ -306,7 +307,7 @@ const OrdersTable = ({
                                 setOpenConfirm(true);
                                 setSelectedOrderId(order.orderId);
                               }}
-                              disabled={order.status.statusCode === "CANCELLED"} 
+                              disabled={order.status.statusCode === OrderStatus.Cancelled} 
                             >
                               Cancel
                             </Button>
