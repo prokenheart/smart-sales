@@ -92,7 +92,7 @@ const OrdersTable = ({
   };
 
   const handleConfirmCancelOrder = async () => {
-    if (selectedOrderId === undefined) return;
+    if (!selectedOrderId) return;
 
     await handleCancelOrder(selectedOrderId);
 
