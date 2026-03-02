@@ -16,6 +16,8 @@ import type { ReactElement, Dispatch, SetStateAction } from "react";
 import { HttpStatusCode } from "axios";
 
 import OrderForm from "@orders/components/OrderForm";
+import AttachmentPreviewButton from "@orders/components/AttachmentPreviewButton";
+import AttachmentPreviewDialog from "@orders/components/AttachmentPreviewDialog";
 
 import { UpdateTableContext } from "@orders/context/UpdateTableContext";
 
@@ -64,7 +66,6 @@ const OrdersTable = ({
 
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [viewURL, setViewURL] = useState<string | null>(null);
-  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
   const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string>();
 

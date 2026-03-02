@@ -50,7 +50,7 @@ export const getItemList = async (orderId: string) => {
 };
 
 export const createViewAttachmentURL = async (orderId: string) => {
-  const res = await axios.post(`${API_URL}/orders/${orderId}/attachment/view-url`);
+  const res = await axiosInstance.post(`/orders/${orderId}/attachment/view-url`);
   return res;
 };
 export const updateOrderStatus = async (orderId: string, statusCode: string) => {
