@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import { useContext } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
+import { HttpStatusCode } from "axios";
 
 import { UpdateTableContext } from "@orders/context/UpdateTableContext";
 
@@ -38,7 +39,7 @@ const UpdateOrderButton = ({
     try {
       if (order != undefined) {
         const res = await createItem(order.orderId, itemPosts);
-        if (res.status == 200) {
+        if (res.status == HttpStatusCode.Ok) {
           const newTotal = calcOrderTotal(items).toString();
 
           if (!order) return;
