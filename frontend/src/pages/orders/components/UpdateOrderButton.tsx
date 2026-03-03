@@ -1,14 +1,15 @@
 import { Button } from "@mui/material";
-import type { Item, ItemPost } from "../types/item";
-import type { Order, Customer } from "../types/order";
-import {
-  useContext,
-  type Dispatch,
-  type ReactElement,
-  type SetStateAction,
-} from "react";
-import { createItem } from "../../../services/order";
-import { UpdateTableContext } from "../context/UpdateTableContext";
+import { useContext } from "react";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
+import { HttpStatusCode } from "axios";
+
+import { UpdateTableContext } from "@orders/context/UpdateTableContext";
+
+import type { Item, ItemPost } from "@orders/types/item";
+import type { Order, Customer } from "@orders/types/order";
+
+import { createItem } from "@services/order";
+
 
 const UpdateOrderButton = ({
   order,
@@ -38,7 +39,7 @@ const UpdateOrderButton = ({
     try {
       if (order != undefined) {
         const res = await createItem(order.orderId, itemPosts);
-        if (res.status == 200) {
+        if (res.status == HttpStatusCode.Ok) {
           const newTotal = calcOrderTotal(items).toString();
 
           if (!order) return;

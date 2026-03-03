@@ -1,6 +1,7 @@
-import type { ReactElement, Dispatch, SetStateAction } from "react";
 import { Stack, Button } from "@mui/material";
-import type { CursorState, CursorResponse } from "../types/cursor";
+import type { ReactElement, Dispatch, SetStateAction } from "react";
+
+import type { CursorState, CursorResponse } from "@orders/types/cursor";
 
 const OrdersNumberPagination = ({
   currentPage,

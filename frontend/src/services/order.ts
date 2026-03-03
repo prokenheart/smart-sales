@@ -1,8 +1,7 @@
-import axios from "axios";
+import { axiosInstance } from "@/lib/axios";
 import type { OrdersResponse, Order } from "../pages/orders/types/order";
 import type { ItemPost, Item } from "../pages/orders/types/item";
 
-const API_URL = import.meta.env.VITE_API_URL;
 const USER_ID = import.meta.env.VITE_USER_ID;
 
 export const getOrders = async (
@@ -12,7 +11,7 @@ export const getOrders = async (
   direction: string | null,
   search: string | null
 ) => {
-  const res = await axios.get<OrdersResponse>(`${API_URL}/orders`, {
+  const res = await axiosInstance.get<OrdersResponse>(`/orders`, {
     params: {
       page,
       cursorDate,
@@ -26,7 +25,7 @@ export const getOrders = async (
 };
 
 export const createOrder = async (customerId: string) => {
-  const res = await axios.post<Order>(`${API_URL}/orders`, {
+  const res = await axiosInstance.post<Order>(`/orders`, {
     customerId: customerId,
     userId: USER_ID,
   });
@@ -38,7 +37,7 @@ export const createItem = async (
   orderId: string,
   itemPosts: ItemPost[]
 ) => {
-  const res = await axios.put(`${API_URL}/orders/${orderId}/items`, {
+  const res = await axiosInstance.put(`/orders/${orderId}/items`, {
     listItem: itemPosts,
   });
 
@@ -46,11 +45,17 @@ export const createItem = async (
 };
 
 export const getItemList = async (orderId: string) => {
-  const res = await axios.get<[Item]>(`${API_URL}/orders/${orderId}/items`);
+  const res = await axiosInstance.get<[Item]>(`/orders/${orderId}/items`);
   return res;
 };
 
 export const createViewAttachmentURL = async (orderId: string) => {
-  const res = await axios.post(`${API_URL}/orders/${orderId}/attachment/view-url`);
+  const res = await axiosInstance.post(`/orders/${orderId}/attachment/view-url`);
   return res;
 };
+export const updateOrderStatus = async (orderId: string, statusCode: string) => {
+  const res = await axiosInstance.patch<Order>(`/orders/${orderId}`, {
+    statusCode: statusCode
+  })
+  return res;
+}

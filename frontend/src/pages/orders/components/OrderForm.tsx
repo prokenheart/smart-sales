@@ -8,16 +8,20 @@ import {
   Stack,
   Box,
 } from "@mui/material";
-import type { Dispatch, ReactElement, SetStateAction } from "react";
-import CustomerSelect from "./CustomerSelect";
-import type { Customer, Order } from "../types/order";
-import type { Item } from "../types/item";
 import { useEffect, useMemo, useState } from "react";
-import ItemListTable from "./ItemListTable";
-import CreateOrderButton from "./CreateOrderButton";
-import UpdateOrderButton from "./UpdateOrderButton";
-import ConfirmDialog from "../../../components/ConfirmDialog";
-import { getItemList } from "../../../services/order";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
+
+import CustomerSelect from "@orders/components/CustomerSelect";
+import ItemListTable from "@orders/components/ItemListTable";
+import CreateOrderButton from "@orders/components/CreateOrderButton";
+import UpdateOrderButton from "@orders/components/UpdateOrderButton";
+
+import type { Customer, Order } from "@orders/types/order";
+import type { Item } from "@orders/types/item";
+
+import ConfirmDialog from "@components/ConfirmDialog";
+
+import { getItemList } from "@services/order";
 
 const OrderForm = ({
   open,
@@ -34,7 +38,7 @@ const OrderForm = ({
     Customer | undefined
   >();
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState(false);
 
   const totalOrder = useMemo(() => {
     const total = selectedItems.reduce((sum, item) => {
@@ -71,7 +75,7 @@ const OrderForm = ({
       <Dialog
         open={open}
         onClose={() => {
-          setOpenConfirm(true);
+          setIsOpenConfirmDialog(true);
         }}
         fullWidth
         maxWidth="md"
@@ -172,7 +176,7 @@ const OrderForm = ({
             <Button
               color="error"
               onClick={() => {
-                setOpenConfirm(true);
+                setIsOpenConfirmDialog(true);
               }}
             >
               Cancel
@@ -181,12 +185,12 @@ const OrderForm = ({
         </Stack>
       </Dialog>
       <ConfirmDialog
-        open={openConfirm}
+        isOpen={isOpenConfirmDialog}
         title="Confirm Close"
         description="Are you sure to exit without saving"
-        onCancel={() => setOpenConfirm(false)}
+        onCancel={() => setIsOpenConfirmDialog(false)}
         onConfirm={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirmDialog(false);
           handleCancel();
         }}
       />

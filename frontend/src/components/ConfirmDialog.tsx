@@ -9,7 +9,7 @@ import {
 import type { ReactElement } from "react";
 
 type ConfirmDialogProps = {
-  open: boolean;
+  isOpen: boolean;
   title: string;
   description: string;
   onConfirm: () => void;
@@ -17,7 +17,7 @@ type ConfirmDialogProps = {
 };
 
 const ConfirmDialog = ({
-  open,
+  isOpen,
   title,
   description,
   onConfirm,
@@ -25,7 +25,7 @@ const ConfirmDialog = ({
 }: Readonly<ConfirmDialogProps>): ReactElement => {
   return (
     <Dialog
-      open={open}
+      open={isOpen}
       onClose={(_, reason) => {
         if (reason === "escapeKeyDown" || reason === "backdropClick") return;
         onCancel();

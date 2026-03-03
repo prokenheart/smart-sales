@@ -1,12 +1,4 @@
 import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type ReactElement,
-  type SetStateAction,
-} from "react";
-import type { Item } from "../types/item";
-import {
   Table,
   TableHead,
   TableBody,
@@ -15,11 +7,17 @@ import {
   Button,
   TextField,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
-import ProductSelect from "./ProductSelect";
-import type { Product } from "../types/product";
-import ConfirmDialog from "../../../components/ConfirmDialog";
+
+import ProductSelect from "@orders/components/ProductSelect";
+
+import type { Product } from "@orders/types/product";
+import type { Item } from "@orders/types/item";
+
+import ConfirmDialog from "@components/ConfirmDialog";
 
 const ItemListTable = ({
   items,
@@ -41,7 +39,7 @@ const ItemListTable = ({
   >(undefined);
 
   const [selectedProduct, setSelectedProduct] = useState<Product>();
-  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState(false);
   const [deleteId, setDeleteId] = useState<string>();
 
   const handleChangeQuantity = (productId: string, value: number) => {
@@ -129,7 +127,7 @@ const ItemListTable = ({
                     color="error"
                     onClick={() => {
                       setDeleteId(item.product.productId);
-                      setOpenConfirm(true);
+                      setIsOpenConfirmDialog(true);
                     }}
                   >
                     <FaRegTrashAlt />
@@ -181,15 +179,15 @@ const ItemListTable = ({
         </TableBody>
       </Table>
       <ConfirmDialog
-        open={openConfirm}
+        isOpen={isOpenConfirmDialog}
         title="Confirm Delete"
         description="Are you sure to delete this"
         onCancel={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirmDialog(false);
           setDeleteId(undefined);
         }}
         onConfirm={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirmDialog(false);
           handleDelete();
         }}
       />

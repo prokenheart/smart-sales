@@ -1,12 +1,8 @@
 import { Autocomplete, TextField } from "@mui/material";
 import axios from "axios";
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type ReactElement,
-  type SetStateAction,
-} from "react";
+import { useEffect, useState } from "react";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
+
 import type { Product } from "../types/product";
 
 const API_URL = import.meta.env.VITE_API_URL;
