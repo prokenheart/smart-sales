@@ -1,11 +1,20 @@
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import select, exists
-from app.models import Item, Product, Order, Price
+from sqlalchemy import select, exists, func
+from app.models import Item, Product, Order, Price, Status
 from app.schemas.item import ItemBase
+from app.schemas.order import TopProductSummaryResponse
 import uuid
-from datetime import date
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from dataclasses import dataclass
+from enum import Enum
+
+
+class OrderStatus(Enum):
+    PENDING = "PENDING"
+    PAID = "PAID"
+    DELIVERED = "DELIVERED"
+    CANCELLED = "CANCELLED"
 
 
 class NotFoundError(Exception):
@@ -165,3 +174,33 @@ def increase_product_quantity(product: Product, amount: int) -> None:
         raise ValueError("Amount must be greater than 0")
 
     product.product_quantity += amount
+
+
+def get_top_product_summary(db: Session) -> TopProductSummaryResponse:
+    today = datetime.now().date()
+    seven_days_ago = today - timedelta(days=6)
+
+    total_revenue = func.sum(Item.item_price * Item.item_quantity)
+
+    results = (
+        db.query(
+            Product.product_name.label("key"),
+            total_revenue.label("total"),
+        )
+        .select_from(Order)
+        .join(Item, Order.order_id == Item.order_id)
+        .join(Product, Item.product_id == Product.product_id)
+        .filter(
+            Order.order_date >= seven_days_ago,
+            Order.status.has(Status.status_code != OrderStatus.CANCELLED.value),
+        )
+        .group_by(Product.product_name)
+        .order_by(total_revenue.desc())
+        .limit(5)
+        .all()
+    )
+
+    return [
+        {"key": row.key, "total": float(row.total)}
+        for row in results
+    ]

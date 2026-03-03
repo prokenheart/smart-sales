@@ -10,6 +10,10 @@ from app.schemas.order import (
     OrderAttachmentUploadURLRequest,
     OrderPaginationResponse,
     OrderFilterQuery,
+    TotalOrdersSummaryResponse,
+    RevenueSummaryResponse,
+    MonthlyRevenueSummaryResponse,
+    TopProductSummaryResponse,
 )
 
 from app.schemas.s3_schema import ViewUrlResponse, UploadUrlResponse, S3KeyParams
@@ -21,6 +25,9 @@ from app.services.order import (
     update_order_status,
     delete_order,
     update_order_attachment_url,
+    get_total_orders_in_7_days,
+    get_total_revenue_in_7_days,
+    get_total_revenue_in_12_months,
     NotFoundError,
 )
 
@@ -29,6 +36,8 @@ from app.s3_client import (
     generate_presigned_get_url,
     delete_file_from_s3,
 )
+
+from app.services.item import get_top_product_summary
 
 from app.core.response import (
     success,
@@ -308,9 +317,7 @@ def create_order_attachment_get_url_handler(order_id: str) -> Response:
     with get_db() as db:
         order = get_order(db, order_id)
         if not order:
-            return error(
-                message="Order not found", status_code=HTTPStatus.NOT_FOUND
-            )
+            return error(message="Order not found", status_code=HTTPStatus.NOT_FOUND)
 
         if order.order_attachment is None:
             return error(
@@ -366,6 +373,76 @@ def delete_order_attachment_handler(order_id: str) -> Response:
 
             return success(response)
 
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            details=str(e),
+        )
+
+
+def get_total_orders_in_7_days_handler():
+    try:
+        with get_db() as db:
+            total_7_date = get_total_orders_in_7_days(db)
+            return success(
+                [
+                    TotalOrdersSummaryResponse.model_validate(total_per_date)
+                    for total_per_date in total_7_date
+                ]
+            )
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            details=str(e),
+        )
+
+
+def get_total_revenue_in_7_days_handler():
+    try:
+        with get_db() as db:
+            total_7_date = get_total_revenue_in_7_days(db)
+            return success(
+                [
+                    RevenueSummaryResponse.model_validate(total_per_date)
+                    for total_per_date in total_7_date
+                ]
+            )
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            details=str(e),
+        )
+
+def get_total_revenue_in_12_months_handler():
+    try:
+        with get_db() as db:
+            total_12_months = get_total_revenue_in_12_months(db)
+            return success(
+                [
+                    MonthlyRevenueSummaryResponse.model_validate(total_per_month)
+                    for total_per_month in total_12_months
+                ]
+            )
+    except Exception as e:
+        return error(
+            message="Internal server error",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            details=str(e),
+        )
+    
+def get_top_product_summary_handler():
+    try:
+        with get_db() as db:
+            top_product_summary = get_top_product_summary(db)
+            return success(
+                [
+                    TopProductSummaryResponse.model_validate(total_per_product)
+                    for total_per_product in top_product_summary
+                ]
+            )
     except Exception as e:
         return error(
             message="Internal server error",
