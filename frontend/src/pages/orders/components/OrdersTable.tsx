@@ -109,11 +109,8 @@ const OrdersTable = ({
     setIsOpenConfirmDialog(false);
     setSelectedOrderId(undefined);
   };
-  
-  const [uploadOrder, setUploadOrder] = useState<Order>();
 
-  const [openViewDialog, setOpenViewDialog] = useState<boolean>(false);
-  const [viewURL, setViewURL] = useState<string | null>(null);
+  const [uploadOrder, setUploadOrder] = useState<Order>();
 
   const [file, setFile] = useState<File>();
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);

@@ -1,4 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
+import { createS3Instance } from "@/lib/s3";
 import type { OrdersResponse, Order } from "../pages/orders/types/order";
 import type { ItemPost, Item } from "../pages/orders/types/item";
 
@@ -33,10 +34,7 @@ export const createOrder = async (customerId: string) => {
   return res;
 };
 
-export const createItem = async (
-  orderId: string,
-  itemPosts: ItemPost[]
-) => {
+export const createItem = async (orderId: string, itemPosts: ItemPost[]) => {
   const res = await axiosInstance.put(`/orders/${orderId}/items`, {
     listItem: itemPosts,
   });
@@ -50,8 +48,8 @@ export const getItemList = async (orderId: string) => {
 };
 
 export const createViewAttachmentURL = async (orderId: string) => {
-  const res = await axios.post(
-    `${API_URL}/orders/${orderId}/attachment/view-url`
+  const res = await axiosInstance.post(
+    `/orders/${orderId}/attachment/view-url`
   );
   return res;
 };
@@ -60,8 +58,8 @@ export const createUploadAttachmentURL = async (
   orderId: string,
   contentType: string
 ) => {
-  const res = await axios.post(
-    `${API_URL}/orders/${orderId}/attachment/upload-url`,
+  const res = await axiosInstance.post(
+    `/orders/${orderId}/attachment/upload-url`,
     {
       contentType: contentType,
     }
@@ -69,25 +67,29 @@ export const createUploadAttachmentURL = async (
   return res;
 };
 
-export const uploadAttachment = async (uploadUrl: string, file: File) => {
-  const res = await axios.put(uploadUrl, file, {
-    headers: {
-      "Content-Type": file.type,
-    },
-  });
+export const uploadAttachment = async (
+  uploadUrl: string,
+  file: File
+) => {
+  const s3Instance = createS3Instance(file.type);
+
+  const res = await s3Instance.put(uploadUrl, file);
 
   return res;
 };
 
 export const updateAttachmentLink = async (orderId: string, s3Key: string) => {
-  const res = await axios.put(`${API_URL}/orders/${orderId}/attachment`, {
+  const res = await axiosInstance.put(`/orders/${orderId}/attachment`, {
     s3Key: s3Key,
   });
   return res;
 };
-export const updateOrderStatus = async (orderId: string, statusCode: string) => {
+export const updateOrderStatus = async (
+  orderId: string,
+  statusCode: string
+) => {
   const res = await axiosInstance.patch<Order>(`/orders/${orderId}`, {
-    statusCode: statusCode
-  })
+    statusCode: statusCode,
+  });
   return res;
-}
+};
