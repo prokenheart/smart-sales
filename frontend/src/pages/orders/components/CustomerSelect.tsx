@@ -1,11 +1,10 @@
 import { Autocomplete, TextField } from "@mui/material";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 
 import type { Customer } from "@orders/types/order";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { searchCustomers } from "@/services/customer";
 
 const CustomerSelect = ({
   selectedCustomer,
@@ -34,9 +33,7 @@ const CustomerSelect = ({
     }
 
     const fetchCustomers = async () => {
-      const res = await axios.get<Customer[]>(
-        `${API_URL}/customers?query=${debouncedKeyword}`
-      );
+      const res = await searchCustomers(debouncedKeyword);
 
       setCustomers(res.data);
     };

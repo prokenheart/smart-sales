@@ -1,11 +1,10 @@
 import { Autocomplete, TextField } from "@mui/material";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 
 import type { Product } from "@orders/types/product";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { searchProducts } from "@/services/product";
 
 const ProductSelect = ({
   selectedProduct,
@@ -34,9 +33,7 @@ const ProductSelect = ({
     }
 
     const fetchProducts = async () => {
-      const res = await axios.get<Product[]>(
-        `${API_URL}/products?query=${debouncedKeyword}`
-      );
+      const res = await searchProducts(debouncedKeyword);
 
       setProducts(res.data);
     };
