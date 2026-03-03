@@ -122,22 +122,23 @@ const OrdersPage = (): ReactElement => {
           <OrderForm isOpen={isOpenForm} setIsOpen={setIsOpenForm} mode="create" />
         </OrderRefreshContext.Provider>
       </Stack>
-
-      <OrdersTable
-        orders={orders}
-        totalOrders={totalOrders}
-        currentPage={currentPage}
-        ordersPerPage={ordersPerPage}
-        setOrders={setOrders}
-      />
-      <OrdersPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setPage={setPage}
-        cursorResponse={cursorResponse}
-        setCursorState={setCursorState}
-        setCurrentPage={setCurrentPage}
-      />
+      <Stack spacing={2}>
+        <OrdersTable
+          orders={orders}
+          totalOrders={totalOrders}
+          currentPage={currentPage}
+          ordersPerPage={ordersPerPage}
+          setOrders={setOrders}
+        />
+        <OrdersPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setPage={setPage}
+          cursorResponse={cursorResponse}
+          setCursorState={setCursorState}
+          setCurrentPage={setCurrentPage}
+        />
+      </Stack>
     </>
   );
 };
