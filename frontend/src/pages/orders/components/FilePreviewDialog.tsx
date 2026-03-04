@@ -4,12 +4,12 @@ import ConfirmDialog from "@components/ConfirmDialog";
 
 const FilePreviewDialog = ({
   open,
-  previewPickedFile,
+  previewPickedFileSrc,
   onCancel,
   onConfirm,
 }: Readonly<{
   open: boolean;
-  previewPickedFile: string | undefined;
+  previewPickedFileSrc: string;
   onCancel: () => void;
   onConfirm: () => void;
 }>): ReactElement => {
@@ -26,7 +26,7 @@ const FilePreviewDialog = ({
     >
       <Box mt={2}>
         <img
-          src={previewPickedFile}
+          src={previewPickedFileSrc}
           alt="preview"
           style={{
             width: "100%",

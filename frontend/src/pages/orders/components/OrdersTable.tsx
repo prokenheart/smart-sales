@@ -114,7 +114,7 @@ const OrdersTable = ({
 
   const [file, setFile] = useState<File>();
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
-  const [previewPickedFile, setPreviewPickedFile] = useState<string>();
+  const [previewPickedFileSrc, setPreviewPickedFileSrc] = useState<string>();
 
   const handleSelect = (file: File, order: Order) => {
     setUploadOrder(order);
@@ -122,14 +122,14 @@ const OrdersTable = ({
     setOpenPreviewDialog(true);
     if (file) {
       const url = URL.createObjectURL(file);
-      setPreviewPickedFile(url);
+      setPreviewPickedFileSrc(url);
     }
   };
 
   const handleCancelUpload = () => {
     setFile(undefined);
     setOpenPreviewDialog(false);
-    setPreviewPickedFile(undefined);
+    setPreviewPickedFileSrc(undefined);
   };
 
   const handleCreateUploadURL = async (order: Order) => {
@@ -169,7 +169,6 @@ const OrdersTable = ({
       await handleUploadToS3(uploadUrl);
       await handleUpdateAttachmentLink(order, s3Key);
 
-      
       const attachmentUpdatedOrder: Order = {
         ...order,
         orderAttachment: s3Key,
@@ -178,7 +177,7 @@ const OrdersTable = ({
       setUpdatedOrder(attachmentUpdatedOrder);
       setFile(undefined);
       setOpenPreviewDialog(false);
-      setPreviewPickedFile(undefined);
+      setPreviewPickedFileSrc(undefined);
     } catch (error) {
       console.error("Upload flow failed", error);
     }
@@ -457,14 +456,16 @@ const OrdersTable = ({
         }}
         onConfirm={handleConfirmCancelOrder}
       />
-      <FilePreviewDialog
-        open={openPreviewDialog}
-        previewPickedFile={previewPickedFile}
-        onCancel={handleCancelUpload}
-        onConfirm={() => {
-          handleUpload?.(uploadOrder);
-        }}
-      />
+      {previewPickedFileSrc && (
+        <FilePreviewDialog
+          open={openPreviewDialog}
+          previewPickedFileSrc={previewPickedFileSrc}
+          onCancel={handleCancelUpload}
+          onConfirm={() => {
+            handleUpload?.(uploadOrder);
+          }}
+        />
+      )}
     </Box>
   );
 };
