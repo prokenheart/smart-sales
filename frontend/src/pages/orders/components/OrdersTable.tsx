@@ -168,8 +168,12 @@ const OrdersTable = ({
       await handleUploadToS3(uploadUrl);
       await handleUpdateAttachmentLink(order, s3Key);
 
-      order.orderAttachment = s3Key;
-      setUpdatedOrder(order);
+      const attachmentUpdatedOrder: Order = {
+        ...order,
+        orderAttachment: s3Key,
+      };
+
+      setUpdatedOrder(attachmentUpdatedOrder);
       setFile(undefined);
       setOpenPreviewDialog(false);
       setPreviewPickedFile(undefined);
