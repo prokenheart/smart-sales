@@ -107,7 +107,7 @@ const OrderForm = ({
                 alignItems="center"
                 justifyContent="space-between"
               >
-                <Box width="50%">
+                <Box width="50%" pt={1}>
                   {mode == "create" && (
                     <CustomerSelect
                       selectedCustomer={selectedCustomer}
