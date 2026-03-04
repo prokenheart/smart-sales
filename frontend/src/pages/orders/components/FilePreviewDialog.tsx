@@ -39,10 +39,8 @@ const FilePreviewDialog = ({
         direction={"row"}
         justifyContent={"flex-end"}
         spacing={2}
-        sx={{
-          pr: 2,
-          pb: 2,
-        }}
+        pr={2}
+        pb={2}
       >
         <Button onClick={onCancel} variant="outlined" color="error">
           Cancel
