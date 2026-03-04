@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import { createS3Instance } from "@/lib/s3";
+import { s3Instance } from "@/lib/s3";
 import type { OrdersResponse, Order } from "../pages/orders/types/order";
 import type { ItemPost, Item } from "../pages/orders/types/item";
 
@@ -67,13 +67,12 @@ export const createUploadAttachmentURL = async (
   return res;
 };
 
-export const uploadAttachment = async (
-  uploadUrl: string,
-  file: File
-) => {
-  const s3Instance = createS3Instance(file.type);
-
-  const res = await s3Instance.put(uploadUrl, file);
+export const uploadAttachment = async (uploadUrl: string, file: File) => {
+  const res = await s3Instance.put(uploadUrl, file, {
+    headers: {
+      "Content-Type": file.type,
+    },
+  });
 
   return res;
 };
