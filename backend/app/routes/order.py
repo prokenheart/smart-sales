@@ -9,10 +9,7 @@ from app.handlers.order import (
     create_order_attachment_get_url_handler,
     delete_order_attachment_handler,
     confirm_order_attachment_handler,
-    get_total_orders_in_7_days_handler,
-    get_total_revenue_in_7_days_handler,
-    get_total_revenue_in_12_months_handler,
-    get_top_product_summary_handler,
+    get_dashboard_summary_handler,
 )
 
 router = Router()
@@ -68,19 +65,6 @@ def confirm_attachment(order_id: str):
     return confirm_order_attachment_handler(order_id, body)
 
 
-@router.get("/orders/summary/total-orders")
-def get_total_orders_in_7_day():
-    return get_total_orders_in_7_days_handler()
-
-
-@router.get("/orders/summary/total-revenue")
-def get_total_revenue_in_7_day():
-    return get_total_revenue_in_7_days_handler()
-
-@router.get("/orders/summary/total-revenue-12-months")
-def get_total_revenue_in_12_months():
-    return get_total_revenue_in_12_months_handler()
-
-@router.get("/orders/summary/top-product-revenue")
-def get_top_product_summary():
-    return get_top_product_summary_handler()
+@router.get("/orders/summary")
+def get_dashboard_summary():
+    return get_dashboard_summary_handler()
