@@ -135,7 +135,6 @@ const OrdersTable = ({
     try {
       if (!file) return;
       const res = await createUploadAttachmentURL(order.orderId, file.type);
-      console.log("Create pre-signed url response", res.status, res.data.s3Key);
       return res.data;
     } catch (error) {
       console.error("Create pre-signed url failed", error);
@@ -146,7 +145,6 @@ const OrdersTable = ({
     try {
       if (!file) return;
       const res = await uploadAttachment(preSignedUrl, file);
-      console.log("Upload to s3 response", res.status);
     } catch (error) {
       console.error("Upload file to s3 bucket failed", error);
     }
