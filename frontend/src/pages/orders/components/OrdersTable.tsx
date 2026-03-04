@@ -111,7 +111,7 @@ const OrdersTable = ({
 
   const [uploadOrder, setUploadOrder] = useState<Order>();
 
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | null>(null);
   const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
   const [previewPickedFileSrc, setPreviewPickedFileSrc] = useState<string>();
 
@@ -126,7 +126,7 @@ const OrdersTable = ({
   };
 
   const handleCancelUpload = () => {
-    setFile(undefined);
+    setFile(null);
     setIsOpenPreviewDialog(false);
     setPreviewPickedFileSrc(undefined);
   };
@@ -174,7 +174,7 @@ const OrdersTable = ({
       };
 
       setUpdatedOrder(attachmentUpdatedOrder);
-      setFile(undefined);
+      setFile(null);
       setIsOpenPreviewDialog(false);
       setPreviewPickedFileSrc(undefined);
     } catch (error) {
