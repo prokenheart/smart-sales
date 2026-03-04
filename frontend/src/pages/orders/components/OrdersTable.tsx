@@ -161,13 +161,15 @@ const OrdersTable = ({
     }
   };
 
-  const handleUpload = async (order: Order) => {
+  const handleUpload = async (order: Order | undefined) => {
     try {
+      if (!order) return;
       const { uploadUrl, s3Key } = await handleCreateUploadURL(order);
 
       await handleUploadToS3(uploadUrl);
       await handleUpdateAttachmentLink(order, s3Key);
 
+      
       const attachmentUpdatedOrder: Order = {
         ...order,
         orderAttachment: s3Key,
@@ -460,7 +462,7 @@ const OrdersTable = ({
         previewPickedFile={previewPickedFile}
         onCancel={handleCancelUpload}
         onConfirm={() => {
-          if (uploadOrder) handleUpload(uploadOrder);
+          handleUpload?.(uploadOrder);
         }}
       />
     </Box>
