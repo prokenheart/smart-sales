@@ -38,13 +38,12 @@ const CreateOrderButton = ({
     }));
 
     try {
-      if (orderId != undefined) {
-        const res = await createItem(orderId, itemPosts);
-        if (res.status == HttpStatusCode.Ok) {
-          setSelectedCustomer(undefined);
-          setSelectedItems([]);
-          refresh?.setShouldRefreshOrder(true);
-        }
+      if (!orderId) return;
+      const res = await createItem(orderId, itemPosts);
+      if (res.status == HttpStatusCode.Ok) {
+        setSelectedCustomer(undefined);
+        setSelectedItems([]);
+        refresh?.setShouldRefreshOrder(true);
       }
     } catch (error) {
       console.error("UPDATE FAILED", error);

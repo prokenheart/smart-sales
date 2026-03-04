@@ -52,11 +52,10 @@ const OrderForm = ({
     if (mode == "update") {
       (async () => {
         try {
-          if (order != undefined) {
-            const res = await getItemList(order.orderId);
-            setSelectedItems(res.data);
-            setSelectedCustomer(order.customer);
-          }
+          if (!order) return;
+          const res = await getItemList(order.orderId);
+          setSelectedItems(res.data);
+          setSelectedCustomer(order.customer);
         } catch (err) {
           console.error("Error fetching orders:", err);
         }

@@ -10,7 +10,6 @@ import type { Order, Customer } from "@orders/types/order";
 
 import { createItem } from "@services/order";
 
-
 const UpdateOrderButton = ({
   order,
   items,
@@ -37,21 +36,20 @@ const UpdateOrderButton = ({
     }));
 
     try {
-      if (order != undefined) {
-        const res = await createItem(order.orderId, itemPosts);
-        if (res.status == HttpStatusCode.Ok) {
-          const newTotal = calcOrderTotal(items).toString();
+      if (!order) return;
+      const res = await createItem(order.orderId, itemPosts);
+      if (res.status == HttpStatusCode.Ok) {
+        const newTotal = calcOrderTotal(items).toString();
 
-          if (!order) return;
+        if (!order) return;
 
-          setSelectedCustomer(undefined);
-          setSelectedItems([]);
+        setSelectedCustomer(undefined);
+        setSelectedItems([]);
 
-          updateTable?.setUpdatedOrder?.({
-            ...order,
-            orderTotal: newTotal,
-          });
-        }
+        updateTable?.setUpdatedOrder?.({
+          ...order,
+          orderTotal: newTotal,
+        });
       }
     } catch (error) {
       console.error("UPDATE FAILED", error);

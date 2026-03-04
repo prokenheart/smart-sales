@@ -134,11 +134,10 @@ const OrdersTable = ({
 
   const handleCreateUploadURL = async (order: Order) => {
     try {
-      if (file != undefined) {
-        const res = await createUploadAttachmentURL(order.orderId, file.type);
-        console.log("Create pre-signed url response", res.status, res.data.s3Key);
-        return res.data;
-      }
+      if (!file) return;
+      const res = await createUploadAttachmentURL(order.orderId, file.type);
+      console.log("Create pre-signed url response", res.status, res.data.s3Key);
+      return res.data;
     } catch (error) {
       console.error("Create pre-signed url failed", error);
     }
@@ -146,10 +145,9 @@ const OrdersTable = ({
 
   const handleUploadToS3 = async (preSignedUrl: string) => {
     try {
-      if (file != undefined) {
-        const res =  await uploadAttachment(preSignedUrl, file);
-        console.log("Upload to s3 response", res.status);
-      }
+      if (!file) return;
+      const res = await uploadAttachment(preSignedUrl, file);
+      console.log("Upload to s3 response", res.status);
     } catch (error) {
       console.error("Upload file to s3 bucket failed", error);
     }
@@ -181,7 +179,7 @@ const OrdersTable = ({
   };
 
   useEffect(() => {
-    if (updatedOrder != undefined) {
+    if (updatedOrder) {
       setOpenOrderForm(false);
       setOrders((prev) =>
         prev.map((o) => (o.orderId === updatedOrder.orderId ? updatedOrder : o))
