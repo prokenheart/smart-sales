@@ -114,7 +114,7 @@ const OrdersTable = ({
 
   const [file, setFile] = useState<File>();
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
-  const [preview, setPreview] = useState<string>();
+  const [previewPickedFile, setPreviewPickedFile] = useState<string>();
 
   const handleSelect = (file: File, order: Order) => {
     setUploadOrder(order);
@@ -122,14 +122,14 @@ const OrdersTable = ({
     setOpenPreviewDialog(true);
     if (file) {
       const url = URL.createObjectURL(file);
-      setPreview(url);
+      setPreviewPickedFile(url);
     }
   };
 
   const handleCancelUpload = () => {
     setFile(undefined);
     setOpenPreviewDialog(false);
-    setPreview(undefined);
+    setPreviewPickedFile(undefined);
   };
 
   const handleCreateUploadURL = async (order: Order) => {
@@ -174,7 +174,7 @@ const OrdersTable = ({
       setUpdatedOrder(order);
       setFile(undefined);
       setOpenPreviewDialog(false);
-      setPreview(undefined);
+      setPreviewPickedFile(undefined);
     } catch (error) {
       console.error("Upload flow failed", error);
     }
@@ -455,7 +455,7 @@ const OrdersTable = ({
       />
       <FilePreviewDialog
         open={openPreviewDialog}
-        preview={preview}
+        previewPickedFile={previewPickedFile}
         onCancel={handleCancelUpload}
         onConfirm={() => {
           if (uploadOrder) handleUpload(uploadOrder);
