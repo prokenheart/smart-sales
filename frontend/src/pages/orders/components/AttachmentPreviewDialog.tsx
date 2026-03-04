@@ -3,22 +3,22 @@ import type { ReactElement, Dispatch, SetStateAction } from "react";
 
 const AttachmentPreviewDialog = ({
   viewURL,
-  open,
-  setOpen,
+  isOpen,
+  setIsOpen,
   setViewURL,
 }: Readonly<{
   viewURL: string | null;
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   setViewURL: Dispatch<SetStateAction<string | null>>;
 }>): ReactElement => {
   const handleClose = (): void => {
-    setOpen(false);
+    setIsOpen(false);
     setViewURL(null);
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={isOpen} onClose={handleClose}>
       <DialogContent>
         <img
           src={viewURL ?? ""}

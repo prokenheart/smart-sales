@@ -3,23 +3,23 @@ import { Dialog, Box, Button, Stack } from "@mui/material";
 import ConfirmDialog from "@components/ConfirmDialog";
 
 const FilePreviewDialog = ({
-  open,
+  isOpen,
   previewPickedFileSrc,
   onCancel,
   onConfirm,
 }: Readonly<{
-  open: boolean;
+  isOpen: boolean;
   previewPickedFileSrc: string;
   onCancel: () => void;
   onConfirm: () => void;
 }>): ReactElement => {
-  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [isOpenConfirm, setIsOpenConfirm] = useState(false);
 
   return (
     <Dialog
-      open={open}
+      open={isOpen}
       onClose={() => {
-        setOpenConfirm(true);
+        setIsOpenConfirm(true);
       }}
       maxWidth="md"
       fullWidth
@@ -51,14 +51,14 @@ const FilePreviewDialog = ({
         </Button>
       </Stack>
       <ConfirmDialog
-        isOpen={openConfirm}
+        isOpen={isOpenConfirm}
         title="Confirm Close"
         description="Are you sure to exit without saving"
         onCancel={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirm(false);
         }}
         onConfirm={() => {
-          setOpenConfirm(false);
+          setIsOpenConfirm(false);
           onCancel();
         }}
       />

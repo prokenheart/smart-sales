@@ -119,7 +119,7 @@ const OrdersPage = (): ReactElement => {
         </Stack>
 
         <OrderRefreshContext.Provider value={{ setShouldRefreshOrder }}>
-          <OrderForm open={isOpenForm} setOpen={setIsOpenForm} mode="create" />
+          <OrderForm isOpen={isOpenForm} setIsOpen={setIsOpenForm} mode="create" />
         </OrderRefreshContext.Provider>
       </Stack>
 

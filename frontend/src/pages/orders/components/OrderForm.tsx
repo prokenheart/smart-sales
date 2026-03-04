@@ -24,13 +24,13 @@ import ConfirmDialog from "@components/ConfirmDialog";
 import { getItemList } from "@services/order";
 
 const OrderForm = ({
-  open,
-  setOpen,
+  isOpen,
+  setIsOpen,
   mode,
   order,
 }: Readonly<{
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   mode: "create" | "update" | undefined;
   order?: Order;
 }>): ReactElement => {
@@ -64,7 +64,7 @@ const OrderForm = ({
   }, [open]);
 
   const handleCancel = () => {
-    setOpen(false);
+    setIsOpen(false);
     setSelectedCustomer(undefined);
     setSelectedItems([]);
   };
@@ -72,7 +72,7 @@ const OrderForm = ({
   return (
     <>
       <Dialog
-        open={open}
+        open={isOpen}
         onClose={() => {
           setIsOpenConfirmDialog(true);
         }}

@@ -5,11 +5,11 @@ import { Button } from "@mui/material";
 const AttachmentPreviewButton = ({
   orderId,
   setViewURL,
-  setOpenViewDialog,
+  setIsOpenViewDialog,
 }: Readonly<{
   orderId: string;
   setViewURL: Dispatch<SetStateAction<string | null>>;
-  setOpenViewDialog: Dispatch<SetStateAction<boolean>>;
+  setIsOpenViewDialog: Dispatch<SetStateAction<boolean>>;
 }>): ReactElement => {
   const createUrl = async () => {
     const res = await createViewAttachmentURL(orderId);
@@ -21,7 +21,7 @@ const AttachmentPreviewButton = ({
       onClick={(e) => {
         e.stopPropagation();
         createUrl();
-        setOpenViewDialog(true);
+        setIsOpenViewDialog(true);
       }}
     >
       View File
