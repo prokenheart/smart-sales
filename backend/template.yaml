@@ -257,29 +257,11 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /orders/{order_id}/attachment
             Method: PUT
-        GetTotalOrdersIn7Days:
+        GetDashboardSummary:
           Type: Api
           Properties:
             RestApiId: !Ref MyApi
-            Path: /orders/summary/total-orders
-            Method: GET
-        GetTotalRevenueIn7Days:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApi
-            Path: /orders/summary/total-revenue
-            Method: GET
-        GetTotalRevenueIn12Months:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApi
-            Path: /orders/summary/total-revenue-12-months
-            Method: GET
-        GetTopProductRevenue:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApi
-            Path: /orders/summary/top-product-revenue
+            Path: /orders/summary
             Method: GET
         GetItem:
           Type: Api

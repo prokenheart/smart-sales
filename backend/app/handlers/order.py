@@ -14,6 +14,7 @@ from app.schemas.order import (
     RevenueSummaryResponse,
     MonthlyRevenueSummaryResponse,
     TopProductSummaryResponse,
+    DashboardSummaryResponse,
 )
 
 from app.schemas.s3_schema import ViewUrlResponse, UploadUrlResponse, S3KeyParams
@@ -385,12 +386,10 @@ def get_total_orders_in_7_days_handler():
     try:
         with get_db() as db:
             total_7_date = get_total_orders_in_7_days(db)
-            return success(
-                [
-                    TotalOrdersSummaryResponse.model_validate(total_per_date)
-                    for total_per_date in total_7_date
-                ]
-            )
+            return [
+                TotalOrdersSummaryResponse.model_validate(total_per_date)
+                for total_per_date in total_7_date
+            ]
     except Exception as e:
         return error(
             message="Internal server error",
@@ -403,12 +402,10 @@ def get_total_revenue_in_7_days_handler():
     try:
         with get_db() as db:
             total_7_date = get_total_revenue_in_7_days(db)
-            return success(
-                [
-                    RevenueSummaryResponse.model_validate(total_per_date)
-                    for total_per_date in total_7_date
-                ]
-            )
+            return [
+                RevenueSummaryResponse.model_validate(total_per_date)
+                for total_per_date in total_7_date
+            ]
     except Exception as e:
         return error(
             message="Internal server error",
@@ -416,36 +413,52 @@ def get_total_revenue_in_7_days_handler():
             details=str(e),
         )
 
+
 def get_total_revenue_in_12_months_handler():
     try:
         with get_db() as db:
             total_12_months = get_total_revenue_in_12_months(db)
-            return success(
-                [
-                    MonthlyRevenueSummaryResponse.model_validate(total_per_month)
-                    for total_per_month in total_12_months
-                ]
-            )
+            return [
+                MonthlyRevenueSummaryResponse.model_validate(total_per_month)
+                for total_per_month in total_12_months
+            ]
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
-    
+
+
 def get_top_product_summary_handler():
     try:
         with get_db() as db:
             top_product_summary = get_top_product_summary(db)
-            return success(
-                [
-                    TopProductSummaryResponse.model_validate(total_per_product)
-                    for total_per_product in top_product_summary
-                ]
-            )
+            return [
+                TopProductSummaryResponse.model_validate(total_per_product)
+                for total_per_product in top_product_summary
+            ]
     except Exception as e:
         return error(
             message="Internal server error",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             details=str(e),
         )
+
+
+def get_dashboard_summary_handler():
+    total_orders_in_7_days = get_total_orders_in_7_days_handler()
+    total_revenue_in_7_days = get_total_revenue_in_7_days_handler()
+    total_revenue_in_12_months = get_total_revenue_in_12_months_handler()
+    top_product_summary = get_top_product_summary_handler()
+
+    response = DashboardSummaryResponse.model_validate(
+        {
+            "total_orders": total_orders_in_7_days,
+            "total_revenue": total_revenue_in_7_days,
+            "monthly_revenue": total_revenue_in_12_months,
+            "top_products": top_product_summary,
+        }
+    )
+
+    return success(response)
