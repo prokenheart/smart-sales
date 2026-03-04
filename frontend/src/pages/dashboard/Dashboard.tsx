@@ -5,12 +5,7 @@ import CustomCard from "@dashboard/components/CustomCard";
 import { CustomLineChart } from "@dashboard/components/CustomLineChart";
 import { CustomBarChart } from "@dashboard/components/CustomBarChart";
 
-import {
-  getTotalOrdersSummary,
-  getRevenueSummary,
-  getMonthlyRevenueSummary,
-  getTopProductRevenue,
-} from "@services/dashboard";
+import { getDashboardSummary } from "@services/dashboard";
 
 type ChartData = {
   key: string;
@@ -72,17 +67,13 @@ const Dashboard = (): ReactElement => {
 
   const fetchDashboardData = async () => {
     try {
-      const [ordersRes, revenueRes, monthlyRevenueRes, topProductRevenueRes] = await Promise.all([
-        getTotalOrdersSummary(),
-        getRevenueSummary(),
-        getMonthlyRevenueSummary(),
-        getTopProductRevenue(),
-      ]);
+      const { totalOrders, totalRevenue, monthlyRevenue, topProducts } =
+        await getDashboardSummary();
 
-      const ordersData = mapData(ordersRes.data);
-      const revenueData = mapData(revenueRes.data);
-      const monthlyRevenueData = mapMonthData(monthlyRevenueRes.data);
-      const topProductRevenueData = topProductRevenueRes.data.map((item) => ({
+      const ordersData = mapData(totalOrders);
+      const revenueData = mapData(totalRevenue);
+      const monthlyRevenueData = mapMonthData(monthlyRevenue);
+      const topProductRevenueData = topProducts.map((item) => ({
         key: item.key,
         value: item.total,
       }));
@@ -102,7 +93,6 @@ const Dashboard = (): ReactElement => {
         },
         topProductRevenue: topProductRevenueData,
       });
-
     } catch (error) {
       console.error(error);
     }
