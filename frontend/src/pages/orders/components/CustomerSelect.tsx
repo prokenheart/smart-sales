@@ -18,6 +18,8 @@ const CustomerSelect = ({
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedKeyword(keyword);
@@ -33,9 +35,13 @@ const CustomerSelect = ({
     }
 
     const fetchCustomers = async () => {
-      const res = await searchCustomers(debouncedKeyword);
-
-      setCustomers(res.data);
+      try {
+        setIsLoading(true);
+        const res = await searchCustomers(debouncedKeyword);
+        setCustomers(res.data);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchCustomers();
@@ -44,12 +50,17 @@ const CustomerSelect = ({
   return (
     <Autocomplete
       options={customers}
+      loading={isLoading}
       value={selectedCustomer ?? null}
       onChange={(_, newValue) => setSelectedCustomer(newValue ?? undefined)}
       getOptionLabel={(option) =>
         `${option.customerName} - ${option.customerPhone}`
       }
       onInputChange={(_, value) => setKeyword(value)}
+      noOptionsText={
+        keyword.trim() === "" ? "Type to search customer" : "No customers found"
+      }
+      loadingText="Finding customer..."
       renderInput={(params) => (
         <TextField {...params} label="Select Customer" size="small" />
       )}

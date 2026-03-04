@@ -18,6 +18,8 @@ const ProductSelect = ({
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedKeyword(keyword);
@@ -33,9 +35,13 @@ const ProductSelect = ({
     }
 
     const fetchProducts = async () => {
-      const res = await searchProducts(debouncedKeyword);
-
-      setProducts(res.data);
+      try {
+        setIsLoading(true);
+        const res = await searchProducts(debouncedKeyword);
+        setProducts(res.data);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchProducts();
@@ -44,6 +50,7 @@ const ProductSelect = ({
   return (
     <Autocomplete
       options={products}
+      loading={isLoading}
       value={selectedProduct ?? null}
       onChange={(_, newValue) => setSelectedProduct(newValue ?? undefined)}
       getOptionLabel={(option) => option.productName}
@@ -56,6 +63,10 @@ const ProductSelect = ({
       renderInput={(params) => (
         <TextField {...params} label="Select Product" size="small" />
       )}
+      noOptionsText={
+        keyword.trim() === "" ? "Type to search product" : "No products found"
+      }
+      loadingText="Finding product..."
       isOptionEqualToValue={(option, value) =>
         option.productId === value.productId
       }
