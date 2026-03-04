@@ -1,7 +1,7 @@
 import { axiosInstance } from "@/lib/axios";
 import { s3Instance } from "@/lib/s3";
-import type { OrdersResponse, Order } from "../pages/orders/types/order";
-import type { ItemPost, Item } from "../pages/orders/types/item";
+import type { OrdersResponse, Order } from "@orders/types/order";
+import type { ItemPost, Item } from "@orders/types/item";
 
 const USER_ID = import.meta.env.VITE_USER_ID;
 

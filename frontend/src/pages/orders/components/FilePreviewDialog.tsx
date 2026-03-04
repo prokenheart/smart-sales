@@ -1,6 +1,6 @@
 import { type ReactElement, useState } from "react";
 import { Dialog, Box, Button, Stack } from "@mui/material";
-import ConfirmDialog from "../../../components/ConfirmDialog";
+import ConfirmDialog from "@components/ConfirmDialog";
 
 const FilePreviewDialog = ({
   open,

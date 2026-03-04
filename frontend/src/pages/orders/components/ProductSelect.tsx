@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 
-import type { Product } from "../types/product";
+import type { Product } from "@orders/types/product";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

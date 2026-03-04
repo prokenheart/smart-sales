@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import type { Order } from "../types/order";
+import type { Order } from "@orders/types/order";
 
 type FilePickerProps = {
   onSelect: (file: File, order: Order) => void;

@@ -28,8 +28,8 @@ import ConfirmDialog from "@components/ConfirmDialog";
 
 import { updateOrderStatus } from "@services/order";
 
-import FilePicker from "./FilePicker";
-import FilePreviewDialog from "./FilePreviewDialog";
+import FilePicker from "@orders/components/FilePicker";
+import FilePreviewDialog from "@orders/components/FilePreviewDialog";
 import {
   createUploadAttachmentURL,
   uploadAttachment,

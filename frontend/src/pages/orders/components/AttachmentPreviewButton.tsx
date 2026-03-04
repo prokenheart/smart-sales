@@ -1,5 +1,5 @@
 import type { ReactElement, Dispatch, SetStateAction } from "react";
-import { createViewAttachmentURL } from "../../../services/order";
+import { createViewAttachmentURL } from "@services/order";
 import { Button } from "@mui/material";
 
 const AttachmentPreviewButton = ({
