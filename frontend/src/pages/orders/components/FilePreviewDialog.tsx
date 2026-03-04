@@ -53,7 +53,7 @@ const FilePreviewDialog = ({
         </Button>
       </Stack>
       <ConfirmDialog
-        open={openConfirm}
+        isOpen={openConfirm}
         title="Confirm Close"
         description="Are you sure to exit without saving"
         onCancel={() => {
