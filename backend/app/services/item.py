@@ -176,9 +176,13 @@ def increase_product_quantity(product: Product, amount: int) -> None:
     product.product_quantity += amount
 
 
+DAYS_RANGE = 6
+NUMBER_OF_PRODUCTS = 5
+
+
 def get_top_product_summary(db: Session) -> TopProductSummaryResponse:
     today = datetime.now().date()
-    seven_days_ago = today - timedelta(days=6)
+    seven_days_ago = today - timedelta(days=DAYS_RANGE)
 
     total_revenue = func.sum(Item.item_price * Item.item_quantity)
 
@@ -196,11 +200,8 @@ def get_top_product_summary(db: Session) -> TopProductSummaryResponse:
         )
         .group_by(Product.product_name)
         .order_by(total_revenue.desc())
-        .limit(5)
+        .limit(NUMBER_OF_PRODUCTS)
         .all()
     )
 
-    return [
-        {"key": row.key, "total": float(row.total)}
-        for row in results
-    ]
+    return [{"key": row.key, "total": float(row.total)} for row in results]

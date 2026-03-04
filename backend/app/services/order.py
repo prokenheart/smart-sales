@@ -314,9 +314,12 @@ def update_order_attachment_url(
     return order
 
 
+DAYS_RANGE = 6
+
+
 def get_total_orders_in_7_days(db: Session) -> list[TotalOrdersSummaryResponse]:
     today = datetime.now().date()
-    seven_days_ago = today - timedelta(days=6)
+    seven_days_ago = today - timedelta(days=DAYS_RANGE)
 
     results = (
         db.query(
@@ -334,7 +337,7 @@ def get_total_orders_in_7_days(db: Session) -> list[TotalOrdersSummaryResponse]:
     data_map = {row.key: row.total for row in results}
 
     final_result = []
-    for i in range(7):
+    for i in range(DAYS_RANGE + 1):
         day = seven_days_ago + timedelta(days=i)
         final_result.append(
             TotalOrdersSummaryResponse(key=day, total=data_map.get(day, 0))
@@ -345,7 +348,7 @@ def get_total_orders_in_7_days(db: Session) -> list[TotalOrdersSummaryResponse]:
 
 def get_total_revenue_in_7_days(db: Session) -> list[RevenueSummaryResponse]:
     today = datetime.now().date()
-    seven_days_ago = today - timedelta(days=6)
+    seven_days_ago = today - timedelta(days=DAYS_RANGE)
 
     results = (
         db.query(
@@ -363,16 +366,20 @@ def get_total_revenue_in_7_days(db: Session) -> list[RevenueSummaryResponse]:
     data_map = {row.key: row.total for row in results}
 
     final_result = []
-    for i in range(7):
+    for i in range(DAYS_RANGE + 1):
         day = seven_days_ago + timedelta(days=i)
         final_result.append(RevenueSummaryResponse(key=day, total=data_map.get(day, 0)))
 
     return final_result
 
 
+MONTH_RANGE = 11
+FIRST_DAY_OF_MONTH = 1
+
+
 def get_total_revenue_in_12_months(db: Session) -> list[MonthlyRevenueSummaryResponse]:
     today = datetime.now().date()
-    start_month = (today - relativedelta(months=11)).replace(day=1)
+    start_month = (today - relativedelta(months=MONTH_RANGE)).replace(day=1)
 
     month_trunc = func.date_trunc("month", Order.order_date)
 
@@ -389,10 +396,12 @@ def get_total_revenue_in_12_months(db: Session) -> list[MonthlyRevenueSummaryRes
         .all()
     )
 
-    data_map = {row.key.date().replace(day=1): row.total for row in results}
+    data_map = {
+        row.key.date().replace(day=FIRST_DAY_OF_MONTH): row.total for row in results
+    }
 
     final_result = []
-    for i in range(12):
+    for i in range(MONTH_RANGE + 1):
         month_date = start_month + relativedelta(months=i)
 
         final_result.append(
