@@ -234,10 +234,10 @@ const OrdersTable = ({
               <Fragment key={order.orderId}>
                 <TableRow
                   key={order.orderId}
-                  hover
                   onClick={() =>
                     setExpandedOrderId(isExpanded ? undefined : order.orderId)
                   }
+                  hover
                 >
                   <TableCell>
                     {ordersPerPage * ((currentPage ?? 0) - 1) + index + 1}
@@ -265,13 +265,7 @@ const OrdersTable = ({
                   <TableCell>
                     {new Date(order.orderDate).toLocaleString()}
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <TableCell>
                     {order.orderAttachment && (
                       <AttachmentPreviewButton
                         orderId={order.orderId}

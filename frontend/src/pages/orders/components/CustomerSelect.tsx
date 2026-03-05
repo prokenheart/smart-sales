@@ -51,6 +51,7 @@ const CustomerSelect = ({
     <Autocomplete
       options={customers}
       loading={isLoading}
+      forcePopupIcon={false}
       value={selectedCustomer ?? null}
       onChange={(_, newValue) => setSelectedCustomer(newValue ?? undefined)}
       getOptionLabel={(option) =>
@@ -68,6 +69,7 @@ const CustomerSelect = ({
         option.customerId === value.customerId
       }
       fullWidth
+      
     />
   );
 };

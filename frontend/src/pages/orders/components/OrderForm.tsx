@@ -90,6 +90,7 @@ const OrderForm = ({
             sx={{
               fontWeight: 600,
               fontSize: "20px",
+              color: "text.secondary",
             }}
           >
             {mode === "create" ? "Create Order" : "Update Order"}
@@ -133,11 +134,11 @@ const OrderForm = ({
                   <Typography
                     variant="body2"
                     component="span"
-                    sx={{ fontWeight: 600 }}
+                    sx={{ fontWeight: 600, color: "text.secondary" }}
                   >
-                    Total Order:
+                    Total Order: {totalOrder}
                   </Typography>{" "}
-                  {totalOrder}
+                  
                 </Typography>
               </Stack>
 

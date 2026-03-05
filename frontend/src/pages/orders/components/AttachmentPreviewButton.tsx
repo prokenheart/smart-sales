@@ -23,6 +23,15 @@ const AttachmentPreviewButton = ({
         createUrl();
         setIsOpenViewDialog(true);
       }}
+      variant="outlined"
+      sx={{
+        color: "secondary.contrastText",
+        borderColor: "secondary.contrastText",
+        backgroundColor: "primary.contrastText",
+        "&:hover": {
+          color: "primary.main",
+        },
+      }}
     >
       View File
     </Button>

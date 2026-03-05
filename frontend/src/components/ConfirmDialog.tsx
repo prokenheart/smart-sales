@@ -32,15 +32,19 @@ const ConfirmDialog = ({
       }}
     >
       <DialogTitle>
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="h6" sx={{ color: "primary.contrastText" }}>
+          {title}
+        </Typography>
       </DialogTitle>
       <DialogContent>
-        <Typography variant="body2">{description}</Typography>
+        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>
+          {description}
+        </Typography>
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onCancel}>No</Button>
-        <Button onClick={onConfirm} color="warning">
+        <Button onClick={onCancel} variant="contained">No</Button>
+        <Button onClick={onConfirm} sx={{ color: "error.main" }}>
           Yes
         </Button>
       </DialogActions>
