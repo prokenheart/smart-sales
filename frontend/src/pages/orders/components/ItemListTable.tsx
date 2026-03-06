@@ -62,7 +62,7 @@ const ItemListTable = ({
   const data = itemMode === "view" ? items : selectedItems;
 
   useEffect(() => {
-    if (selectedProduct != undefined) {
+    if (selectedProduct) {
       const newItem: Item = {
         product: {
           productId: selectedProduct.productId,

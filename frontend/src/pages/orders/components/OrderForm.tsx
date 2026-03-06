@@ -24,13 +24,13 @@ import ConfirmDialog from "@components/ConfirmDialog";
 import { getItemList } from "@services/order";
 
 const OrderForm = ({
-  open,
-  setOpen,
+  isOpen,
+  setIsOpen,
   mode,
   order,
 }: Readonly<{
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
   mode: "create" | "update" | undefined;
   order?: Order;
 }>): ReactElement => {
@@ -52,11 +52,10 @@ const OrderForm = ({
     if (mode == "update") {
       (async () => {
         try {
-          if (order != undefined) {
-            const res = await getItemList(order.orderId);
-            setSelectedItems(res.data);
-            setSelectedCustomer(order.customer);
-          }
+          if (!order) return;
+          const res = await getItemList(order.orderId);
+          setSelectedItems(res.data);
+          setSelectedCustomer(order.customer);
         } catch (err) {
           console.error("Error fetching orders:", err);
         }
@@ -65,7 +64,7 @@ const OrderForm = ({
   }, [open]);
 
   const handleCancel = () => {
-    setOpen(false);
+    setIsOpen(false);
     setSelectedCustomer(undefined);
     setSelectedItems([]);
   };
@@ -73,7 +72,7 @@ const OrderForm = ({
   return (
     <>
       <Dialog
-        open={open}
+        open={isOpen}
         onClose={() => {
           setIsOpenConfirmDialog(true);
         }}

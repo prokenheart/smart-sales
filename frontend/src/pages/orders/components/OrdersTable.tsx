@@ -28,6 +28,14 @@ import ConfirmDialog from "@components/ConfirmDialog";
 
 import { updateOrderStatus } from "@services/order";
 
+import FilePicker from "@orders/components/FilePicker";
+import FilePreviewDialog from "@orders/components/FilePreviewDialog";
+import {
+  createUploadAttachmentURL,
+  uploadAttachment,
+  updateAttachmentLink,
+} from "../../../services/order";
+
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
     case OrderStatus.Pending:
@@ -60,13 +68,13 @@ const OrdersTable = ({
     undefined
   );
 
-  const [openOrderForm, setOpenOrderForm] = useState<boolean>(false);
+  const [isOpenOrderForm, setIsOpenOrderForm] = useState(false);
 
   const [updatedOrder, setUpdatedOrder] = useState<Order>();
 
-  const [openViewDialog, setOpenViewDialog] = useState(false);
+  const [isOpenViewDialog, setIsOpenViewDialog] = useState(false);
   const [viewURL, setViewURL] = useState<string | null>(null);
-  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState<boolean>(false);
+  const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string>();
 
   const handleCancelOrder = async (orderId: string) => {
@@ -101,9 +109,80 @@ const OrdersTable = ({
     setSelectedOrderId(undefined);
   };
 
+  const [uploadOrder, setUploadOrder] = useState<Order>();
+
+  const [file, setFile] = useState<File | null>(null);
+  const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
+  const [previewPickedFileSrc, setPreviewPickedFileSrc] = useState<string>();
+
+  const handleSelect = (file: File, order: Order) => {
+    setUploadOrder(order);
+    setFile(file);
+    setIsOpenPreviewDialog(true);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewPickedFileSrc(url);
+    }
+  };
+
+  const handleCancelUpload = () => {
+    setFile(null);
+    setIsOpenPreviewDialog(false);
+    setPreviewPickedFileSrc(undefined);
+  };
+
+  const handleCreateUploadURL = async (order: Order) => {
+    try {
+      if (!file) return;
+      const res = await createUploadAttachmentURL(order.orderId, file.type);
+      return res.data;
+    } catch (error) {
+      console.error("Create pre-signed url failed", error);
+    }
+  };
+
+  const handleUploadToS3 = async (preSignedUrl: string) => {
+    try {
+      if (!file) return;
+      const res = await uploadAttachment(preSignedUrl, file);
+    } catch (error) {
+      console.error("Upload file to s3 bucket failed", error);
+    }
+  };
+
+  const handleUpdateAttachmentLink = async (order: Order, s3Key: string) => {
+    try {
+      await updateAttachmentLink(order.orderId, s3Key);
+    } catch (error) {
+      console.error("Upload attachment link to database failed", error);
+    }
+  };
+
+  const handleUpload = async (order: Order | undefined) => {
+    try {
+      if (!order) return;
+      const { uploadUrl, s3Key } = await handleCreateUploadURL(order);
+
+      await handleUploadToS3(uploadUrl);
+      await handleUpdateAttachmentLink(order, s3Key);
+
+      const attachmentUpdatedOrder: Order = {
+        ...order,
+        orderAttachment: s3Key,
+      };
+
+      setUpdatedOrder(attachmentUpdatedOrder);
+      setFile(null);
+      setIsOpenPreviewDialog(false);
+      setPreviewPickedFileSrc(undefined);
+    } catch (error) {
+      console.error("Upload flow failed", error);
+    }
+  };
+
   useEffect(() => {
-    if (updatedOrder != undefined) {
-      setOpenOrderForm(false);
+    if (updatedOrder) {
+      setIsOpenOrderForm(false);
       setOrders((prev) =>
         prev.map((o) => (o.orderId === updatedOrder.orderId ? updatedOrder : o))
       );
@@ -197,7 +276,7 @@ const OrdersTable = ({
                       <AttachmentPreviewButton
                         orderId={order.orderId}
                         setViewURL={setViewURL}
-                        setOpenViewDialog={setOpenViewDialog}
+                        setIsOpenViewDialog={setIsOpenViewDialog}
                       />
                     )}
                   </TableCell>
@@ -286,7 +365,10 @@ const OrdersTable = ({
                               >
                                 Attachment:
                               </Typography>{" "}
-                              {order.orderAttachment ?? "None"}
+                              <FilePicker
+                                onSelect={handleSelect}
+                                order={order}
+                              />
                             </Typography>
                           </Box>
                         </Stack>
@@ -297,7 +379,7 @@ const OrdersTable = ({
                               variant="contained"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setOpenOrderForm(true);
+                                setIsOpenOrderForm(true);
                               }}
                             >
                               Update
@@ -307,8 +389,8 @@ const OrdersTable = ({
                               value={{ setUpdatedOrder }}
                             >
                               <OrderForm
-                                open={openOrderForm}
-                                setOpen={setOpenOrderForm}
+                                isOpen={isOpenOrderForm}
+                                setIsOpen={setIsOpenOrderForm}
                                 mode="update"
                                 order={order}
                               />
@@ -357,8 +439,8 @@ const OrdersTable = ({
 
       <AttachmentPreviewDialog
         viewURL={viewURL}
-        open={openViewDialog}
-        setOpen={setOpenViewDialog}
+        isOpen={isOpenViewDialog}
+        setIsOpen={setIsOpenViewDialog}
         setViewURL={setViewURL}
       />
       <ConfirmDialog
@@ -371,6 +453,16 @@ const OrdersTable = ({
         }}
         onConfirm={handleConfirmCancelOrder}
       />
+      {previewPickedFileSrc && (
+        <FilePreviewDialog
+          isOpen={isOpenPreviewDialog}
+          previewPickedFileSrc={previewPickedFileSrc}
+          onCancel={handleCancelUpload}
+          onConfirm={() => {
+            handleUpload?.(uploadOrder);
+          }}
+        />
+      )}
     </Box>
   );
 };
