@@ -1,11 +1,10 @@
 import { Autocomplete, TextField } from "@mui/material";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 
 import type { Customer } from "@orders/types/order";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { searchCustomers } from "@/services/customer";
 
 const CustomerSelect = ({
   selectedCustomer,
@@ -18,6 +17,8 @@ const CustomerSelect = ({
 
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -34,11 +35,13 @@ const CustomerSelect = ({
     }
 
     const fetchCustomers = async () => {
-      const res = await axios.get<Customer[]>(
-        `${API_URL}/customers?query=${debouncedKeyword}`
-      );
-
-      setCustomers(res.data);
+      try {
+        setIsLoading(true);
+        const res = await searchCustomers(debouncedKeyword);
+        setCustomers(res.data);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchCustomers();
@@ -47,12 +50,18 @@ const CustomerSelect = ({
   return (
     <Autocomplete
       options={customers}
+      loading={isLoading}
+      forcePopupIcon={false}
       value={selectedCustomer ?? null}
       onChange={(_, newValue) => setSelectedCustomer(newValue ?? undefined)}
       getOptionLabel={(option) =>
         `${option.customerName} - ${option.customerPhone}`
       }
       onInputChange={(_, value) => setKeyword(value)}
+      noOptionsText={
+        keyword.trim() === "" ? "Type to search customer" : "No customers found"
+      }
+      loadingText="Finding customer..."
       renderInput={(params) => (
         <TextField {...params} label="Select Customer" size="small" />
       )}
@@ -60,6 +69,7 @@ const CustomerSelect = ({
         option.customerId === value.customerId
       }
       fullWidth
+      
     />
   );
 };

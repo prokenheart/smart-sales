@@ -83,7 +83,7 @@ const ItemListTable = ({
     <>
       <Table>
         <TableHead>
-          <TableRow>
+          <TableRow sx={{ backgroundColor: "secondary.main" }}>
             <TableCell>Product</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell>Price</TableCell>
@@ -94,7 +94,7 @@ const ItemListTable = ({
 
         <TableBody>
           {data.map((item) => (
-            <TableRow key={item.product.productId}>
+            <TableRow key={item.product.productId} hover>
               <TableCell>{item.product.productName}</TableCell>
               <TableCell>
                 {" "}

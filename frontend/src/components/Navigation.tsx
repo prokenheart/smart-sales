@@ -9,22 +9,78 @@ import { Link, useLocation } from "react-router-dom";
 import { MdOutlineDashboard, MdOutlineShoppingCart } from "react-icons/md";
 import type { ReactElement } from "react";
 
-const drawerWidth = 160;
+const drawerWidth = 180;
 
-const menuItemSx = {
-  borderRadius: "8px",
-  color: "white",
-  "&.Mui-selected": {
-    backgroundColor: "white",
-    color: "#1976d2",
-    boxShadow: "0px 4px 8px rgba(0,0,0,0.2)",
-  },
-  "&.Mui-selected:hover": {
-    backgroundColor: "#f5f5f5",
-  },
-  "&:hover": {
-    transform: "translateX(6px)",
-  },
+const Navigation = (): ReactElement => {
+  const location = useLocation();
+
+  return (
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: drawerWidth,
+          boxSizing: "border-box",
+          p: 2,
+          backgroundColor: "sidebar.main",
+          color: "sidebar.contrastText",
+          borderRight: "none",
+        },
+      }}
+    >
+      <List sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        {menuItems.map((item) => (
+          <ListItemButton
+            key={item.path}
+            component={Link}
+            to={item.path}
+            selected={item.isActive(location.pathname)}
+            sx={{
+              borderRadius: 2,
+              color: "text.main",
+              transition: "all 0.2s ease",
+
+              "&:hover": {
+                backgroundColor: "rgba(255,255,255,0.08)",
+                color: "primary.main",
+                transform: "translateX(6px)",
+              },
+
+              "&.Mui-selected": {
+                backgroundColor: "primary.main",
+                color: "primary.contrastText",
+                boxShadow: "0px 6px 15px rgba(0,0,0,0.25)",
+
+                "& .MuiListItemIcon-root": {
+                  color: "primary.contrastText",
+                },
+                "&:hover": {
+                  backgroundColor: "primary.main",
+                  color: "primary.contrastText",
+                  transform: "translateX(6px)",
+                },
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 35,
+                color: "inherit",
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+
+            <ListItemText
+              primary={item.label}
+            />
+          </ListItemButton>
+        ))}
+      </List>
+    </Drawer>
+  );
 };
 
 const menuItems = [
@@ -41,42 +97,5 @@ const menuItems = [
     isActive: (pathname: string) => pathname.startsWith("/orders"),
   },
 ];
-
-const Navigation = (): ReactElement => {
-  const location = useLocation();
-
-  return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: {
-          width: drawerWidth,
-          boxSizing: "border-box",
-          padding: "10px",
-          backgroundColor: "#1976d2",
-        },
-      }}
-    >
-      <List sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        {menuItems.map((item) => (
-          <ListItemButton
-            key={item.path}
-            component={Link}
-            to={item.path}
-            selected={item.isActive(location.pathname)}
-            sx={menuItemSx}
-          >
-            <ListItemIcon sx={{ minWidth: 35, color: "inherit" }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.label} />
-          </ListItemButton>
-        ))}
-      </List>
-    </Drawer>
-  );
-};
 
 export default Navigation;
