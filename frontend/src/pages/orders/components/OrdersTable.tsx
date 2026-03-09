@@ -201,7 +201,12 @@ const OrdersTable = ({
     >
       <Table
         stickyHeader
-        sx={{ tableLayout: "fixed", width: "100%", borderCollapse: "collapse" }}
+        sx={{
+          tableLayout: "fixed",
+          width: "100%",
+          borderCollapse: "collapse",
+          height: "100%",
+        }}
       >
         <colgroup>
           <col style={{ width: "5%" }} />
