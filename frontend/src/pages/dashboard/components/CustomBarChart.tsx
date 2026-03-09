@@ -6,6 +6,9 @@ type ChartData = {
   value: number;
 };
 
+const CHAR_PIXEL_WIDTH = 8;
+const Y_AXIS_PADDING = 15;
+
 export const CustomBarChart = ({
   data,
 }: Readonly<{ data: ChartData[] }>): ReactElement => {
@@ -13,7 +16,7 @@ export const CustomBarChart = ({
 
   const getYAxisWidth = (data: { key: string }[]) => {
     const maxLength = Math.max(...data.map((d) => d.key.length));
-    return maxLength * 8 + 15;
+    return maxLength * CHAR_PIXEL_WIDTH + Y_AXIS_PADDING;
   };
 
   return (
