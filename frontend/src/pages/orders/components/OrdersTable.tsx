@@ -10,6 +10,7 @@ import {
   Button,
   Collapse,
   Stack,
+  CircularProgress,
 } from "@mui/material";
 import { useState, Fragment, useEffect } from "react";
 import type { ReactElement, Dispatch, SetStateAction } from "react";
@@ -57,12 +58,14 @@ const OrdersTable = ({
   currentPage,
   ordersPerPage,
   setOrders,
+  isLoading,
 }: Readonly<{
   orders: Order[];
   totalOrders: number;
   currentPage: number;
   ordersPerPage: number;
   setOrders: Dispatch<SetStateAction<Order[]>>;
+  isLoading: boolean;
 }>): ReactElement => {
   const [expandedOrderId, setExpandedOrderId] = useState<string | undefined>(
     undefined
@@ -230,192 +233,202 @@ const OrdersTable = ({
             <TableCell>Attachment</TableCell>
           </TableRow>
         </TableHead>
+
         <TableBody>
-          {orders.map((order, index) => {
-            const isExpanded = expandedOrderId === order.orderId;
-            const isDisabled =
-              order.status.statusCode === OrderStatus.Cancelled;
-            return (
-              <Fragment key={order.orderId}>
-                <TableRow
-                  key={order.orderId}
-                  onClick={() =>
-                    setExpandedOrderId(isExpanded ? undefined : order.orderId)
-                  }
-                  hover
-                >
-                  <TableCell>
-                    {ordersPerPage * ((currentPage ?? 0) - 1) + index + 1}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={8} align="center">
+                <CircularProgress />
+              </TableCell>
+            </TableRow>
+          ) : (
+            orders.map((order, index) => {
+              const isExpanded = expandedOrderId === order.orderId;
+              const isDisabled =
+                order.status.statusCode === OrderStatus.Cancelled;
+              return (
+                <Fragment key={order.orderId}>
+                  <TableRow
+                    key={order.orderId}
+                    onClick={() =>
+                      setExpandedOrderId(isExpanded ? undefined : order.orderId)
+                    }
+                    hover
                   >
-                    {order.orderId}
-                  </TableCell>
-                  <TableCell>{order.customer.customerName}</TableCell>
-                  <TableCell>{order.user.userName}</TableCell>
-                  <TableCell>{Number(order.orderTotal).toFixed(2)}</TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      color: getStatusColor(order.status.statusCode),
-                    }}
-                  >
-                    {order.status.statusCode}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(order.orderDate).toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    {order.orderAttachment && (
-                      <AttachmentPreviewButton
-                        orderId={order.orderId}
-                        setViewURL={setViewURL}
-                        setIsOpenViewDialog={setIsOpenViewDialog}
-                      />
-                    )}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    sx={{
-                      padding: 0,
-                      borderBottom: isExpanded ? "1px solid #ddd" : "none",
-                    }}
-                  >
-                    <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                      <Box sx={{ p: 2, backgroundColor: "#fafafa" }}>
-                        <Typography variant="h6" sx={{ mb: 2 }}>
-                          Order Detail
-                        </Typography>
-                        <Stack
-                          direction="row"
-                          justifyContent="center"
-                          spacing={4}
-                        >
-                          <Box sx={{ flex: 1 }}>
-                            <Typography variant="body2">
-                              <Typography
-                                variant="body2"
-                                component="span"
-                                sx={{ fontWeight: 600 }}
-                              >
-                                Order ID:
-                              </Typography>{" "}
-                              {order.orderId}
-                            </Typography>
+                    <TableCell>
+                      {ordersPerPage * ((currentPage ?? 0) - 1) + index + 1}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {order.orderId}
+                    </TableCell>
+                    <TableCell>{order.customer.customerName}</TableCell>
+                    <TableCell>{order.user.userName}</TableCell>
+                    <TableCell>{Number(order.orderTotal).toFixed(2)}</TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 600,
+                        color: getStatusColor(order.status.statusCode),
+                      }}
+                    >
+                      {order.status.statusCode}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(order.orderDate).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      {order.orderAttachment && (
+                        <AttachmentPreviewButton
+                          orderId={order.orderId}
+                          setViewURL={setViewURL}
+                          setIsOpenViewDialog={setIsOpenViewDialog}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      sx={{
+                        padding: 0,
+                        borderBottom: isExpanded ? "1px solid #ddd" : "none",
+                      }}
+                    >
+                      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                        <Box sx={{ p: 2, backgroundColor: "#fafafa" }}>
+                          <Typography variant="h6" sx={{ mb: 2 }}>
+                            Order Detail
+                          </Typography>
+                          <Stack
+                            direction="row"
+                            justifyContent="center"
+                            spacing={4}
+                          >
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="body2">
+                                <Typography
+                                  variant="body2"
+                                  component="span"
+                                  sx={{ fontWeight: 600 }}
+                                >
+                                  Order ID:
+                                </Typography>{" "}
+                                {order.orderId}
+                              </Typography>
 
-                            <Typography variant="body2">
-                              <Typography
-                                variant="body2"
-                                component="span"
-                                sx={{ fontWeight: 600 }}
-                              >
-                                Customer Phone:
-                              </Typography>{" "}
-                              {order.customer.customerPhone}
-                            </Typography>
+                              <Typography variant="body2">
+                                <Typography
+                                  variant="body2"
+                                  component="span"
+                                  sx={{ fontWeight: 600 }}
+                                >
+                                  Customer Phone:
+                                </Typography>{" "}
+                                {order.customer.customerPhone}
+                              </Typography>
 
-                            <Typography variant="body2">
-                              <Typography
-                                variant="body2"
-                                component="span"
-                                sx={{ fontWeight: 600 }}
-                              >
-                                Customer Email:
-                              </Typography>{" "}
-                              {order.customer.customerEmail}
-                            </Typography>
-                          </Box>
+                              <Typography variant="body2">
+                                <Typography
+                                  variant="body2"
+                                  component="span"
+                                  sx={{ fontWeight: 600 }}
+                                >
+                                  Customer Email:
+                                </Typography>{" "}
+                                {order.customer.customerEmail}
+                              </Typography>
+                            </Box>
 
-                          <Box sx={{ flex: 1 }}>
-                            <Typography variant="body2">
-                              <Typography
-                                variant="body2"
-                                component="span"
-                                sx={{ fontWeight: 600 }}
-                              >
-                                Total:
-                              </Typography>{" "}
-                              {Number(order.orderTotal).toFixed(2)}
-                            </Typography>
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="body2">
+                                <Typography
+                                  variant="body2"
+                                  component="span"
+                                  sx={{ fontWeight: 600 }}
+                                >
+                                  Total:
+                                </Typography>{" "}
+                                {Number(order.orderTotal).toFixed(2)}
+                              </Typography>
 
-                            <Typography variant="body2">
-                              <Typography
-                                variant="body2"
-                                component="span"
-                                sx={{ fontWeight: 600 }}
-                              >
-                                Status:
-                              </Typography>{" "}
-                              {order.status.statusCode}
-                            </Typography>
+                              <Typography variant="body2">
+                                <Typography
+                                  variant="body2"
+                                  component="span"
+                                  sx={{ fontWeight: 600 }}
+                                >
+                                  Status:
+                                </Typography>{" "}
+                                {order.status.statusCode}
+                              </Typography>
 
-                            <Typography variant="body2">
-                              <Typography
-                                variant="body2"
-                                component="span"
-                                sx={{ fontWeight: 600 }}
-                              >
-                                Attachment:
-                              </Typography>{" "}
-                              <FilePicker
-                                onSelect={handleSelect}
-                                order={order}
-                              />
-                            </Typography>
-                          </Box>
-                        </Stack>
-
-                        <Box sx={{ mt: 2 }}>
-                          <Stack direction="row" spacing={2}>
-                            <Button
-                              variant="contained"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setIsOpenOrderForm(true);
-                              }}
-                            >
-                              Update
-                            </Button>
-
-                            <UpdateTableContext.Provider
-                              value={{ setUpdatedOrder }}
-                            >
-                              <OrderForm
-                                isOpen={isOpenOrderForm}
-                                setIsOpen={setIsOpenOrderForm}
-                                mode="update"
-                                order={order}
-                              />
-                            </UpdateTableContext.Provider>
-                            <Button
-                              variant="contained"
-                              color="error"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setIsOpenConfirmDialog(true);
-                                setSelectedOrderId(order.orderId);
-                              }}
-                              disabled={isDisabled}
-                            >
-                              Cancel
-                            </Button>
+                              <Typography variant="body2">
+                                <Typography
+                                  variant="body2"
+                                  component="span"
+                                  sx={{ fontWeight: 600 }}
+                                >
+                                  Attachment:
+                                </Typography>{" "}
+                                <FilePicker
+                                  onSelect={handleSelect}
+                                  order={order}
+                                />
+                              </Typography>
+                            </Box>
                           </Stack>
+
+                          <Box sx={{ mt: 2 }}>
+                            <Stack direction="row" spacing={2}>
+                              <Button
+                                variant="contained"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setIsOpenOrderForm(true);
+                                }}
+                              >
+                                Update
+                              </Button>
+
+                              <UpdateTableContext.Provider
+                                value={{ setUpdatedOrder }}
+                              >
+                                <OrderForm
+                                  isOpen={isOpenOrderForm}
+                                  setIsOpen={setIsOpenOrderForm}
+                                  mode="update"
+                                  order={order}
+                                />
+                              </UpdateTableContext.Provider>
+                              <Button
+                                variant="contained"
+                                color="error"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setIsOpenConfirmDialog(true);
+                                  setSelectedOrderId(order.orderId);
+                                }}
+                                disabled={isDisabled}
+                              >
+                                Cancel
+                              </Button>
+                            </Stack>
+                          </Box>
                         </Box>
-                      </Box>
-                    </Collapse>
-                  </TableCell>
-                </TableRow>
-              </Fragment>
-            );
-          })}
+                      </Collapse>
+                    </TableCell>
+                  </TableRow>
+                </Fragment>
+              );
+            })
+          )}
         </TableBody>
+
         <TableFooter>
           <TableRow>
             <TableCell

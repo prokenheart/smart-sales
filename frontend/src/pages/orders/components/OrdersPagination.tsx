@@ -1,4 +1,5 @@
 import { Stack, Button } from "@mui/material";
+import { useState } from "react";
 import type { ReactElement, Dispatch, SetStateAction } from "react";
 
 import type { CursorState, CursorResponse } from "@orders/types/cursor";
@@ -43,6 +44,7 @@ const OrdersPagination = ({
   cursorResponse,
   setCursorState,
   setCurrentPage,
+  isLoading,
 }: Readonly<{
   currentPage: number;
   totalPages: number;
@@ -50,18 +52,21 @@ const OrdersPagination = ({
   cursorResponse: CursorResponse | null;
   setCursorState: Dispatch<SetStateAction<CursorState>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
+  isLoading: boolean;
 }>): ReactElement => {
   const handleCursorPagination = (direction: "prev" | "next") => {
-    if (direction == "prev" && cursorResponse) {
+    if (!cursorResponse) return;
+
+    if (direction == "prev") {
       setCursorState({
         cursor: {
           cursorDate: cursorResponse.prev.cursorDate,
           cursorId: cursorResponse.prev.cursorId,
         },
-        direction,
+        direction: direction,
       });
       setCurrentPage(currentPage - 1);
-    } else if (direction == "next" && cursorResponse) {
+    } else if (direction == "next") {
       setCursorState({
         cursor: {
           cursorDate: cursorResponse.next.cursorDate,
@@ -81,7 +86,7 @@ const OrdersPagination = ({
       spacing={1}
     >
       <Button
-        disabled={!cursorResponse?.prev.cursorDate}
+        disabled={isLoading || !cursorResponse?.prev.cursorDate}
         onClick={() => handleCursorPagination("prev")}
       >
         {"<"}
@@ -93,7 +98,7 @@ const OrdersPagination = ({
         setCurrentPage={setCurrentPage}
       />
       <Button
-        disabled={!cursorResponse?.next.cursorDate}
+        disabled={isLoading || !cursorResponse?.next.cursorDate}
         onClick={() => handleCursorPagination("next")}
       >
         {">"}
