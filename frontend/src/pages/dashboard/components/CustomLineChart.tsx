@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { LineChart, Tooltip, Line, XAxis } from "recharts";
+import { LineChart, Tooltip, Line, XAxis, YAxis} from "recharts";
 
 type ChartData = {
   key: string;
@@ -11,7 +11,9 @@ export const CustomLineChart = ({
 }: Readonly<{ data: ChartData[] }>): ReactElement => {
   return (
     <LineChart width={500} height={300} data={data}>
+      <YAxis tickFormatter={(value) => `$${value}`} width="auto" />
       <XAxis dataKey="key" />
+
       <Tooltip />
       <Line
         type="monotone"

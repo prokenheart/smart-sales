@@ -13,21 +13,23 @@ export const CustomBarChart = ({
 
   const getYAxisWidth = (data: { key: string }[]) => {
     const maxLength = Math.max(...data.map((d) => d.key.length));
-    return maxLength * 8; 
+    return maxLength * 8 + 15;
   };
 
   return (
     <BarChart height={300} data={top5} layout="vertical">
       <CartesianGrid strokeDasharray="3 3" />
 
-      <XAxis type="number"  />
+      <XAxis type="number" tickFormatter={(value) => `$${value}`} />
 
-      <YAxis type="category" dataKey="key" interval={0} width={getYAxisWidth(data)}/>
-
-      <Bar
-        dataKey="value"
-        fill="#f9b17a"
+      <YAxis
+        type="category"
+        dataKey="key"
+        interval={0}
+        width={getYAxisWidth(data)}
       />
+
+      <Bar dataKey="value" fill="#f9b17a" />
     </BarChart>
   );
 };
