@@ -12,6 +12,11 @@ type ChartData = {
   value: number;
 };
 
+type ResponseData = {
+  key: string;
+  total: number;
+};
+
 type DashboardState = {
   totalOrders: {
     summary: ChartData[];
@@ -45,7 +50,7 @@ const Dashboard = (): ReactElement => {
     topProductRevenue: [],
   });
 
-  const mapData = (data: any[]) =>
+  const mapData = (data: ResponseData[]): ChartData[] =>
     data.map((item) => {
       const d = new Date(item.key);
       return {
@@ -54,7 +59,7 @@ const Dashboard = (): ReactElement => {
       };
     });
 
-  const mapMonthData = (data: any[]) =>
+  const mapMonthData = (data: ResponseData[]): ChartData[] =>
     data.map((item) => {
       const [year, month] = item.key.split("-");
       const date = new Date(Number(year), Number(month) - 1);
