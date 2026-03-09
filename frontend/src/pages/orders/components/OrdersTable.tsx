@@ -196,7 +196,7 @@ const OrdersTable = ({
   return (
     <Box
       sx={{
-        height: "450px",
+        maxHeight: "450px",
         overflow: "auto",
         border: "1px solid #ddd",
         borderRadius: 2,
@@ -254,6 +254,7 @@ const OrdersTable = ({
                       setExpandedOrderId(isExpanded ? undefined : order.orderId)
                     }
                     hover
+                    sx={{ height: "70px" }}
                   >
                     <TableCell>
                       {ordersPerPage * ((currentPage ?? 0) - 1) + index + 1}
@@ -291,12 +292,17 @@ const OrdersTable = ({
                       )}
                     </TableCell>
                   </TableRow>
-                  <TableRow>
+                  <TableRow
+                    sx={{
+                      height: isExpanded ? "auto" : 0,
+                    }}
+                  >
                     <TableCell
                       colSpan={8}
                       sx={{
                         padding: 0,
-                        borderBottom: isExpanded ? "1px solid #ddd" : "none",
+                        borderBottom: isExpanded ? "1px solid" : "0px",
+                        borderColor: "primary.contrastText",
                       }}
                     >
                       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
@@ -439,7 +445,7 @@ const OrdersTable = ({
                 backgroundColor: "white",
                 fontWeight: 600,
                 zIndex: 1,
-                borderTop: "1px solid #ddd",
+                borderColor: "primary.contrastText",
                 borderBottom: "0px",
               }}
             >
