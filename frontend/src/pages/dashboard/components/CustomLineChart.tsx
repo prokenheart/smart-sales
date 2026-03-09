@@ -16,7 +16,7 @@ export const CustomLineChart = ({
       <Line
         type="monotone"
         dataKey="value"
-        stroke="#1976d2"
+        stroke="#2d3250"
         strokeWidth={2}
         dot={false}
       />

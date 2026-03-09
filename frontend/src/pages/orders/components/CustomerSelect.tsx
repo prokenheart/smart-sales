@@ -63,7 +63,7 @@ const CustomerSelect = ({
       }
       loadingText="Finding customer..."
       renderInput={(params) => (
-        <TextField {...params} label="Select Customer" size="small" />
+        <TextField {...params} label="Select Customer" size="small"/>
       )}
       isOptionEqualToValue={(option, value) =>
         option.customerId === value.customerId

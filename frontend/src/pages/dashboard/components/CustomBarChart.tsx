@@ -26,7 +26,7 @@ export const CustomBarChart = ({
 
       <Bar
         dataKey="value"
-        fill="#1976d2"
+        fill="#f9b17a"
       />
     </BarChart>
   );

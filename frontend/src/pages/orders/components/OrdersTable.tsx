@@ -198,7 +198,8 @@ const OrdersTable = ({
       sx={{
         maxHeight: "450px",
         overflow: "auto",
-        border: "1px solid #ddd",
+        border: "1px solid",
+        borderColor: "secondary.main",
         borderRadius: 2,
       }}
     >

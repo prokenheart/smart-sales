@@ -83,7 +83,7 @@ const ItemListTable = ({
     <>
       <Table>
         <TableHead>
-          <TableRow sx={{ backgroundColor: "secondary.main" }}>
+          <TableRow>
             <TableCell>Product</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell>Price</TableCell>
