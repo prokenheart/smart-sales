@@ -95,7 +95,9 @@ const OrdersPage = (): ReactElement => {
     if (currentPage === 1) {
       setIsLoading(true);
       fetchOrders();
-    } else setCurrentPage(1);
+    } else {
+      setCurrentPage(1);
+    }
   }, [search]);
 
   useEffect(() => {
