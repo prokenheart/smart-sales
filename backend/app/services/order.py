@@ -15,6 +15,10 @@ from app.schemas.order import (
 from dateutil.relativedelta import relativedelta
 from enum import Enum
 
+DAYS_RANGE = 6
+MONTH_RANGE = 11
+FIRST_DAY_OF_MONTH = 1
+
 
 class OrderStatus(Enum):
     PENDING = "PENDING"
@@ -315,9 +319,6 @@ def update_order_attachment_url(
     return order
 
 
-DAYS_RANGE = 6
-
-
 def get_total_orders_in_7_days(db: Session) -> list[TotalOrdersSummaryResponse]:
     today = datetime.now().date()
     seven_days_ago = today - timedelta(days=DAYS_RANGE)
@@ -372,10 +373,6 @@ def get_total_revenue_in_7_days(db: Session) -> list[RevenueSummaryResponse]:
         final_result.append(RevenueSummaryResponse(key=day, total=data_map.get(day, 0)))
 
     return final_result
-
-
-MONTH_RANGE = 11
-FIRST_DAY_OF_MONTH = 1
 
 
 def get_total_revenue_in_12_months(db: Session) -> list[MonthlyRevenueSummaryResponse]:
