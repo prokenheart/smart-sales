@@ -147,7 +147,7 @@ const OrdersTable = ({
   const handleUploadToS3 = async (preSignedUrl: string) => {
     try {
       if (!file) return;
-      const res = await uploadAttachment(preSignedUrl, file);
+      await uploadAttachment(preSignedUrl, file);
     } catch (error) {
       console.error("Upload file to s3 bucket failed", error);
     }
