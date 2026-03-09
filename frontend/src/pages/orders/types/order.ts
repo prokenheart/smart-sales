@@ -37,3 +37,8 @@ export type OrdersResponse = {
   totalOrders: number;
   ordersPerPage: number;
 };
+
+export enum Direction {
+  PREV = "prev",
+  NEXT = "next",
+}
