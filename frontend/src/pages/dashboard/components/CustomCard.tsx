@@ -8,6 +8,7 @@ type Props = {
   chart?: ReactNode;
   chartHeight?: number;
 };
+
 const CustomCard = ({
   title,
   content,
@@ -21,7 +22,7 @@ const CustomCard = ({
       borderRadius={3}
       boxShadow={2}
       bgcolor="background.paper"
-      sx={{color:"primary.contrastText"}}
+      sx={{ color: "primary.contrastText" }}
     >
       <Typography variant="h6">{title}</Typography>
 
