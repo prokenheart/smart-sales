@@ -61,7 +61,7 @@ const OrderForm = ({
         }
       })();
     }
-  }, [open]);
+  }, [isOpen]);
 
   const handleCancel = () => {
     setIsOpen(false);
