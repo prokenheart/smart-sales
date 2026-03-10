@@ -55,16 +55,16 @@ const Dashboard = (): ReactElement => {
     topProductRevenue: [],
   });
 
-  const mapData = (data: ResponseData[]): ChartData[] =>
+  const mapDailyResponseToChartData  = (data: ResponseData[]): ChartData[] =>
     data.map((item) => {
-      const d = new Date(item.key);
+      const date = new Date(item.key);
       return {
-        key: `${d.getDate()}/${d.getMonth() + 1}`,
+        key: `${date.getDate()}/${date.getMonth() + 1}`,
         value: item.total,
       };
     });
 
-  const mapMonthData = (data: ResponseData[]): ChartData[] =>
+  const mapMonthlyResponseToChartData = (data: ResponseData[]): ChartData[] =>
     data.map((item) => {
       const [year, month] = item.key.split("-");
       const date = new Date(Number(year), Number(month) - 1);
@@ -80,9 +80,9 @@ const Dashboard = (): ReactElement => {
       const { totalOrders, totalRevenue, monthlyRevenue, topProducts } =
         await getDashboardSummary();
 
-      const ordersData = mapData(totalOrders);
-      const revenueData = mapData(totalRevenue);
-      const monthlyRevenueData = mapMonthData(monthlyRevenue);
+      const ordersData = mapDailyResponseToChartData (totalOrders);
+      const revenueData = mapDailyResponseToChartData (totalRevenue);
+      const monthlyRevenueData = mapMonthlyResponseToChartData(monthlyRevenue);
       const topProductRevenueData = topProducts.map((item) => ({
         key: item.key,
         value: item.total,
