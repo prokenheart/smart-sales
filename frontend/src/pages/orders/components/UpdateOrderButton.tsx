@@ -1,5 +1,5 @@
-import { Button } from "@mui/material";
-import { useContext } from "react";
+import { Button, CircularProgress } from "@mui/material";
+import { useContext, useState } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 import { HttpStatusCode } from "axios";
 
@@ -22,6 +22,7 @@ const UpdateOrderButton = ({
   setSelectedItems: Dispatch<SetStateAction<Item[]>>;
 }>): ReactElement => {
   const updateTable = useContext(UpdateTableContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const calcOrderTotal = (items: Item[]): number => {
     return items.reduce((sum, item) => {
@@ -30,18 +31,20 @@ const UpdateOrderButton = ({
   };
 
   const handleSave = async () => {
+    if (!order) return;
+
+    setIsLoading(true);
+
     const itemPosts: ItemPost[] = items.map((item) => ({
       productId: item.product.productId,
       itemQuantity: item.itemQuantity,
     }));
 
     try {
-      if (!order) return;
       const res = await createItem(order.orderId, itemPosts);
-      if (res.status == HttpStatusCode.Ok) {
-        const newTotal = calcOrderTotal(items).toString();
 
-        if (!order) return;
+      if (res.status === HttpStatusCode.Ok) {
+        const newTotal = calcOrderTotal(items).toString();
 
         setSelectedCustomer(undefined);
         setSelectedItems([]);
@@ -53,12 +56,14 @@ const UpdateOrderButton = ({
       }
     } catch (error) {
       console.error("UPDATE FAILED", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Button variant="contained" onClick={handleSave}>
-      Save
+    <Button variant="contained" onClick={handleSave} disabled={isLoading}>
+      {isLoading ? <CircularProgress size={20} /> : "Save"}
     </Button>
   );
 };

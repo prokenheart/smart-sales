@@ -486,9 +486,7 @@ const OrdersTable = ({
           isOpen={isOpenPreviewDialog}
           previewPickedFileSrc={previewPickedFileSrc}
           onCancel={handleCancelUpload}
-          onConfirm={() => {
-            handleUpload?.(uploadOrder);
-          }}
+          onConfirm={() => handleUpload(uploadOrder)}
         />
       )}
     </Box>

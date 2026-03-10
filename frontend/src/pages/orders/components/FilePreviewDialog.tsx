@@ -1,5 +1,5 @@
 import { type ReactElement, useState } from "react";
-import { Dialog, Box, Button, Stack } from "@mui/material";
+import { Dialog, Box, Button, Stack, CircularProgress } from "@mui/material";
 import ConfirmDialog from "@components/ConfirmDialog";
 
 const FilePreviewDialog = ({
@@ -11,15 +11,25 @@ const FilePreviewDialog = ({
   isOpen: boolean;
   previewPickedFileSrc: string;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
 }>): ReactElement => {
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleUpload = async () => {
+    try {
+      setIsUploading(true);
+      await onConfirm();
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   return (
     <Dialog
       open={isOpen}
       onClose={() => {
-        setIsOpenConfirm(true);
+        if (!isUploading) setIsOpenConfirm(true);
       }}
       maxWidth="md"
       fullWidth
@@ -46,8 +56,12 @@ const FilePreviewDialog = ({
           Cancel
         </Button>
 
-        <Button onClick={onConfirm} variant="contained">
-          Upload
+        <Button
+          onClick={handleUpload}
+          variant="contained"
+          disabled={isUploading}
+        >
+          {isUploading ? <CircularProgress size={20} /> : "Upload"}
         </Button>
       </Stack>
       <ConfirmDialog
