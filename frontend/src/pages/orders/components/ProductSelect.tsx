@@ -9,9 +9,11 @@ import { searchProducts } from "@/services/product";
 const ProductSelect = ({
   selectedProduct,
   setSelectedProduct,
+  excludedProductIds,
 }: Readonly<{
   selectedProduct: Product | undefined;
   setSelectedProduct: Dispatch<SetStateAction<Product | undefined>>;
+  excludedProductIds: string[];
 }>): ReactElement => {
   const [products, setProducts] = useState<Product[]>([]);
 
@@ -19,6 +21,10 @@ const ProductSelect = ({
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const filteredProducts = products.filter(
+    (p) => !excludedProductIds.includes(p.productId)
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -49,7 +55,7 @@ const ProductSelect = ({
 
   return (
     <Autocomplete
-      options={products}
+    options={filteredProducts}
       loading={isLoading}
       value={selectedProduct ?? null}
       onChange={(_, newValue) => setSelectedProduct(newValue ?? undefined)}

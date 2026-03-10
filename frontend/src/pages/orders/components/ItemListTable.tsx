@@ -143,6 +143,7 @@ const ItemListTable = ({
                 <ProductSelect
                   selectedProduct={selectedProduct}
                   setSelectedProduct={setSelectedProduct}
+                  excludedProductIds={selectedItems.map((i) => i.product.productId)}
                 />
               </TableCell>
 
