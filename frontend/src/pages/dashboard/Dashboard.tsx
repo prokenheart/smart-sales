@@ -33,6 +33,11 @@ type DashboardState = {
   topProductRevenue: ChartData[];
 };
 
+const formatters = {
+  currency: (value: number | string) => `$${Number(value)}`,
+  number: (value: number | string) => String(value),
+};
+
 const Dashboard = (): ReactElement => {
   const [dashboard, setDashboard] = useState<DashboardState>({
     totalOrders: {
@@ -117,23 +122,38 @@ const Dashboard = (): ReactElement => {
         <Stack direction={"row"} spacing={2}>
           <CustomCard
             title="Today Revenue"
-            content={"$" + dashboard.revenue.today}
-            chart={<CustomLineChart data={dashboard.revenue.summary} />}
+            content={formatters.currency(dashboard.revenue.today)}
+            chart={
+              <CustomLineChart
+                data={dashboard.revenue.summary}
+                yAxisFormatter={formatters.currency}
+              />
+            }
           />
           <CustomCard
             title="This Month Revenue"
-            content={"$" + dashboard.monthlyRevenue.thisMonth}
-            chart={<CustomLineChart data={dashboard.monthlyRevenue.summary} />}
+            content={formatters.currency(dashboard.monthlyRevenue.thisMonth)}
+            chart={
+              <CustomLineChart
+                data={dashboard.monthlyRevenue.summary}
+                yAxisFormatter={formatters.currency}
+              />
+            }
           />
         </Stack>
         <Stack direction={"row"} spacing={2}>
           <CustomCard
             title="New Orders"
-            content={dashboard.totalOrders.today.toString()}
-            chart={<CustomLineChart data={dashboard.totalOrders.summary} />}
+            content={formatters.number(dashboard.totalOrders.today)}
+            chart={
+              <CustomLineChart
+                data={dashboard.totalOrders.summary}
+                yAxisFormatter={formatters.number}
+              />
+            }
           />
           <CustomCard
-            title="Top Product Revenue"
+            title="Top Products by Revenue (Last 7 Days)"
             chart={<CustomBarChart data={dashboard.topProductRevenue} />}
             chartHeight={140}
           />
