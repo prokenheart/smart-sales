@@ -257,6 +257,12 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /orders/{order_id}/attachment
             Method: PUT
+        GetDashboardSummary:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /orders/summary
+            Method: GET
         GetItem:
           Type: Api
           Properties:

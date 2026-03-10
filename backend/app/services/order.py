@@ -3,9 +3,28 @@ from sqlalchemy import select, exists, func, and_, or_
 from sqlalchemy.sql import Select
 from app.models import Order, User, Customer, Status
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.core.logger import logger
-from app.schemas.order import OrderFilterQuery, OrderPaginationResponse
+from app.schemas.order import (
+    OrderFilterQuery,
+    OrderPaginationResponse,
+    TotalOrdersSummaryResponse,
+    RevenueSummaryResponse,
+    MonthlyRevenueSummaryResponse,
+)
+from dateutil.relativedelta import relativedelta
+from enum import Enum
+
+DAYS_RANGE = 6
+MONTH_RANGE = 11
+FIRST_DAY_OF_MONTH = 1
+
+
+class OrderStatus(Enum):
+    PENDING = "PENDING"
+    PAID = "PAID"
+    DELIVERED = "DELIVERED"
+    CANCELLED = "CANCELLED"
 
 
 class NotFoundError(Exception):
@@ -53,17 +72,17 @@ def _apply_filters(stmt: Select, db: Session, query: OrderFilterQuery) -> Select
     if query.search:
         stmt = (
             stmt.join(Order.customer)
-                .join(Order.user)
-                .join(Order.status)
-                .where(
-                    or_(
-                        Customer.customer_name.ilike(f"%{query.search}%"),
-                        Customer.customer_phone.ilike(f"%{query.search}%"),
-                        Customer.customer_email.ilike(f"%{query.search}%"),
-                        User.user_name.ilike(f"%{query.search}%"),
-                        Status.status_code.ilike(f"%{query.search}%")
-                    )
+            .join(Order.user)
+            .join(Order.status)
+            .where(
+                or_(
+                    Customer.customer_name.ilike(f"%{query.search}%"),
+                    Customer.customer_phone.ilike(f"%{query.search}%"),
+                    Customer.customer_email.ilike(f"%{query.search}%"),
+                    User.user_name.ilike(f"%{query.search}%"),
+                    Status.status_code.ilike(f"%{query.search}%"),
                 )
+            )
         )
 
     return stmt
@@ -192,7 +211,7 @@ def get_orders(
         next_cursor_id=next_cursor_id,
         total_pages=total_pages,
         total_orders=total_count,
-        orders_per_page=LIMIT
+        orders_per_page=LIMIT,
     )
 
     return order_pagination_response
@@ -297,3 +316,96 @@ def update_order_attachment_url(
     db.commit()
     db.refresh(order)
     return order
+
+
+def get_total_orders_in_7_days(db: Session) -> list[TotalOrdersSummaryResponse]:
+    today = datetime.now().date()
+    seven_days_ago = today - timedelta(days=DAYS_RANGE)
+
+    results = (
+        db.query(
+            func.date(Order.order_date).label("key"),
+            func.count(Order.order_id).label("total"),
+        )
+        .filter(
+            Order.order_date >= seven_days_ago,
+            Order.status.has(Status.status_code != OrderStatus.CANCELLED.value),
+        )
+        .group_by(func.date(Order.order_date))
+        .all()
+    )
+
+    data_map = {row.key: row.total for row in results}
+
+    final_result = []
+    for i in range(DAYS_RANGE + 1):
+        day = seven_days_ago + timedelta(days=i)
+        final_result.append(
+            TotalOrdersSummaryResponse(key=day, total=data_map.get(day, 0))
+        )
+
+    return final_result
+
+
+def get_total_revenue_in_7_days(db: Session) -> list[RevenueSummaryResponse]:
+    today = datetime.now().date()
+    seven_days_ago = today - timedelta(days=DAYS_RANGE)
+
+    results = (
+        db.query(
+            func.date(Order.order_date).label("key"),
+            func.sum(Order.order_total).label("total"),
+        )
+        .filter(
+            Order.order_date >= seven_days_ago,
+            Order.status.has(Status.status_code != OrderStatus.CANCELLED.value),
+        )
+        .group_by(func.date(Order.order_date))
+        .all()
+    )
+
+    data_map = {row.key: row.total for row in results}
+
+    final_result = []
+    for i in range(DAYS_RANGE + 1):
+        day = seven_days_ago + timedelta(days=i)
+        final_result.append(RevenueSummaryResponse(key=day, total=data_map.get(day, 0)))
+
+    return final_result
+
+
+def get_total_revenue_in_12_months(db: Session) -> list[MonthlyRevenueSummaryResponse]:
+    today = datetime.now().date()
+    start_month = (today - relativedelta(months=MONTH_RANGE)).replace(day=1)
+
+    month_trunc = func.date_trunc("month", Order.order_date)
+
+    results = (
+        db.query(
+            month_trunc.label("key"),
+            func.sum(Order.order_total).label("total"),
+        )
+        .filter(
+            Order.order_date >= start_month,
+            Order.status.has(Status.status_code != OrderStatus.CANCELLED.value),
+        )
+        .group_by(month_trunc)
+        .all()
+    )
+
+    data_map = {
+        row.key.date().replace(day=FIRST_DAY_OF_MONTH): row.total for row in results
+    }
+
+    final_result = []
+    for i in range(MONTH_RANGE + 1):
+        month_date = start_month + relativedelta(months=i)
+
+        final_result.append(
+            MonthlyRevenueSummaryResponse(
+                key=month_date.strftime("%Y-%m"),
+                total=data_map.get(month_date, 0),
+            )
+        )
+
+    return final_result

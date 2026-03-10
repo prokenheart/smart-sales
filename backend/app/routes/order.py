@@ -9,6 +9,7 @@ from app.handlers.order import (
     create_order_attachment_get_url_handler,
     delete_order_attachment_handler,
     confirm_order_attachment_handler,
+    get_dashboard_summary_handler,
 )
 
 router = Router()
@@ -62,3 +63,8 @@ def delete_file(order_id: str):
 def confirm_attachment(order_id: str):
     body = router.current_event.json_body
     return confirm_order_attachment_handler(order_id, body)
+
+
+@router.get("/orders/summary")
+def get_dashboard_summary():
+    return get_dashboard_summary_handler()

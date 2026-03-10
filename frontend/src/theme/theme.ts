@@ -2,7 +2,7 @@ import { createTheme } from "@mui/material/styles";
 
 export const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
 
     // Primary = CTA (Add Order, Active pagination)
     primary: {
@@ -12,17 +12,17 @@ export const theme = createTheme({
 
     // Secondary = UI phụ
     secondary: {
-      main: "#676f9d",
+      main: "#2d3250",
       contrastText: "#ffffff",
     },
 
     background: {
-      default: "#424769",
+      default: "#f4f5f7",
       paper: "#ffffff", // card, table
     },
 
     text: {
-      primary: "#ffffff",
+      primary: "#2d3250",
       secondary: "#676f9d",
     },
 
@@ -63,12 +63,14 @@ export const theme = createTheme({
     },
 
     // ===== TABLE =====
+
+
     MuiTableHead: {
       styleOverrides: {
         root: {
-          backgroundColor: "#676f9d",
           "& .MuiTableCell-head": {
-            color: "#ffffff",
+            color: "#2d3250",
+            backgroundColor: "#f4f5f7",
             fontWeight: 600,
           },
         },

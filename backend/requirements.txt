@@ -10,3 +10,4 @@ pytest
 boto3
 requests_toolbelt
 aws-xray-sdk
+python-dateutil

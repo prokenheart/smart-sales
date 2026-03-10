@@ -13,6 +13,7 @@
     "paths": {
       "@/*": ["src/*"],
       "@orders/*": ["src/pages/orders/*"],
+      "@dashboard/*": ["src/pages/dashboard/*"],
       "@services/*": ["src/services/*"],
       "@components/*": ["src/components/*"],
     },

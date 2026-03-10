@@ -133,3 +133,25 @@ class OrderFilterQuery(CamelCaseModel):
             )
 
         return self
+
+class TotalOrdersSummaryResponse(CamelCaseModel):
+    key: date
+    total: int
+
+class RevenueSummaryResponse(CamelCaseModel):
+    key: date
+    total: float
+
+class MonthlyRevenueSummaryResponse(CamelCaseModel):
+    key: str
+    total: float
+
+class TopProductSummaryResponse(CamelCaseModel):
+    key: str
+    total: float
+
+class DashboardSummaryResponse(CamelCaseModel):
+    total_orders: list[TotalOrdersSummaryResponse]
+    total_revenue: list[RevenueSummaryResponse]
+    monthly_revenue: list[MonthlyRevenueSummaryResponse]
+    top_products: list[TopProductSummaryResponse]
