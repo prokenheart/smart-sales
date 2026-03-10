@@ -15,6 +15,7 @@ import {
 import { useState, Fragment, useEffect } from "react";
 import type { ReactElement, Dispatch, SetStateAction } from "react";
 import { HttpStatusCode } from "axios";
+import { useSnackbar } from "notistack";
 
 import OrderForm from "@orders/components/OrderForm";
 import AttachmentPreviewButton from "@orders/components/AttachmentPreviewButton";
@@ -80,6 +81,8 @@ const OrdersTable = ({
   const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string>();
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const handleCancelOrder = async (orderId: string) => {
     try {
       const res = await updateOrderStatus(orderId, OrderStatus.Cancelled);
@@ -97,6 +100,7 @@ const OrdersTable = ({
               : order
           )
         );
+        enqueueSnackbar("Order cancelled successfully", { variant: "success" });
       }
     } catch (error) {
       console.error("Cancel Order Failed: ", error);
@@ -175,6 +179,7 @@ const OrdersTable = ({
       };
 
       setUpdatedOrder(attachmentUpdatedOrder);
+      enqueueSnackbar("Attachment uploaded successfully", { variant: "success" });
       setFile(null);
       setIsOpenPreviewDialog(false);
       setPreviewPickedFileSrc(undefined);
@@ -190,6 +195,7 @@ const OrdersTable = ({
         prev.map((o) => (o.orderId === updatedOrder.orderId ? updatedOrder : o))
       );
       setUpdatedOrder(undefined);
+      enqueueSnackbar("Order updated successfully", { variant: "success" });
     }
   }, [updatedOrder]);
 

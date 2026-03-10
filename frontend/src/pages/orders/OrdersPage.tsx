@@ -1,5 +1,6 @@
 import { Button, Typography, Stack } from "@mui/material";
 import { useEffect, useState, type ReactElement } from "react";
+import { useSnackbar } from "notistack";
 
 import OrdersTable from "@orders/components/OrdersTable";
 import OrdersPagination from "@orders/components/OrdersPagination";
@@ -43,6 +44,8 @@ const OrdersPage = (): ReactElement => {
   const [search, setSearch] = useState<string>("");
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleCreateOrder = () => {
     setIsOpenForm(true);
@@ -104,8 +107,13 @@ const OrdersPage = (): ReactElement => {
     if (shouldRefreshOrder) {
       setIsOpenForm(false);
       setShouldRefreshOrder(false);
-      if (currentPage === 1) fetchOrders();
-      else setCurrentPage(1);
+      enqueueSnackbar("Order added successfully", { variant: "success" });
+
+      if (currentPage === 1) {
+        fetchOrders();
+      } else {
+        setCurrentPage(1);
+      }
     }
   }, [shouldRefreshOrder]);
 
