@@ -28,15 +28,15 @@ import { OrderStatus } from "@orders/types/status";
 
 import ConfirmDialog from "@components/ConfirmDialog";
 
-import { updateOrderStatus } from "@services/order";
-
-import FilePicker from "@orders/components/FilePicker";
-import FilePreviewDialog from "@orders/components/FilePreviewDialog";
 import {
+  updateOrderStatus,
   createUploadAttachmentURL,
   uploadAttachment,
   updateAttachmentLink,
-} from "../../../services/order";
+} from "@services/order";
+
+import FilePicker from "@orders/components/FilePicker";
+import FilePreviewDialog from "@orders/components/FilePreviewDialog";
 
 function getStatusColor(statusCode: string): string {
   switch (statusCode) {
@@ -179,7 +179,9 @@ const OrdersTable = ({
       };
 
       setUpdatedOrder(attachmentUpdatedOrder);
-      enqueueSnackbar("Attachment uploaded successfully", { variant: "success" });
+      enqueueSnackbar("Attachment uploaded successfully", {
+        variant: "success",
+      });
       setFile(null);
       setIsOpenPreviewDialog(false);
       setPreviewPickedFileSrc(undefined);
