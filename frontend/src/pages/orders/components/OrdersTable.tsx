@@ -406,6 +406,7 @@ const OrdersTable = ({
                                   e.stopPropagation();
                                   setIsOpenOrderForm(true);
                                 }}
+                                disabled={isDisabled}
                               >
                                 Update
                               </Button>
