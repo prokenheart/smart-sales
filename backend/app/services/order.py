@@ -72,16 +72,15 @@ def _apply_filters(stmt: Select, db: Session, query: OrderFilterQuery) -> Select
     if query.search:
         stmt = (
             stmt.join(Order.customer)
-                .join(Order.user)
-                .join(Order.status)
-                .where(
-                    or_(
-                        Customer.customer_name.ilike(f"%{query.search}%"),
-                        Customer.customer_phone.ilike(f"%{query.search}%"),
-                        Customer.customer_email.ilike(f"%{query.search}%"),
-                        User.user_name.ilike(f"%{query.search}%"),
-                        Status.status_code.ilike(f"%{query.search}%")
-                    )
+            .join(Order.user)
+            .join(Order.status)
+            .where(
+                or_(
+                    Customer.customer_name.ilike(f"%{query.search}%"),
+                    Customer.customer_phone.ilike(f"%{query.search}%"),
+                    Customer.customer_email.ilike(f"%{query.search}%"),
+                    User.user_name.ilike(f"%{query.search}%"),
+                    Status.status_code.ilike(f"%{query.search}%"),
                 )
             )
         )
