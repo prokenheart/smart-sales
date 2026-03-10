@@ -121,6 +121,7 @@ const OrdersTable = ({
   const [file, setFile] = useState<File | null>(null);
   const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
   const [previewPickedFileSrc, setPreviewPickedFileSrc] = useState<string>();
+  const [previewFileType, setPreviewFileType] = useState<string>();
 
   const handleSelect = (file: File, order: Order) => {
     setUploadOrder(order);
@@ -129,6 +130,7 @@ const OrdersTable = ({
     if (file) {
       const url = URL.createObjectURL(file);
       setPreviewPickedFileSrc(url);
+      setPreviewFileType(file.type);
     }
   };
 
@@ -136,6 +138,7 @@ const OrdersTable = ({
     setFile(null);
     setIsOpenPreviewDialog(false);
     setPreviewPickedFileSrc(undefined);
+    setPreviewFileType(undefined);
   };
 
   const handleCreateUploadURL = async (order: Order) => {
@@ -476,6 +479,7 @@ const OrdersTable = ({
         <FilePreviewDialog
           isOpen={isOpenPreviewDialog}
           previewPickedFileSrc={previewPickedFileSrc}
+          isPdf={previewFileType === "application/pdf"}
           onCancel={handleCancelUpload}
           onConfirm={() => handleUpload(uploadOrder)}
         />

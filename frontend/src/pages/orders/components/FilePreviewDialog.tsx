@@ -5,11 +5,13 @@ import ConfirmDialog from "@components/ConfirmDialog";
 const FilePreviewDialog = ({
   isOpen,
   previewPickedFileSrc,
+  isPdf,
   onCancel,
   onConfirm,
 }: Readonly<{
   isOpen: boolean;
   previewPickedFileSrc: string;
+  isPdf: boolean;
   onCancel: () => void;
   onConfirm: () => Promise<void>;
 }>): ReactElement => {
@@ -35,15 +37,27 @@ const FilePreviewDialog = ({
       fullWidth
     >
       <Box mt={2}>
-        <img
-          src={previewPickedFileSrc}
-          alt="preview"
-          style={{
-            width: "100%",
-            height: "400px",
-            objectFit: "contain",
-          }}
-        />
+        {isPdf ? (
+          <iframe
+            src={previewPickedFileSrc}
+            title="PDF preview"
+            style={{
+              width: "100%",
+              height: "400px",
+              border: "none",
+            }}
+          />
+        ) : (
+          <img
+            src={previewPickedFileSrc}
+            alt="preview"
+            style={{
+              width: "100%",
+              height: "400px",
+              objectFit: "contain",
+            }}
+          />
+        )}
       </Box>
       <Stack
         direction={"row"}

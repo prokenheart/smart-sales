@@ -17,18 +17,35 @@ const AttachmentPreviewDialog = ({
     setViewURL(null);
   };
 
+  const isPdf = viewURL
+    ? new URL(viewURL).pathname.toLowerCase().endsWith(".pdf")
+    : false;
+
   return (
-    <Dialog open={isOpen} onClose={handleClose}>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogContent>
-        <img
-          src={viewURL ?? ""}
-          alt="Preview"
-          style={{
-            width: "100%",
-            height: "400px",
-            objectFit: "contain",
-          }}
-        />
+        {viewURL &&
+          (isPdf ? (
+            <iframe
+              src={viewURL}
+              title="PDF Preview"
+              style={{
+                width: "100%",
+                height: "500px",
+                border: "none",
+              }}
+            />
+          ) : (
+            <img
+              src={viewURL}
+              alt="Preview"
+              style={{
+                width: "100%",
+                height: "400px",
+                objectFit: "contain",
+              }}
+            />
+          ))}
       </DialogContent>
     </Dialog>
   );
