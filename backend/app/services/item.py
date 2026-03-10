@@ -9,6 +9,9 @@ from decimal import Decimal
 from dataclasses import dataclass
 from enum import Enum
 
+DAYS_RANGE = 6
+NUMBER_OF_PRODUCTS = 5
+
 
 class OrderStatus(Enum):
     PENDING = "PENDING"
@@ -174,10 +177,6 @@ def increase_product_quantity(product: Product, amount: int) -> None:
         raise ValueError("Amount must be greater than 0")
 
     product.product_quantity += amount
-
-
-DAYS_RANGE = 6
-NUMBER_OF_PRODUCTS = 5
 
 
 def get_top_product_summary(db: Session) -> TopProductSummaryResponse:
