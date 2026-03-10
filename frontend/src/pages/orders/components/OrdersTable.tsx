@@ -381,20 +381,6 @@ const OrdersTable = ({
                                 </Typography>{" "}
                                 {order.status.statusCode}
                               </Typography>
-
-                              <Typography variant="body2">
-                                <Typography
-                                  variant="body2"
-                                  component="span"
-                                  sx={{ fontWeight: 600 }}
-                                >
-                                  Attachment:
-                                </Typography>{" "}
-                                <FilePicker
-                                  onSelect={handleSelect}
-                                  order={order}
-                                />
-                              </Typography>
                             </Box>
                           </Stack>
 
@@ -433,6 +419,11 @@ const OrdersTable = ({
                               >
                                 Cancel
                               </Button>
+                              <FilePicker
+                                onSelect={handleSelect}
+                                order={order}
+                                isDisabled={isDisabled}
+                              />
                             </Stack>
                           </Box>
                         </Box>
