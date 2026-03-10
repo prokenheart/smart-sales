@@ -42,6 +42,8 @@ const OrdersPage = (): ReactElement => {
 
   const [search, setSearch] = useState<string>("");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleCreateOrder = () => {
     setIsOpenForm(true);
   };
@@ -81,15 +83,21 @@ const OrdersPage = (): ReactElement => {
       direction: null,
     });
     setPage(null);
+    setIsLoading(false);
   };
 
   useEffect(() => {
+    setIsLoading(true);
     fetchOrders();
   }, [currentPage]);
 
   useEffect(() => {
-    if (currentPage === 1) fetchOrders();
-    else setCurrentPage(1);
+    if (currentPage === 1) {
+      setIsLoading(true);
+      fetchOrders();
+    } else {
+      setCurrentPage(1);
+    }
   }, [search]);
 
   useEffect(() => {
@@ -119,7 +127,11 @@ const OrdersPage = (): ReactElement => {
         </Stack>
 
         <OrderRefreshContext.Provider value={{ setShouldRefreshOrder }}>
-          <OrderForm isOpen={isOpenForm} setIsOpen={setIsOpenForm} mode="create" />
+          <OrderForm
+            isOpen={isOpenForm}
+            setIsOpen={setIsOpenForm}
+            mode="create"
+          />
         </OrderRefreshContext.Provider>
       </Stack>
       <Stack spacing={2}>
@@ -129,6 +141,7 @@ const OrdersPage = (): ReactElement => {
           currentPage={currentPage}
           ordersPerPage={ordersPerPage}
           setOrders={setOrders}
+          isLoading={isLoading}
         />
         <OrdersPagination
           currentPage={currentPage}
@@ -137,6 +150,7 @@ const OrdersPage = (): ReactElement => {
           cursorResponse={cursorResponse}
           setCursorState={setCursorState}
           setCurrentPage={setCurrentPage}
+          isLoading={isLoading}
         />
       </Stack>
     </>
