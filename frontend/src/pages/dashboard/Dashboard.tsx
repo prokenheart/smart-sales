@@ -59,7 +59,7 @@ const Dashboard = (): ReactElement => {
     data.map((item) => {
       const date = new Date(item.key);
       return {
-        key: `${date.getDate()}/${date.getMonth() + 1}`,
+        key: `${date.getDate()}-${date.toLocaleString("en-US", { month: "short" })}`,
         value: item.total,
       };
     });
