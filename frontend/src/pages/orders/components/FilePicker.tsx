@@ -23,6 +23,7 @@ const FilePicker = ({ isDisabled, onSelect, order }: FilePickerProps) => {
     }
 
     onSelect(file, order);
+    e.target.value = "";
   };
 
   return (
