@@ -419,7 +419,7 @@ const OrdersTable = ({
                                 }}
                                 disabled={isDisabled}
                               >
-                                Cancel
+                                Cancel Order
                               </Button>
                               <FilePicker
                                 onSelect={handleSelect}

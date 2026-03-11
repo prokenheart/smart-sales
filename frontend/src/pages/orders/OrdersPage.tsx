@@ -107,7 +107,7 @@ const OrdersPage = (): ReactElement => {
     if (shouldRefreshOrder) {
       setIsOpenForm(false);
       setShouldRefreshOrder(false);
-      enqueueSnackbar("Order added successfully", { variant: "success" });
+      enqueueSnackbar("Order created successfully", { variant: "success" });
 
       if (currentPage === 1) {
         fetchOrders();
@@ -130,7 +130,7 @@ const OrdersPage = (): ReactElement => {
         <Stack direction="row" spacing={2} alignItems="center">
           <SearchBox value={search} onChange={setSearch} delay={500} />
           <Button variant="contained" onClick={handleCreateOrder}>
-            Add Order
+            Create Order
           </Button>
         </Stack>
 
