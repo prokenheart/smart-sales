@@ -2,6 +2,7 @@ import { Button, CircularProgress } from "@mui/material";
 import { useContext, useState } from "react";
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 import { HttpStatusCode } from "axios";
+import { useSnackbar } from "notistack";
 
 import { UpdateTableContext } from "@orders/context/UpdateTableContext";
 
@@ -23,6 +24,8 @@ const UpdateOrderButton = ({
 }>): ReactElement => {
   const updateTable = useContext(UpdateTableContext);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const calcOrderTotal = (items: Item[]): number => {
     return items.reduce((sum, item) => {
@@ -58,6 +61,7 @@ const UpdateOrderButton = ({
       console.error("UPDATE FAILED", error);
     } finally {
       setIsLoading(false);
+      enqueueSnackbar("Order updated successfully", { variant: "success" });
     }
   };
 

@@ -200,7 +200,6 @@ const OrdersTable = ({
         prev.map((o) => (o.orderId === updatedOrder.orderId ? updatedOrder : o))
       );
       setUpdatedOrder(undefined);
-      enqueueSnackbar("Order updated successfully", { variant: "success" });
     }
   }, [updatedOrder]);
 
