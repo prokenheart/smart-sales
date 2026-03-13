@@ -15,7 +15,7 @@ export const CustomBarChart = ({
   const top5 = data.slice(0, 5);
 
   const getYAxisWidth = (data: { key: string }[]) => {
-    const maxLength = Math.max(...data.map((d) => d.key.length));
+    const maxLength = Math.max(...data.map((d) => d.key.length),0);
     return maxLength * CHAR_PIXEL_WIDTH + Y_AXIS_PADDING;
   };
 
