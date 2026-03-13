@@ -31,9 +31,6 @@ Globals:
     Timeout: 25
     LoggingConfig:
       LogFormat: JSON
-  Api:
-    Auth:
-      DefaultAuthorizer: NONE
 
 
 Resources:
@@ -42,9 +39,17 @@ Resources:
     Properties:
       StageName: Prod
       Cors:
-        AllowMethods: "'GET,POST,PUT,PATCH,DELETE'"
+        AllowMethods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
         AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: arn:aws:cognito-idp:ap-southeast-2:375065980285:userpool/ap-southeast-2_vziGmPF2e
+            Identity:
+              Header: Authorization
   SmartSalesFunction:
     Type: AWS::Serverless::Function 
     Properties:
@@ -179,12 +184,20 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /users/{user_id}
             Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - api/read
         GetAllUsers:
           Type: Api
           Properties:
             RestApiId: !Ref MyApi
             Path: /users
-            Method: GET     
+            Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - api/read
         UpdateUserInfo:
           Type: Api
           Properties:
@@ -209,6 +222,10 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /orders
             Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - api/write
         GetOrder:
           Type: Api
           Properties:
@@ -220,7 +237,11 @@ Resources:
           Properties:
             RestApiId: !Ref MyApi
             Path: /orders
-            Method: GET     
+            Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - api/read
         UpdateOrderStatus:
           Type: Api
           Properties:
@@ -263,6 +284,10 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /orders/summary
             Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - api/read
         GetItem:
           Type: Api
           Properties:
