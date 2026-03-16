@@ -1,13 +1,40 @@
 import { createTheme } from "@mui/material/styles";
 
-const COLORS = {
+type ColorPalette = {
+  mode: "light" | "dark";
+
+  primary: string;
+  primaryContrast: string;
+  primaryHover: string;
+
+  secondary: string;
+  secondaryContrast: string;
+
+  accent: string;
+  accentContrast: string;
+  accentHover: string;
+
+  background: string;
+  surface: string;
+
+  tableHeadBackground: string;
+  tableRowHover: string;
+
+  textPrimary: string;
+  textSecondary: string;
+
+  collapseBackground: string;
+};
+
+export const lightColors: ColorPalette = {
+  mode: "light",
+
   primary: "#f9b17a",
   primaryContrast: "#2d3250",
   primaryHover: "#e9a66f",
 
   secondary: "#2d3250",
   secondaryContrast: "#ffffff",
-  secondaryHover: "#1f2436",
 
   accent: "#676f9d",
   accentContrast: "#ffffff",
@@ -21,138 +48,187 @@ const COLORS = {
 
   textPrimary: "#2d3250",
   textSecondary: "#676f9d",
+
+  collapseBackground: "#fafafb",
 };
 
-export const theme = createTheme({
-  palette: {
-    mode: "light",
+export const darkColors: ColorPalette = {
+  mode: "dark",
 
-    // Primary = CTA (Add Order, Active pagination)
-    primary: {
-      main: COLORS.primary,
-      contrastText: COLORS.primaryContrast,
-    },
+  primary: "#f9b17a",
+  primaryContrast: "#1a1a2e",
+  primaryHover: "#f7a766",
 
-    // Secondary
-    secondary: {
-      main: COLORS.secondary,
-      contrastText: COLORS.secondaryContrast,
-    },
+  secondary: "#424769",
+  secondaryContrast: "#ffffff",
 
-    background: {
-      default: COLORS.background,
-      paper: COLORS.surface, // card, table
-    },
+  accent: "#7a83b4",
+  accentContrast: "#ffffff",
+  accentHover: "#8f97c4",
 
-    text: {
-      primary: COLORS.textPrimary,
-      secondary: COLORS.textSecondary,
-    },
-  },
+  background: "#16171f",
+  surface: "#23253a",
 
-  shape: {
-    borderRadius: 12,
-  },
+  tableHeadBackground: "#2c2f4a",
+  tableRowHover: "#34375a",
 
-  components: {
-    // ===== BUTTON =====
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: "none",
-          fontWeight: 600,
-          borderRadius: 10,
-        },
-        containedPrimary: {
-          backgroundColor: COLORS.primary,
-          color: COLORS.primaryContrast,
-          "&:hover": {
-            backgroundColor: COLORS.primaryHover,
-          },
-        },
-        containedSecondary: {
-          backgroundColor: COLORS.accent,
-          color: COLORS.accentContrast,
-          "&:hover": {
-            backgroundColor: COLORS.accentHover,
-          },
-        },
+  textPrimary: "#ffffff",
+  textSecondary: "#b8bddf",
+
+  collapseBackground: "#2a2d45",
+};
+
+export const createAppTheme = (COLORS: ColorPalette) =>
+  createTheme({
+    palette: {
+      mode: COLORS.mode,
+
+      // Primary = CTA (Add Order, Active pagination)
+      primary: {
+        main: COLORS.primary,
+        contrastText: COLORS.primaryContrast,
+      },
+
+      // Secondary
+      secondary: {
+        main: COLORS.secondary,
+        contrastText: COLORS.secondaryContrast,
+      },
+
+      background: {
+        default: COLORS.background,
+        paper: COLORS.surface, // card, table
+      },
+
+      text: {
+        primary: COLORS.textPrimary,
+        secondary: COLORS.textSecondary,
       },
     },
 
-    // ===== TABLE =====
+    shape: {
+      borderRadius: 12,
+    },
 
-    MuiTableHead: {
-      styleOverrides: {
-        root: {
-          "& .MuiTableCell-head": {
-            color: COLORS.textPrimary,
-            backgroundColor: COLORS.tableHeadBackground,
+    components: {
+      // ===== BUTTON =====
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: "none",
             fontWeight: 600,
+            borderRadius: 10,
+          },
+          containedPrimary: {
+            backgroundColor: COLORS.primary,
+            color: COLORS.primaryContrast,
+            "&:hover": {
+              backgroundColor: COLORS.primaryHover,
+            },
+          },
+          containedSecondary: {
+            backgroundColor: COLORS.accent,
+            color: COLORS.accentContrast,
+            "&:hover": {
+              backgroundColor: COLORS.accentHover,
+            },
+          },
+        },
+      },
+
+      // ===== TABLE =====
+
+      MuiTableHead: {
+        styleOverrides: {
+          root: {
+            "& .MuiTableCell-head": {
+              color: COLORS.textPrimary,
+              backgroundColor: COLORS.tableHeadBackground,
+              fontWeight: 600,
+            },
+          },
+        },
+      },
+
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            backgroundColor: COLORS.surface,
+            "&.MuiTableRow-hover:hover": {
+              backgroundColor: COLORS.tableRowHover,
+            },
+          },
+        },
+      },
+
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            color: COLORS.textPrimary,
+          },
+        },
+      },
+
+      MuiTableFooter: {
+        styleOverrides: {
+          root: {
+            "& .MuiTableCell-root": {
+              backgroundColor: COLORS.tableHeadBackground,
+              color: COLORS.textPrimary,
+              fontWeight: 600,
+            },
+          },
+        },
+      },
+
+      MuiCollapse: {
+        styleOverrides: {
+          wrapperInner: {
+            backgroundColor: COLORS.collapseBackground,
+          },
+        },
+      },
+
+      // ===== INPUT / SEARCH =====
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            backgroundColor: COLORS.surface,
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: COLORS.accent,
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: COLORS.primary,
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: COLORS.primary,
+            },
+          },
+          input: {
+            color: COLORS.textPrimary,
+            "&::placeholder": {
+              color: COLORS.textSecondary,
+              opacity: 0.7,
+            },
+          },
+        },
+      },
+
+      // ===== Autocomplete =====
+
+      MuiAutocomplete: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: COLORS.surface,
+            color: COLORS.textPrimary,
+          },
+          listbox: {
+            padding: 0,
+          },
+          option: {
+            color: COLORS.textPrimary,
           },
         },
       },
     },
-
-    MuiTableRow: {
-      styleOverrides: {
-        root: {
-          backgroundColor: COLORS.surface,
-          "&.MuiTableRow-hover:hover": {
-            backgroundColor: COLORS.tableRowHover,
-          },
-        },
-      },
-    },
-
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          color: COLORS.textPrimary,
-        },
-      },
-    },
-
-    // ===== INPUT / SEARCH =====
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          backgroundColor: COLORS.surface,
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: COLORS.accent,
-          },
-          "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: COLORS.primary,
-          },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: COLORS.primary,
-          },
-        },
-        input: {
-          color: COLORS.textPrimary,
-          "&::placeholder": {
-            color: COLORS.textSecondary,
-            opacity: 0.7,
-          },
-        },
-      },
-    },
-
-    // ===== Autocomplete =====
-
-    MuiAutocomplete: {
-      styleOverrides: {
-        paper: {
-          backgroundColor: COLORS.surface,
-          color: COLORS.textPrimary,
-        },
-        listbox: {
-          padding: 0,
-        },
-        option: {
-          color: COLORS.textPrimary,
-        },
-      },
-    },
-  },
-});
+  });

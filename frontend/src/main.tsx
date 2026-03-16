@@ -6,11 +6,11 @@ import { SnackbarProvider } from "notistack";
 
 import "@/index.css";
 import { router } from "@/router";
-import { theme } from "@/theme/theme";
+import { createAppTheme, lightColors, darkColors } from "@/theme/theme";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={createAppTheme(lightColors)}>
       <CssBaseline />
       <SnackbarProvider
         maxSnack={3}

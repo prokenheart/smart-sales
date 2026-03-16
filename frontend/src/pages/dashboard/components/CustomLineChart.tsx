@@ -35,7 +35,7 @@ export const CustomLineChart = ({
       <Line
         type="monotone"
         dataKey="value"
-        stroke={theme.palette.secondary.main}
+        stroke={theme.palette.primary.main}
         strokeWidth={2}
         dot={false}
       />

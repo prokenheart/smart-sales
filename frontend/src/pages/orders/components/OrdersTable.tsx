@@ -317,7 +317,7 @@ const OrdersTable = ({
                       }}
                     >
                       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                        <Box sx={{ p: 2, backgroundColor: "#fafafa" }}>
+                        <Box sx={{ p: 2 }}>
                           <Typography variant="h6" sx={{ mb: 2 }}>
                             Order Detail
                           </Typography>

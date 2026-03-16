@@ -32,12 +32,12 @@ const ConfirmDialog = ({
       }}
     >
       <DialogTitle>
-        <Typography variant="h6" sx={{ color: "primary.contrastText" }}>
+        <Typography variant="h6" sx={{ color: "text.primary" }}>
           {title}
         </Typography>
       </DialogTitle>
       <DialogContent>
-        <Typography variant="body2" sx={{ color: "primary.contrastText" }}>
+        <Typography variant="body2" sx={{ color: "text.primary" }}>
           {description}
         </Typography>
       </DialogContent>
