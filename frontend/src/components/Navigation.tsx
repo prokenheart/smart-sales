@@ -24,8 +24,8 @@ const Navigation = (): ReactElement => {
           width: drawerWidth,
           boxSizing: "border-box",
           p: 2,
-          backgroundColor: "sidebar.main",
-          color: "sidebar.contrastText",
+          backgroundColor: "secondary.main",
+          color: "secondary.contrastText",
           borderRight: "none",
         },
       }}
@@ -39,7 +39,6 @@ const Navigation = (): ReactElement => {
             selected={item.isActive(location.pathname)}
             sx={{
               borderRadius: 2,
-              color: "text.main",
               transition: "all 0.2s ease",
 
               "&:hover": {

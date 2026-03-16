@@ -90,7 +90,6 @@ const OrderForm = ({
             sx={{
               fontWeight: 600,
               fontSize: "20px",
-              color: "text.primary",
             }}
           >
             {mode === "create" ? "Create Order" : "Update Order"}
@@ -121,11 +120,10 @@ const OrderForm = ({
                       <Typography
                         variant="body2"
                         component="span"
-                        sx={{ fontWeight: 600, color: "text.primary" }}
+                        sx={{ fontWeight: 600 }}
                       >
                         Customer Name: {order?.customer.customerName}
                       </Typography>{" "}
-                      
                     </Typography>
                   )}
                 </Box>
@@ -134,11 +132,10 @@ const OrderForm = ({
                   <Typography
                     variant="body2"
                     component="span"
-                    sx={{ fontWeight: 600, color: "text.primary" }}
+                    sx={{ fontWeight: 600 }}
                   >
                     Total Order: {totalOrder}
                   </Typography>{" "}
-                  
                 </Typography>
               </Stack>
 

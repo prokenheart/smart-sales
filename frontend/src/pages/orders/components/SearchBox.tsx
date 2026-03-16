@@ -40,20 +40,13 @@ const SearchBox = ({
       slotProps={{
         input: {
           startAdornment: (
-            <InputAdornment
-              position="start"
-              sx={{ color: "primary.contrastText" }}
-            >
+            <InputAdornment position="start">
               <FaSearch size={14} />
             </InputAdornment>
           ),
           endAdornment: localValue ? (
             <InputAdornment position="end">
-              <IconButton
-                size="small"
-                onClick={() => setLocalValue("")}
-                sx={{ color: "primary.contrastText" }}
-              >
+              <IconButton size="small" onClick={() => setLocalValue("")}>
                 <MdCancel size={18} />
               </IconButton>
             </InputAdornment>

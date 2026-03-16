@@ -88,6 +88,7 @@ const OrdersPagination = ({
       <Button
         disabled={isLoading || !cursorResponse?.prev.cursorDate}
         onClick={() => handleCursorPagination(Direction.PREV)}
+        variant="text"
       >
         {"<"}
       </Button>
@@ -100,6 +101,7 @@ const OrdersPagination = ({
       <Button
         disabled={isLoading || !cursorResponse?.next.cursorDate}
         onClick={() => handleCursorPagination(Direction.NEXT)}
+        variant="text"
       >
         {">"}
       </Button>

@@ -1,35 +1,53 @@
 import { createTheme } from "@mui/material/styles";
 
+const COLORS = {
+  primary: "#f9b17a",
+  primaryContrast: "#2d3250",
+  primaryHover: "#e9a66f",
+
+  secondary: "#2d3250",
+  secondaryContrast: "#ffffff",
+  secondaryHover: "#1f2436",
+
+  accent: "#676f9d",
+  accentContrast: "#ffffff",
+  accentHover: "#5b6390",
+
+  background: "#f4f5f7",
+  surface: "#ffffff",
+
+  tableHeadBackground: "#eef0f3",
+  tableRowHover: "#ffe3cc",
+
+  textPrimary: "#2d3250",
+  textSecondary: "#676f9d",
+};
+
 export const theme = createTheme({
   palette: {
     mode: "light",
 
     // Primary = CTA (Add Order, Active pagination)
     primary: {
-      main: "#f9b17a",
-      contrastText: "#2d3250",
+      main: COLORS.primary,
+      contrastText: COLORS.primaryContrast,
     },
 
-    // Secondary = UI phụ
+    // Secondary
     secondary: {
-      main: "#2d3250",
-      contrastText: "#ffffff",
+      main: COLORS.secondary,
+      contrastText: COLORS.secondaryContrast,
     },
 
     background: {
-      default: "#f4f5f7",
-      paper: "#ffffff", // card, table
+      default: COLORS.background,
+      paper: COLORS.surface, // card, table
     },
 
     text: {
-      primary: "#2d3250",
-      secondary: "#676f9d",
+      primary: COLORS.textPrimary,
+      secondary: COLORS.textSecondary,
     },
-
-    sidebar: {
-      main: "#2d3250",
-      contrastText: "#ffffff",
-    } as any,
   },
 
   shape: {
@@ -46,17 +64,17 @@ export const theme = createTheme({
           borderRadius: 10,
         },
         containedPrimary: {
-          backgroundColor: "#f9b17a",
-          color: "#2d3250",
+          backgroundColor: COLORS.primary,
+          color: COLORS.primaryContrast,
           "&:hover": {
-            backgroundColor: "#e9a66f",
+            backgroundColor: COLORS.primaryHover,
           },
         },
         containedSecondary: {
-          backgroundColor: "#676f9d",
-          color: "#ffffff",
+          backgroundColor: COLORS.accent,
+          color: COLORS.accentContrast,
           "&:hover": {
-            backgroundColor: "#5b6390",
+            backgroundColor: COLORS.accentHover,
           },
         },
       },
@@ -64,13 +82,12 @@ export const theme = createTheme({
 
     // ===== TABLE =====
 
-
     MuiTableHead: {
       styleOverrides: {
         root: {
           "& .MuiTableCell-head": {
-            color: "#2d3250",
-            backgroundColor: "#f4f5f7",
+            color: COLORS.textPrimary,
+            backgroundColor: COLORS.tableHeadBackground,
             fontWeight: 600,
           },
         },
@@ -80,9 +97,9 @@ export const theme = createTheme({
     MuiTableRow: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffff",
+          backgroundColor: COLORS.surface,
           "&.MuiTableRow-hover:hover": {
-            backgroundColor: "#ffc79c",
+            backgroundColor: COLORS.tableRowHover,
           },
         },
       },
@@ -91,7 +108,7 @@ export const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          color: "#2d3250",
+          color: COLORS.textPrimary,
         },
       },
     },
@@ -100,63 +117,40 @@ export const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffff",
+          backgroundColor: COLORS.surface,
           "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#676f9d",
+            borderColor: COLORS.accent,
           },
           "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#f9b17a",
+            borderColor: COLORS.primary,
           },
           "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#f9b17a",
+            borderColor: COLORS.primary,
           },
         },
         input: {
-          color: "#2d3250",
+          color: COLORS.textPrimary,
           "&::placeholder": {
-            color: "#676f9d",
+            color: COLORS.textSecondary,
             opacity: 0.7,
           },
         },
       },
     },
 
-    // ===== PAGINATION =====
-    MuiPaginationItem: {
-      styleOverrides: {
-        root: {
-          color: "#ffffff",
-          backgroundColor: "#424769",
-          "&.Mui-selected": {
-            backgroundColor: "#f9b17a",
-            color: "#2d3250",
-            fontWeight: 600,
-          },
-          "&:hover": {
-            backgroundColor: "#676f9d",
-          },
-        },
-      },
-    },
+    // ===== Autocomplete =====
 
     MuiAutocomplete: {
       styleOverrides: {
         paper: {
-          backgroundColor: "#ffffff",
-          color: "#2d3250",
+          backgroundColor: COLORS.surface,
+          color: COLORS.textPrimary,
         },
         listbox: {
           padding: 0,
         },
         option: {
-          color: "#2d3250",
-          "&.Mui-focused": {
-            backgroundColor: "#ffc79c",
-          },
-          "&[aria-selected='true']": {
-            backgroundColor: "#f9b17a",
-            color: "#2d3250",
-          },
+          color: COLORS.textPrimary,
         },
       },
     },
