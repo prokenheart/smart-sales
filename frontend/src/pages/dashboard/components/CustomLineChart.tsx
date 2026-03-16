@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { LineChart, Tooltip, Line, XAxis, YAxis } from "recharts";
 import type { YAxisProps } from "recharts";
+import { useTheme } from "@mui/material/styles";
 
 type ChartData = {
   key: string;
@@ -17,6 +18,8 @@ export const CustomLineChart = ({
   data: ChartData[];
   yAxisFormatter: YAxisProps["tickFormatter"];
 }>): ReactElement => {
+  const theme = useTheme();
+
   const getYAxisWidth = (data: { value: number }[]) => {
     const maxLength = Math.max(...data.map((d) => d.value.toFixed(0).toString().length), 0);
     console.log("Max length of Y-axis labels:", maxLength*CHAR_PIXEL_WIDTH);
@@ -32,7 +35,7 @@ export const CustomLineChart = ({
       <Line
         type="monotone"
         dataKey="value"
-        stroke="#2d3250"
+        stroke={theme.palette.secondary.main}
         strokeWidth={2}
         dot={false}
       />

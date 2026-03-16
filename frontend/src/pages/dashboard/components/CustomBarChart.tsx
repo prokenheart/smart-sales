@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { useTheme } from "@mui/material/styles";
 
 type ChartData = {
   key: string;
@@ -12,6 +13,8 @@ const Y_AXIS_PADDING = 15;
 export const CustomBarChart = ({
   data,
 }: Readonly<{ data: ChartData[] }>): ReactElement => {
+  const theme = useTheme();
+
   const top5 = data.slice(0, 5);
 
   const getYAxisWidth = (data: { key: string }[]) => {
@@ -32,7 +35,7 @@ export const CustomBarChart = ({
         width={getYAxisWidth(data)}
       />
 
-      <Bar dataKey="value" fill="#f9b17a" />
+      <Bar dataKey="value" fill={theme.palette.primary.main} />
     </BarChart>
   );
 };
